@@ -172,7 +172,7 @@
   .flag{display:inline-block}
   .flaglayer{position:absolute;inset:3px;display:flex;align-items:center;justify-content:center;pointer-events:none}
   .flaglayer.cover{background:inherit}
-  .flaglayer.top{z-index:2}
+  .flaglayer.ftop{z-index:2}
   .flaglayer.up{animation:asmUp .24s steps(8) both}
   .flaglayer.dn{animation:asmDn .24s steps(8) both}
   @keyframes asmUp{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
@@ -529,14 +529,25 @@
   #yard{margin-top:12px;border:2px solid var(--line);background:#030812;padding:8px 10px}
   #yard[hidden]{display:none}
   .lane{display:flex;align-items:center;gap:6px;margin:5px 0}
-  .ydepot,.yvault{display:inline-block;width:26px;height:26px;font-style:normal;flex:none}
-  .ydepot .px,.yvault .px{width:26px;height:26px}
+  .ydepot,.yvault,.ywall{display:inline-block;width:26px;height:26px;font-style:normal;flex:none}
+  .ydepot .px,.yvault .px,.ywall .px{width:26px;height:26px}
+  .ywall{box-shadow:2px 0 0 #3a2410}
   .track{position:relative;flex:1;height:28px;border-bottom:2px dashed #1f4062}
-  .ybot{position:absolute;left:0;top:0;width:26px;height:26px;font-style:normal;animation:botBob 1s steps(2) infinite}
-  .ybot .px{width:26px;height:26px}
+  .ybot{position:absolute;left:0;top:-2px;width:26px;height:28px;font-style:normal;animation:botBob 1s steps(2) infinite}
+  .ybot>.px{width:26px;height:26px}
+  .lane.t2 .ybot{filter:drop-shadow(0 0 4px #4fd8e8aa);animation-duration:.8s}
+  .lane.t3 .ybot{filter:drop-shadow(0 0 6px #ff5c93cc);animation:botHover .5s steps(2) infinite}
+  @keyframes botHover{50%{margin-top:-5px}}
+  .lane.t2 .ypick{animation-duration:.4s}.lane.t3 .ypick{animation-duration:.3s}
   .ybot .carrycoin{position:absolute;left:5px;top:-13px;width:14px;height:14px}
+  .ypick{position:absolute;left:-15px;top:-9px;width:22px;height:22px;font-style:normal;transform-origin:70% 100%;animation:swing .5s steps(2) infinite}
+  .ypick .px{width:22px;height:22px}
+  .ybot.carry .ypick{display:none}
+  @keyframes swing{0%{transform:rotate(-65deg)}50%{transform:rotate(-15deg)}}
   @keyframes botBob{50%{margin-top:-3px}}
   .yvault.bump{animation:bump .3s steps(3)}
+  .yrate{font-family:var(--pix);font-size:9px;color:#ffd166;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;flex:none;width:96px}
+  .yrate .px{width:12px;height:12px}
   .ycnt{font-family:var(--pix);font-size:10px;color:var(--cyan);width:32px;text-align:right}
   .ybar{width:48px;height:8px;border:2px solid var(--line);background:#02060d;flex:none}
   .ybar i{display:block;height:100%;width:0;background:var(--cyan)}
@@ -547,6 +558,15 @@
   @keyframes built{from{opacity:0;transform:translateY(-22px) scale(1.5)}to{opacity:1;transform:none}}
   .cell.erase{animation:eraseOut .45s both}
   @keyframes eraseOut{to{opacity:0;transform:scale(.2) rotate(40deg)}}
+  .cell.tgt{box-shadow:0 0 0 3px #ffd166,0 0 22px #ffd166;z-index:4;animation:tgtPulse .7s steps(2) infinite}
+  @keyframes tgtPulse{50%{box-shadow:0 0 0 5px #fff,0 0 30px #ffd166}}
+  .cell.tutdim{opacity:.35}
+  .cell.nudge{animation:nudge .3s steps(3)}
+  @keyframes nudge{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  #tutHand{position:fixed;z-index:70;width:44px;height:44px;pointer-events:none;transform:translate(-30%,-10%);animation:handTap .8s ease-in-out infinite}
+  #tutHand[hidden]{display:none}
+  #tutHand .px{width:44px;height:44px}
+  @keyframes handTap{50%{transform:translate(-30%,-30%) scale(.9)}}
   #builder{position:fixed;z-index:60;width:34px;height:34px;pointer-events:none;transform:translate(-25%,-95%);animation:hammer .22s steps(2) infinite}
   #builder[hidden]{display:none}
   #builder .px{width:34px;height:34px}
@@ -630,6 +650,7 @@
 <div id="toast"></div>
 <div id="cool" hidden><div id="coolMsg"></div><div class="coolbar"><i id="coolFill"></i></div><button class="tool" id="coolSkip"></button></div>
 <i id="builder" hidden>:hammer:</i>
+<i id="tutHand" hidden>:hand:</i>
 <div id="askbox"><div class="modal"><div class="big" id="askE"></div><h2 id="askT"></h2><p id="askP"></p><div class="row" id="askB"></div></div></div>
 <div id="adbox"><div class="adc"><h3 id="adT"></h3><p id="adP"></p><div id="adLeft"></div></div></div>
 <div id="reviewbar" hidden><div id="rvText"></div><div class="rvbtns"><button class="tool" id="rvAgain" data-i18n="again">Play again</button><button class="tool" id="rvMenu" data-i18n="toMenu">Menu</button></div></div>
@@ -643,6 +664,7 @@
   <div class="srow"><div class="slabel"><span data-i18n="layoutLbl">Layout</span> <span id="devInfo"></span></div>
     <div class="sopts" id="devOpts"><button class="lvl" data-d="auto" data-i18n="devAuto">Auto</button><button class="lvl" data-d="mobile" data-i18n="devMobile">Mobile</button><button class="lvl" data-d="pc" data-i18n="devPc">PC</button></div></div>
   <div class="srow"><div class="slabel" data-i18n="soundLbl">Sound</div><div class="sopts"><button class="lvl" id="setSound"></button></div></div>
+  <div class="srow" id="tutRow" hidden><div class="sopts"><button class="lvl" id="tutBtn"></button></div></div>
   <div class="srow" id="resetRow" hidden><div class="sopts"><button class="lvl" id="resetBtn"></button></div></div>
   <button class="play" id="setOk" data-i18n="close">Close</button></div></div>
 
@@ -1214,7 +1236,8 @@ function mountPolys(G,s){
 const pos=(i,j)=>shapes?pts[i]:[i,j];
 const dist=(a,b)=>{const p=pos(a[0],a[1]),q=pos(b[0],b[1]);return Math.hypot(p[0]-q[0],p[1]-q[1])};
 function setupCell(el,x,y){
-  let pressTimer,long=false,rDown=false,both=false,suppress=false;
+  let pressTimer,long=false,rDown=false,both=false,suppress=false,ctxDone=false,flagAt=0;
+  const flagOnce=()=>{if(performance.now()-flagAt<350)return;flagAt=performance.now();toggleFlag(x,y)};
   el.addEventListener('click',()=>{ if(suppress){suppress=false;return}
     if(long){long=false;return}
     if(radarOn)return scan(x,y);
@@ -1222,6 +1245,7 @@ function setupCell(el,x,y){
   /* os dois botões (ou o botão do meio) num número = abrir vizinhos com efeito */
   el.addEventListener('mousedown',e=>{
     if(e.buttons!==3&&e.button!==1)suppress=false;
+    ctxDone=false;
     if(e.button===2)rDown=true; // (antes ficava depois do 'radarOn' e as bandeiras sumiam no Detector)
     if(radarOn)return;
     if(e.button===1){e.preventDefault();suppress=true;if(grid[y][x].o)move(x,y,true);return}
@@ -1229,14 +1253,14 @@ function setupCell(el,x,y){
   });
   el.addEventListener('mouseup',e=>{
     if(both){both=false;rDown=false;chordPreview(x,y,false);if(grid[y][x].o)move(x,y,true);return}
-    if(e.button===2&&rDown){rDown=false;if(!touching)toggleFlag(x,y)}
+    if(e.button===2&&rDown){rDown=false;if(!touching&&!ctxDone)flagOnce()}
   });
   el.addEventListener('mouseleave',()=>{if(both)chordPreview(x,y,false);both=false;rDown=false});
-  el.addEventListener('contextmenu',e=>e.preventDefault());
+  el.addEventListener('contextmenu',e=>{e.preventDefault();if(touching||both)return;ctxDone=true;flagOnce()}); // cobre Ctrl+clique (Mac) e navegadores que não mandam o mouseup do botão direito
   el.addEventListener('mouseenter',()=>{if(has('mirror')&&mirrorOf){const j=mirrorOf[y*C+x];if(j!==y*C+x)cells[j].classList.add('twin')}});
   el.addEventListener('mouseleave',()=>{if(mirrorOf){const j=mirrorOf[y*C+x];if(cells[j])cells[j].classList.remove('twin')}});
   el.addEventListener('touchstart',()=>{touching=true;long=false;
-    pressTimer=setTimeout(()=>{long=true;toggleFlag(x,y);navigator.vibrate&&navigator.vibrate(30)},380)},{passive:true});
+    pressTimer=setTimeout(()=>{long=true;flagAt=performance.now();toggleFlag(x,y);navigator.vibrate&&navigator.vibrate(30)},380)},{passive:true});
   ['touchend','touchmove','touchcancel'].forEach(t=>el.addEventListener(t,()=>{clearTimeout(pressTimer);setTimeout(()=>touching=false,700)},{passive:true}));
 }
 const el=(x,y)=>cells[y*C+x];
@@ -1446,7 +1470,7 @@ function renderFlag(x,y,prev){
   if(prev===undefined){e.innerHTML='';if(f!==0)e.appendChild(flagLayer(f,''));return}
   const cur=[...e.querySelectorAll('.flaglayer')].pop();
   if(f===0){if(cur&&prev!==0)disintegrate(cur,prev<0);e.innerHTML='';return}
-  const nw=flagLayer(f,' top '+(f<0?'dn':'up')+(prev!==0&&cur?' cover':''));
+  const nw=flagLayer(f,' ftop '+(f<0?'dn':'up')+(prev!==0&&cur?' cover':''));
   if(prev!==0&&cur){ // cobre a bandeira anterior
     e.querySelectorAll('.flaglayer').forEach(l=>{if(l!==cur)l.remove()});cur.classList.add('old');
     nw.addEventListener('animationend',()=>{e.querySelectorAll('.flaglayer.old').forEach(o=>o.remove());nw.classList.remove('cover')},{once:true});
@@ -1484,7 +1508,9 @@ function toggleFlag(x,y){
   if(over)return;
   if(!started){toast(tr('flagFirst'));return}
   const g=grid[y][x];if(g.o)return;
+  if(tutorial&&!tutGate('flag',x,y))return;
   const nf=nextFlag(g.f),prev=g.f;fsum+=nf-g.f;g.f=nf;g.fo=turn;renderFlag(x,y,prev);setCounter();SFX.flag(nf);
+  if(tutorial)tutAfter('flag');
 }
 /* jogada do jogador: abre casa/vizinhos; no duelo pontua e passa a vez */
 function updateTide(){ // falta 1 jogada: o texto pula alternando cores e aparecem placas de perigo nos lados
@@ -1554,6 +1580,7 @@ function startTide(){
 }
 function move(x,y,loud){
   if(over||tideBusy||campBlock)return;
+  if(tutorial&&!tutGate('tap',x,y))return;
   if(!started){ // 1º clique
     if(campaign){startBoardFast(x,y);started=true} // campanha: sem zoom nem espera
     else{ // gera um tabuleiro que dá para resolver por lógica (com zoom)
@@ -1565,6 +1592,7 @@ function move(x,y,loud){
   const before=opened,seen0=seenCount;
   reveal(x,y,loud);
   if(campaign)campPay(x,y);
+  if(tutorial)tutAfter('tap');
   if(over)return;
   const gain=opened-before,fresh=seenCount-seen0;
   if(has('duel')&&fresh>0){scores[turn]+=fresh;updateDuel()}
@@ -1853,7 +1881,7 @@ function syncSettings(){
 }
 function campLabels(){
   const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};
-  set('#coolSkip',ct('skip'));set('#resetBtn',ct('resetBtn'));set('#introSkip',ct('skipIntro'));
+  set('#coolSkip',ct('skip'));set('#resetBtn',ct('resetBtn'));set('#tutBtn',ct('tutBtn'));set('#introSkip',ct('skipIntro'));
   if(camp){renderTabs();renderCards();renderYard()}
 }
 function applyLang(){
@@ -1867,7 +1895,7 @@ function applyLang(){
 }
 function setLang(l){if(l===lang)return;lang=l;try{localStorage.setItem('ms-lang',l)}catch(e){}SFX.menu();applyLang()}
 function closeSettings(){$('#settings').classList.remove('show')}
-$('#gear').onclick=()=>{SFX.menu();$('#resetRow').hidden=!campaign;$('#settings').classList.add('show')};
+$('#gear').onclick=()=>{SFX.menu();$('#resetRow').hidden=!campaign;$('#tutRow').hidden=!campaign;$('#settings').classList.add('show')};
 $('#setX').onclick=closeSettings;$('#setOk').onclick=closeSettings;
 $('#settings').addEventListener('click',e=>{if(e.target.id==='settings')closeSettings()});
 $('#langOpts').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setLang(b.dataset.l)});
@@ -1888,17 +1916,20 @@ $('#cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b
   else if(a.startsWith('eq:')){const k=a.slice(3);camp.eq[k]=!camp.eq[k];SFX.click();saveCamp();renderCards()}});
 $('#coolSkip').onclick=()=>rewardedAd(()=>endCool());
 $('#resetBtn').onclick=()=>{closeSettings();resetCamp()};
+$('#tutBtn').onclick=()=>{closeSettings();startTutorial()};
 /* ===================== CAMPANHA (idle) com o Smily — v2: abas à esquerda, mapa à direita ===================== */
 const SMILY='Smily';
 const SAVE_KEY='ms-camp-v1';
-let camp=null,campaign=false,custom=null,campCells=0,campBlock=false,coolT=0,coolLeft=0,coolTotal=10,coolTimers=[],boardBuilt=false,idleAt=Date.now(),lastQuip=0,sayT=0,curTab=null,tickers=false,cardsDirty=false;
+let camp=null,campaign=false,tutorial=false,tutIdx=0,custom=null,campCells=0,campBlock=false,coolT=0,coolLeft=0,coolTotal=10,coolTimers=[],boardBuilt=false,idleAt=Date.now(),lastQuip=0,sayT=0,curTab=null,tickers=false,cardsDirty=false;
 
 /* ---------- ícones em pixel art, desenhados à mão (menos emoji) ---------- */
-const PALX={k:'#0b1020',w:'#ffffff',y:'#ffd166',Y:'#c98b1a',r:'#ff4d5e',R:'#a82636',b:'#4fa8ff',B:'#2d6fd0',c:'#4fd8e8',g:'#aebfd0',G:'#6a869f',p:'#ff5c93',o:'#ff9a4f',O:'#a35a22',n:'#53e69a'};
+const PALX={k:'#0b1020',w:'#ffffff',y:'#ffd166',Y:'#c98b1a',r:'#ff4d5e',R:'#a82636',b:'#4fa8ff',B:'#2d6fd0',c:'#4fd8e8',g:'#aebfd0',G:'#6a869f',p:'#ff5c93',o:'#ff9a4f',O:'#a35a22',n:'#53e69a',e:'#8b5a2b',E:'#5c3b1c',s:'#b07a4a',m:'#9b5de5',M:'#5a3a8c',q:'#ffe27a'};
 const ICONS={
   coin:["..kkkkkk..",".kyyyyyyk.","kyywyyyyYk","kywyyYyyYk","kywyyYyyYk","kywyyYyyYk","kyyyyYyyYk","kyyyyyyYYk",".kYYYYYYk.","..kkkkkk.."],
   shield:[".kkkkkkkk.","kbbbbbbbbk","kbwbbbbbBk","kbwbbbbbBk","kbbbbbbbBk","kbbbbbbBBk",".kbbbbBBk.","..kbbBBk..","...kBBk...","....kk...."],
-  drone:["....kc....","....kk....",".kkkkkkkk.","kggggggggk","kgccggccgk","kgccggccgk","kggggggggk","kgkkkkkkgk","kGGGGGGGGk",".kkkkkkkk."],
+  drone1:[".....kc.....",".....k......","..kkkkkkkk..",".kggggggggk.",".kgccggccgk.",".kgccggccgk.",".kggggggggk.",".kgkkkkkkgk.",".kGGGGGGGGk.","..kkkkkkkk..","..kk....kk..","..kk....kk.."],
+  drone2:["....kkkk....","...kyyyyk...","..kyyyyyyk..","..kkkkkkkk..",".kbbbbbbbbk.",".kbccwwccbk.",".kbbbbbbbbk.","kBBkbbbbkBBk","kBBkBBBBkBBk",".kkkkkkkkkk.",".kGGGk.kGGGk",".kkkkk.kkkkk"],
+  drone3:[".....kk.....","...kkqqkk...","..kqqqqqqk..",".kqqqqqqqqk.",".kkkkkkkkkk.",".kmrrrrrrmk.",".kmmwrrwmmk.","kqqmmmmmmqqk","kqqkMMMMkqqk",".kkkMMMMkkk.","...koyyyok..",".....oyyo..."],
   flag:[".kw.......",".kwrrrr...",".kwrrrrrr.",".kwrrrrrR.",".kwrrrRR..",".kwrRR....",".kw.......",".kw.......",".kw.......","kkkkk....."],
   bomb:[".......oy.","......ko..","....kkkk..","...kGGGGk.","..kGwGGGGk","..kGwGGGGk","..kGGGGGGk","..kGGGGGGk","...kGGGGk.","....kkkk.."],
   star:["....yy....","....yy....","...yyyy...","yyyyyyyyyy",".yyyyyyyy.","..yyyyyy..","..yyyyyy..",".yyyyyyyy.",".yyy..yyy.",".yy....yy."],
@@ -1911,14 +1942,22 @@ const ICONS={
   warn:["....kk....","...kyyk...","..kyyyyk..","..kyykyk..",".kyyykkyyk",".kyyykkyyk","kyyyyyyyyk","kyyyykkyyk","kyyyyyyyyk","kkkkkkkkkk"],
   hammer:["..kkkkk...",".kggggGk..",".kggggGk..","..kkkkk...","....ko....","....ko....","....ko....","....ko....","....ko....","....kk...."],
   vault:["..........",".kkkkkkkk.","kyyyyyyyyk","kyYyyyyYyk","kkkkkkkkkk","kooooooook","kooookoook","kooooooook","kooooooook","kkkkkkkkkk"],
+  dirt:["eeeeEeeeee","eEeeeeeEee","eeeseeeeee","eeeeeEeese","EeeeeeeeEe","eeseeEeeee","eeeeeeeese","eEeeseeeee","eeeeeeEeee","EEEEEEEEEE"],
+  hand:["....kk....","...kwwk...","...kwwk...","...kwwk...","...kwwkkk.",".kkkwwkwwk","kwwkwwkwwk","kwwwwwwwwk",".kwwwwwwwk","..kkkkkkk."],
+  pick2:[".cccccccc.","cBBBBBBBBc","cc..eE..cc","....eE....","....eE....","....eE....","....eE....","....eE....","....eE....","....EE...."],
+  pick3:[".qqqqqqqq.","qYYYYYYYYq","cq..eE..qc","....eE....","....eE....","....eE....","....eE....","....eE....","....eE....","....EE...."],
+  stone:["GGGGgGGGGG","GgGGGGGgGG","GGGGgGGGGG","gGGGGGGGgG","GGGgGGGGGG","GGGGGGgGGG","GgGGGGGGGg","GGGGgGGGGG","GGgGGGGgGG","kkkkkkkkkk"],
+  crystal:["MMMMMMMMMM","MMMcMMMMMM","MMcwcMMMcM","MMMcMMMcwc","MMMMMMMMcM","McMMMcMMMM","cwcMMwcMMM","McMMcwcMMM","MMMMMcMMMM","kkkkkkkkkk"],
+  pick:[".gggggggg.","gGGGGGGGGg","gg..eE..gg","....eE....","....eE....","....eE....","....eE....","....eE....","....eE....","....EE...."],
   depot:["..kkkkkk..",".kGGGGGGk.","kGGGGGGGGk","kGGkkkkGGk","kGkkkkkkGk","kGkkkkkkGk","kGkkkkkkGk","kGkkkkkkGk","kkkkkkkkkk",".........."]
 };
+ICONS.drone=ICONS.drone1;ICONS.pick1=ICONS.pick;
 const iconCache=new Map();
 function iconURL(name){
   if(iconCache.has(name))return iconCache.get(name);
   const g=ICONS[name];if(!g)return null;
-  const cv=document.createElement('canvas');cv.width=cv.height=10;const c=cv.getContext('2d'),pix=[];
-  g.forEach((row,y)=>{for(let x=0;x<10;x++){const ch=row[x];if(ch&&ch!=='.'&&PALX[ch]){c.fillStyle=PALX[ch];c.fillRect(x,y,1,1);
+  const W=g[0].length,H=g.length,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d'),pix=[];
+  g.forEach((row,y)=>{for(let x=0;x<W;x++){const ch=row[x];if(ch&&ch!=='.'&&PALX[ch]){c.fillStyle=PALX[ch];c.fillRect(x,y,1,1);
     const h=PALX[ch];pix.push({x,y,rgb:[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]})}}});
   const url=cv.toDataURL();iconCache.set(name,url);spritePix.set(':'+name+':',pix);return url;
 }
@@ -1944,25 +1983,25 @@ const CSTR={
   en:{shop:'Shop',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
     cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',
-    lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
+    perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
     build:s=>`Smily is building the next map… ${s}s`,skip:'Skip (watch ad)',
     reviveT:'BOOM!',reviveP:(loss,pct)=>`You hit a mine. Lose ${loss} coins (${pct}%) — or revive and keep going.`,reviveBtn:'Revive (watch ad)',takeLoss:'Take the loss',
     offT:'Welcome back',offP:n=>`Your drones made ${n} coins while you were away.`,collect:'Collect',double:'Double (watch ad)',
     adT:'Ad (placeholder)',adP:'The rewarded ad plays here.',adLeft:s=>`Reward in ${s}s`,
-    resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
+    tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Loja',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
     cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',
-    lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
+    perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
     build:s=>`O Smily está construindo o próximo mapa… ${s}s`,skip:'Pular (ver anúncio)',
     reviveT:'BOOM!',reviveP:(loss,pct)=>`Você pisou numa mina. Perde ${loss} moedas (${pct}%) — ou reviva e continue.`,reviveBtn:'Reviver (ver anúncio)',takeLoss:'Aceitar a perda',
     offT:'Bem-vindo de volta',offP:n=>`Seus drones fizeram ${n} moedas enquanto você estava fora.`,collect:'Coletar',double:'Dobrar (ver anúncio)',
     adT:'Anúncio (exemplo)',adP:'Aqui toca o anúncio recompensado.',adLeft:s=>`Recompensa em ${s}s`,
-    resetBtn:'Reiniciar progresso',resetT:'Reiniciar tudo?',resetP:'Isso apaga suas moedas, melhorias e drones.',yes:'Sim, reiniciar',no:'Cancelar',skipIntro:'Pular >>'}
+    tutBtn:'Rever tutorial',resetBtn:'Reiniciar progresso',resetT:'Reiniciar tudo?',resetP:'Isso apaga suas moedas, melhorias e drones.',yes:'Sim, reiniciar',no:'Cancelar',skipIntro:'Pular >>'}
 };
 const ct=(k,...a)=>{const v=CSTR[lang][k];return typeof v==='function'?v(...a):v};
 
@@ -2001,14 +2040,19 @@ const LINES={
 };
 const MOODS={start:'🙂',firstCoin:'😐',win:'😒',lose:'😈',shield:'🙄',revive:'😏',idle:'😴',fourth:'🤨',buy:'😏',unlock:'😈',poke:'😠',drone:'😐',bigger:'😬',build:'🤨',unlock_shop:'😏',unlock_items:'😏',unlock_drones:'😐',unlock_loadout:'😈',unlock_floors:'😈'};
 function setFace(e){faceEl.textContent=e}
+function sayText(t,mood,hold){
+  const b=$('#say');b.hidden=false;const tx=$('#sayText');tx.textContent='';lastQuip=Date.now();
+  setFace(mood||'🙂');
+  let i=0;clearTimeout(sayT);
+  (function type(){i++;tx.textContent=t.slice(0,i);if(i%4===0)SFX.talk();
+    if(i<t.length)sayT=setTimeout(type,hold?16:18);
+    else if(!hold)sayT=setTimeout(()=>{b.hidden=true;if(!campBlock)setFace('🙂')},Math.max(4200,t.length*60))})();
+}
 function quip(ctx,vars){
-  const arr=LINES[ctx];if(!arr||!campaign)return;
+  const arr=LINES[ctx];if(!arr||!campaign||tutorial)return;
   let t=RES(arr[Math.random()*arr.length|0]);
   if(vars)for(const k in vars)t=t.replace('{'+k+'}',vars[k]);
-  const b=$('#say');b.hidden=false;const tx=$('#sayText');tx.textContent='';lastQuip=Date.now();
-  setFace(MOODS[ctx]||'🙂');
-  let i=0;clearTimeout(sayT);
-  (function type(){i++;tx.textContent=t.slice(0,i);if(i<t.length)sayT=setTimeout(type,18);else sayT=setTimeout(()=>{b.hidden=true;if(!campBlock)setFace('🙂')},Math.max(4200,t.length*60))})();
+  sayText(t,MOODS[ctx],false);
 }
 
 /* ---------- economia ---------- */
@@ -2036,7 +2080,7 @@ function floatText(txt,anchor,cls){
   d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height/2)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1000);
 }
 function campPay(x,y){ // moedas por casa segura aberta (agrupadas por jogada)
-  const n=campCells;campCells=0;if(!n)return;
+  const n=campCells;campCells=0;if(!n||tutorial)return;
   const gain=Math.max(1,Math.round(n*cpcVal()*modReward()));
   const first=camp.total===0;addCoins(gain);floatText('+'+gain,el(x,y),'coin');SFX.coin(n);
   if(first)setTimeout(()=>quip('firstCoin'),700);
@@ -2103,7 +2147,7 @@ function renderCards(){
       :card({ic:':shield:',name:ct('cShield'),sub:'5/5 '+ct('max'),dis:true}));
   }else if(curTab==='drones'){
     DRONES.forEach((d,i)=>{
-      if(camp.size>=d.need)cs.push(card({ic:':drone:',name:ct('droneName',d.n),sub:ct('droneD',d.every,d.yield)+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i))}));
+      if(camp.size>=d.need)cs.push(card({ic:':drone'+(i+1)+':',name:ct('droneName',d.n),sub:ct('droneD',d.every,d.yield)+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i))}));
       else cs.push(card({ic:':lock:',name:ct('droneName',d.n),sub:ct('droneNeed',SIZES[d.need]),dis:true}));
     });
   }else if(curTab==='loadout'){
@@ -2158,6 +2202,7 @@ function campAfterLose(){
   quip('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
 }
 function campWin(){
+  if(tutorial){over=true;tutFinish();return}
   over=true;
   const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()));
   addCoins(bonus);camp.wins++;camp.streak++;saveCamp();setFace('😎');
@@ -2218,9 +2263,10 @@ function renderYard(){
   const owned=DRONES.map((d,i)=>i).filter(i=>camp.drones[i]>0);
   y.hidden=!owned.length&&!(camp.tabs||[]).includes('drones');
   if(y.hidden)return;
-  y.innerHTML=owned.length?owned.map(i=>`<div class="lane" data-i="${i}"><i class="ydepot">:depot:</i><div class="track"><i class="ybot" id="bot${i}">:drone:</i></div>`+
-    `<i class="yvault" id="vault${i}">:vault:</i><span class="ycnt">x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
+  y.innerHTML=owned.length?owned.map(i=>`<div class="lane t${i+1}" data-i="${i}"><i class="ywall">:${['dirt','stone','crystal'][i]}:</i><div class="track"><i class="ybot" id="bot${i}">:drone${i+1}:<i class="ypick">:pick${i+1}:</i></i></div>`+
+    `<i class="yvault" id="vault${i}">:vault:</i><span class="yrate" title="${ct('perMinT')}">:coin: ${perMin(i)}${ct('perMin')}</span><span class="ycnt">x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
 }
+const perMin=i=>{const v=camp.drones[i]*DRONES[i].yield*60/DRONES[i].every;return fmtC(v)===String(Math.floor(v))&&v!==Math.floor(v)?v.toFixed(1):(v>=1e4?fmtC(v):(Number.isInteger(v)?String(v):v.toFixed(1)))};
 function flyCoins(fromEl,amount){
   const a=fromEl.getBoundingClientRect(),b=$('#coinStat').getBoundingClientRect();
   const n=Math.min(8,3+Math.floor(Math.log10(amount+1)*2)),sx=a.left+a.width/2,sy=a.top+a.height/2,ex=b.left+b.width/2,ey=b.top+b.height/2;
@@ -2235,6 +2281,7 @@ function deliver(i,amount){
   const bot=$('#bot'+i),vault=$('#vault'+i);
   if(!bot||!vault){addCoins(amount);return}
   if(bot.dataset.busy){addCoins(amount);return}bot.dataset.busy='1';
+  bot.classList.add('carry'); // larga a picareta, pega a moeda e leva até o baú
   bot.insertAdjacentHTML('beforeend','<img class="px carrycoin" alt="" src="'+iconURL('coin')+'">');
   const dx=bot.parentElement.clientWidth-bot.offsetWidth;
   bot.style.transition='transform .9s cubic-bezier(.4,0,.2,1)';bot.style.transform=`translateX(${dx}px)`;
@@ -2243,13 +2290,18 @@ function deliver(i,amount){
     vault.classList.remove('bump');void vault.offsetWidth;vault.classList.add('bump');
     flyCoins(vault,amount);
     bot.style.transition='transform .8s ease-in-out';bot.style.transform='translateX(0)';
-    setTimeout(()=>{delete bot.dataset.busy},850);
+    setTimeout(()=>{delete bot.dataset.busy;bot.classList.remove('carry')},850);
   },950);
 }
 function campTick(){
   if(!camp||!campaign)return;
   DRONES.forEach((d,i)=>{const n=camp.drones[i];if(!n)return;camp.droneT[i]++;
     const bar=$('#ybar'+i);if(bar)bar.style.width=Math.min(100,camp.droneT[i]/d.every*100)+'%';
+    const bot=$('#bot'+i);if(bot&&!bot.dataset.busy){ // poeira de terra voando da parede enquanto ele pica
+      const r=bot.getBoundingClientRect();
+      for(let k=0;k<3;k++)parts.push({x:r.left-8,y:r.top+6+Math.random()*12,vx:-(.4+Math.random()*1.6),vy:-(.6+Math.random()*1.6),g:.16,life:1,d:.05,sz:2,c:['#8b5a2b','#b07a4a','#5c3b1c'][k],sq:true});
+      loop();
+    }
     if(camp.droneT[i]>=d.every){camp.droneT[i]=0;deliver(i,n*d.yield)}});
   const now=Date.now();
   if(now-lastQuip>50000&&now-idleAt>40000)quip('idle');
@@ -2258,7 +2310,7 @@ function campTick(){
 const incomePerSec=()=>DRONES.reduce((s,d,i)=>s+camp.drones[i]*d.yield/d.every,0);
 
 /* ---------- conversa de abertura (tela cheia) ---------- */
-const INTRO=[
+const INTRO_A=[
   {m:'🙂',t:X("Oh. A player. Hello. I'm Smily.","Ah. Um jogador. Olá. Eu sou o Smily.")},
   {m:'😐',t:X("Yes, the yellow one. The smile is not a promise.","Sim, o amarelo. O sorriso não é uma promessa.")},
   {m:'😏',t:X("Here's how this works: I hide mines. You find the cells where I didn't. Step on one and I win.","Funciona assim: eu escondo minas. Você acha as casas onde eu não escondi. Pisou em uma, eu ganho.")},
@@ -2270,7 +2322,9 @@ const INTRO=[
   {m:'😬',t:X("Hold your finger (or right-click) to plant a flag. Don't flag what you can't prove. I will laugh. Loudly.","Segure o dedo (ou clique direito) para pôr bandeira. Não marque o que você não consegue provar. Eu vou rir. Alto.")},
   {m:'😏',t:X("Every safe cell pays one coin. Clear the board, get a bonus. Yes, I'm generous. It physically hurts.","Cada casa segura paga uma moeda. Limpou o tabuleiro, ganha bônus. Sim, eu sou generoso. Dói fisicamente.")},
   {m:'😈',t:X("Step on a mine and you lose a slice of your coins. Buy shields and I'll look away. Once.","Pisou numa mina, perde uma fatia das moedas. Compre escudos e eu viro o rosto. Uma vez.")},
-  {m:'🤨',t:X("Also, there's a developer behind this screen. Hi, boss. Yes, I know you're reading this. Raise my salary.","Aliás, tem um desenvolvedor atrás desta tela. Oi, chefe. Sim, eu sei que você está lendo isso. Aumenta meu salário.")},
+  {m:'🤨',t:X("Also, there's a developer behind this screen. Hi, boss. Yes, I know you're reading this. Raise my salary.","Aliás, tem um desenvolvedor atrás desta tela. Oi, chefe. Sim, eu sei que você está lendo isso. Aumenta meu salário.")}
+];
+const INTRO_B=[
   {m:'🙂',t:X("Okay. A little 3×3 to warm up. Even you can't mess this up.","Certo. Um 3×3 só para aquecer. Nem você consegue estragar isso.")},
   {m:'😏',t:X("...Probably.","...Provavelmente.")}
 ];
@@ -2279,7 +2333,7 @@ function introFlow(){
     show('intro');
     const stage=$('#introStage'),face=$('#introFace'),txt=$('#introText'),ch=$('#introChoices'),nxt=$('#introNext');
     let skipped=false;
-    const finish=()=>{skipped=true;resolve()};
+    const finish=()=>{skipped=true;resolve({tutorial:false})};
     $('#introSkip').onclick=e=>{e.stopPropagation();finish()};
     const beat=(text,mood)=>new Promise(res=>{
       if(skipped)return res();
@@ -2295,22 +2349,72 @@ function introFlow(){
       opts.forEach((o,i)=>{const b=document.createElement('button');b.className='lvl';b.textContent=RES(o.l);b.onclick=e=>{e.stopPropagation();SFX.click();res(i)};ch.appendChild(b)});
     });
     (async()=>{
-      for(const s of INTRO){
+      const play=async list=>{for(const s of list){
         if(skipped)return;
         if(s.choice){const i=await choose(s.choice);if(skipped)return;await beat(RES(s.choice[i].r),s.choice[i].m)}
-        else await beat(RES(s.t),s.m);
-      }
-      if(!skipped)resolve();
+        else await beat(RES(s.t),s.m)}};
+      await play(INTRO_A);if(skipped)return;
+      // o Smily confere se o jogador entendeu; se não, vai para o tutorial prático
+      await beat(RES(X("Quick check. Did you get all that?","Conferindo rapidinho. Você entendeu tudo isso?")),'🤨');
+      if(skipped)return;
+      const a=await choose([{l:X("Yes, got it.","Sim, entendi.")},{l:X("Not really. Show me.","Não muito. Me mostra.")}]);
+      if(skipped)return;
+      if(a===0){await beat(RES(X("Confident. I respect that. It won't help.","Confiante. Eu respeito. Não vai ajudar.")),'😏');await play(INTRO_B);if(!skipped)resolve({tutorial:false})}
+      else{await beat(RES(X("Honest. Refreshing. Rare. Let's do this properly.","Sincero. Refrescante. Raro. Vamos fazer direito.")),'🙂');if(!skipped)resolve({tutorial:true})}
     })();
   });
 }
 
+/* ---------- tutorial prático: um 3×3 com a mina no centro, passo a passo ---------- */
+const TUT=[
+  {act:'tap',t:[0,0],m:'🙂',s:X("Let's do this properly. Tap the glowing cell.","Vamos fazer direito. Toque na casa que está brilhando.")},
+  {act:'tap',t:[2,0],m:'😏',s:X("See that 1? Exactly one mine touches that cell. Now tap the other corner.","Viu esse 1? Exatamente uma mina encosta nessa casa. Agora toque no outro canto.")},
+  {act:'tap',t:[0,2],m:'🤨',s:X("Another 1. The same mine touches this one too. One more corner.","Outro 1. A mesma mina encosta nesta também. Mais um canto.")},
+  {act:'flag',t:[1,1],m:'😬',s:X("Three cells, one mine. Only one cell touches all three: the middle one. Right-click (or hold) the glowing cell to plant a flag.","Três casas, uma mina. Só uma casa encosta nas três: a do meio. Clique direito (ou segure) na casa brilhante para plantar uma bandeira.")},
+  {act:'tap',t:[0,0],m:'😐',s:X("Flag planted. Now the shortcut: tap a number that already has its flags and I open everything around it. Tap the 1.","Bandeira plantada. Agora o atalho: toque num número que já tem suas bandeiras e eu abro tudo em volta. Toque no 1.")},
+  {act:'free',t:null,m:'😏',s:X("Safe, see? Everything else is safe too. Open the rest. Just not the flagged cell.","Seguro, viu? O resto também é seguro. Abra o resto. Só não a casa com bandeira.")}
+];
+function moveHand(c){
+  const h=$('#tutHand'),r=c.getBoundingClientRect();h.hidden=false;h.style.left=(r.left+r.width*.55)+'px';h.style.top=(r.top+r.height*.5)+'px';
+}
+function hideHand(){const h=$('#tutHand');if(h)h.hidden=true}
+function tutShow(){
+  const st=TUT[tutIdx];if(!st)return;
+  cells.forEach(c=>c.classList.remove('tgt','tutdim'));
+  sayText(mt(RES(st.s)),st.m,true);
+  if(st.t){const i=st.t[1]*C+st.t[0];cells.forEach((c,k)=>{const g=grid[k/C|0][k%C];if(k!==i&&!g.o&&!g.f)c.classList.add('tutdim')});cells[i].classList.add('tgt');moveHand(cells[i])}
+  else hideHand();
+}
+function tutGate(kind,x,y){ // só deixa passar a ação que o passo atual pede
+  const st=TUT[tutIdx];if(!st)return false;
+  const ok=st.act==='free'?(kind==='tap'&&!(x===1&&y===1)):(kind===st.act&&x===st.t[0]&&y===st.t[1]);
+  if(!ok){SFX.deny();const t=cells[(st.t?st.t[1]:1)*C+(st.t?st.t[0]:1)];if(st.t&&t){t.classList.remove('nudge');void t.offsetWidth;t.classList.add('nudge')}}
+  return ok;
+}
+function tutAfter(kind){
+  const st=TUT[tutIdx];if(!st||st.act==='free'||st.act!==kind)return;
+  tutIdx++;SFX.menu();setTimeout(tutShow,450);
+}
+function startTutorial(){
+  clearCool();$('#cool').hidden=true;hideBuilder();campBlock=false;
+  tutorial=true;tutIdx=0;
+  custom={c:3,r:3,m:1};level='easy';cur=new Set(['classic']);floor='square';shapes=false;
+  init();placeLayout(Int8Array.of(0,0,0,0,1,0,0,0,0));started=true; // mina fixa no centro
+  tutShow();
+}
+function tutFinish(){
+  tutorial=false;cells.forEach(c=>c.classList.remove('tgt','tutdim'));hideHand();
+  camp.tutDone=true;saveCamp();SFX.win();
+  sayText(RES(X("Done! Numbers say how many mines touch a cell. Flags are your proof. Tap a number for the shortcut. Now the real thing: no glowing cells. Good luck. You'll need it.","Pronto! Números dizem quantas minas encostam numa casa. Bandeiras são sua prova. Toque num número para o atalho. Agora é de verdade: sem casas brilhando. Boa sorte. Você vai precisar.")),'😈',false);
+  setTimeout(()=>{if(!tutorial)campNewBoard()},4200);
+}
+
 /* ---------- entrada no jogo ---------- */
-function enterGame(){
+function enterGame(tut){
   campaign=true;lastQuip=Date.now();
   const g=$('#game');g.classList.add('camp');show('game');
   $('#coinStat').hidden=false;$('#timeStat').hidden=true;
-  checkUnlocks(true);renderYard();campNewBoard();setCoins();
+  checkUnlocks(true);renderYard();if(tut)startTutorial();else campNewBoard();setCoins();
   if(!tickers){tickers=true;setInterval(campTick,1000);setInterval(saveCamp,5000);
     addEventListener('pagehide',saveCamp);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveCamp()});
     document.addEventListener('pointerdown',()=>{idleAt=Date.now()},true)}
@@ -2318,7 +2422,7 @@ function enterGame(){
 async function bootCampaign(){
   loadCamp();
   const away=Math.min((Date.now()-camp.last)/1000,2*3600);
-  if(!camp.introDone){await introFlow();camp.introDone=true;camp.last=Date.now();saveCamp();enterGame();setTimeout(()=>quip('start'),500);return}
+  if(!camp.introDone){const r=await introFlow();camp.introDone=true;camp.last=Date.now();saveCamp();enterGame(r&&r.tutorial);if(!(r&&r.tutorial))setTimeout(()=>quip('start'),500);return}
   enterGame();
   const earn=Math.floor(incomePerSec()*away*.5); // offline rende metade, até 2 h
   if(earn>=1&&away>60){
@@ -2341,7 +2445,7 @@ for(let i=0;i<(isMobile()?10:26);i++){const b=document.createElement('div'),z=2+
 /* ---------- emojis em pixel art: cada emoji vira um sprite 20×20 (sem suavização, poucas cores) ---------- */
 const EMO=/(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/u;
 const EMO_G=new RegExp(EMO.source,'gu');
-const TOKS='coin|shield|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot';
+const TOKS='coin|shield|drone1|drone2|drone3|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot|dirt|pick1|pick2|pick3|pick|stone|crystal|hand';
 const TOKRE=new RegExp(':('+TOKS+'):'),SPLIT=new RegExp('(:(?:'+TOKS+'):|'+EMO.source.slice(1,-1)+')','u');
 const HAS=v=>EMO.test(v)||TOKRE.test(v);
 const spriteCache=new Map(),spritePix=new Map(),PXN=20;
