@@ -461,10 +461,6 @@
   #coinStat{color:#ffd166;text-shadow:-2px 0 var(--pink),2px 0 var(--cyan)}
   #coinN.bump{animation:bump .25s steps(3)}
   @keyframes bump{50%{transform:scale(1.35)}}
-  #campbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px;align-items:center}
-  #campbar[hidden]{display:none}
-  #campbar .tool{position:relative}
-  #shieldN{font-size:16px;padding:6px 10px;border:2px solid var(--line);background:var(--panel)}
   .dot{position:absolute;top:-5px;right:-5px;width:12px;height:12px;background:var(--pink);border:2px solid #000;animation:upd .8s steps(2) infinite}
   .dot[hidden]{display:none}
   #cool{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:25;width:min(430px,92vw);background:var(--panel);border:2px solid var(--cyan);padding:10px 14px;box-shadow:0 0 26px #4fd8e844;text-align:center}
@@ -501,19 +497,75 @@
   @keyframes floaty{to{transform:translate(-50%,-90px);opacity:0}}
   html.mobile #cool{bottom:86px}
   html.mobile #game.camp{padding-bottom:104px}
-  html.mobile #campbar .tool{padding:8px 8px;font-size:14px;min-height:42px}
-  html.mobile #campbar{gap:6px}
-  html.mobile #shieldN{padding:8px 8px}
   html.mobile #introFace{font-size:90px}
   html.mobile #introText{font-size:17px}
   html.mobile .citem .cm b{font-size:14px}
+  /* ---------- campanha v2: abas e cartas à esquerda, mapa à direita ---------- */
+  #game.camp{display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr);column-gap:22px;align-items:start;width:min(1100px,100%)}
+  #game.camp>*{grid-column:1;min-width:0}
+  #game.camp>.boardbox{grid-column:2;grid-row:1 / span 10;justify-self:center}
+  #game.camp .boardwrap{max-height:none;max-width:100%}
+  #tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;min-height:40px}
+  #tabs[hidden]{display:none}
+  #tabs .tab{flex:1;min-width:70px;position:relative}
+  #shieldN{font-size:15px;padding:7px 10px;border:2px solid var(--line);background:var(--panel);white-space:nowrap}
+  #cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin-bottom:6px}
+  #cards:empty{display:none}
+  .card{display:flex;flex-direction:column;align-items:center;justify-content:space-between;aspect-ratio:1/1;border:2px solid var(--line);background:var(--panel);padding:8px 5px;gap:3px;text-align:center;cursor:pointer;color:var(--text);transition:border-color .15s,transform .15s,background .15s}
+  .card:hover:not(:disabled){border-color:var(--cyan);transform:translateY(-2px)}
+  .card:disabled{opacity:.45;cursor:not-allowed}
+  .card.ok{border-color:var(--cyan);box-shadow:0 0 14px #4fd8e833}
+  .card.on{background:var(--cyan);color:#04111f;border-color:var(--cyan)}
+  .card.on small,.card.on .cpr{color:#04111f}
+  .card b{font-size:13px;line-height:1.15;font-weight:600}
+  .card small{font-size:12px;color:var(--muted);line-height:1.2}
+  .cic{height:34px;display:flex;align-items:center;justify-content:center}
+  .cic .px{width:30px;height:30px}
+  .cpr{font-size:13px;color:#ffd166;min-height:18px}
+  .tg{font-family:var(--pix);font-size:12px;font-style:normal;color:var(--cyan)}
+  .card.on .tg{color:#04111f}
+  #cardsInfo{font-size:13px;color:var(--cyan);text-align:center;margin-bottom:8px}
+  #cardsInfo:empty{display:none}
+  #yard{margin-top:12px;border:2px solid var(--line);background:#030812;padding:8px 10px}
+  #yard[hidden]{display:none}
+  .lane{display:flex;align-items:center;gap:6px;margin:5px 0}
+  .ydepot,.yvault{display:inline-block;width:26px;height:26px;font-style:normal;flex:none}
+  .ydepot .px,.yvault .px{width:26px;height:26px}
+  .track{position:relative;flex:1;height:28px;border-bottom:2px dashed #1f4062}
+  .ybot{position:absolute;left:0;top:0;width:26px;height:26px;font-style:normal;animation:botBob 1s steps(2) infinite}
+  .ybot .px{width:26px;height:26px}
+  .ybot .carrycoin{position:absolute;left:5px;top:-13px;width:14px;height:14px}
+  @keyframes botBob{50%{margin-top:-3px}}
+  .yvault.bump{animation:bump .3s steps(3)}
+  .ycnt{font-family:var(--pix);font-size:10px;color:var(--cyan);width:32px;text-align:right}
+  .ybar{width:48px;height:8px;border:2px solid var(--line);background:#02060d;flex:none}
+  .ybar i{display:block;height:100%;width:0;background:var(--cyan)}
+  .yempty{font-size:13px;color:var(--muted);text-align:center;padding:6px}
+  .flycoin{position:fixed;z-index:80;width:18px;height:18px;image-rendering:pixelated;pointer-events:none}
+  .cell.hid{opacity:0}
+  .cell.built{animation:built .38s steps(5)}
+  @keyframes built{from{opacity:0;transform:translateY(-22px) scale(1.5)}to{opacity:1;transform:none}}
+  .cell.erase{animation:eraseOut .45s both}
+  @keyframes eraseOut{to{opacity:0;transform:scale(.2) rotate(40deg)}}
+  #builder{position:fixed;z-index:60;width:34px;height:34px;pointer-events:none;transform:translate(-25%,-95%);animation:hammer .22s steps(2) infinite}
+  #builder[hidden]{display:none}
+  #builder .px{width:34px;height:34px}
+  @keyframes hammer{50%{transform:translate(-25%,-95%) rotate(-28deg)}}
+  @media(max-width:900px){#game.camp{grid-template-columns:minmax(0,1fr)}#game.camp>*{grid-column:1}#game.camp>.boardbox{grid-column:1;grid-row:auto}}
+  html.mobile #game.camp{grid-template-columns:minmax(0,1fr);width:100%}
+  html.mobile #game.camp>*{grid-column:1}
+  html.mobile #game.camp>.hud{order:1}html.mobile #game.camp>#say{order:2}html.mobile #game.camp>#tide{order:3}html.mobile #game.camp>.boardbox{order:4;grid-column:1;grid-row:auto}
+  html.mobile #game.camp>#tabs{order:5}html.mobile #game.camp>#cardsInfo{order:6}html.mobile #game.camp>#cards{order:7}html.mobile #game.camp>#yard{order:8}html.mobile #game.camp>.foot{order:9}
+  html.mobile #cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+  html.mobile .hud .stat{min-width:0;flex:1}
+  html.mobile #face{flex:none}
   canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:6}
   @media(max-width:520px){.stat{min-width:78px;font-size:13px}.screen{padding:14px}#menu h1{font-size:26px}.play{font-size:12px}}
 </style>
 </head>
 <body>
-<button id="gear" data-i18n-title="tSettings">⚙️</button>
-<button id="sound" data-i18n-title="tSound">🔊</button>
+<button id="gear" data-i18n-title="tSettings">:gear:</button>
+<button id="sound" data-i18n-title="tSound">:spk:</button>
 
 <!-- MENU INICIAL -->
 <!-- INTRO COM O SMILY -->
@@ -545,29 +597,27 @@
     <div class="tag" id="tag"></div>
   </div>
   <div class="hud">
-    <div class="stat" data-i18n-title="tMines"><span>🚩</span><b id="mines">010</b></div>
+    <div class="stat" data-i18n-title="tMines"><span>:flag:</span><b id="mines">010</b></div>
     <button id="face" data-i18n-title="tReset">🙂</button>
     <div class="stat" id="timeStat"><span>⏱</span><b id="time">000</b></div>
-    <div class="stat" id="coinStat" hidden><span>🪙</span><b id="coinN">0</b></div>
+    <div class="stat" id="coinStat" hidden><span>:coin:</span><b id="coinN">0</b></div>
   </div>
   <div class="say" id="say" hidden><span id="sayText"></span></div>
+  <div id="tabs" hidden></div>
+  <div id="cardsInfo"></div>
+  <div id="cards"></div>
+  <div id="yard" hidden></div>
   <div class="tidebar" id="tide" hidden></div>
   <div class="duelbar" id="duel" hidden>
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">⚠️</i><i class="hsign r">⚠️</i><div class="boardwrap"><div id="board"></div></div></div>
-  <div id="campbar" hidden>
-    <button class="tool" id="bShop"><span id="bShopL"></span><i class="dot" id="dotShop" hidden></i></button>
-    <button class="tool" id="bLoad"><span id="bLoadL"></span></button>
-    <button class="tool" id="bDrone"><span id="bDroneL"></span></button>
-    <span id="shieldN">🛡 0</span>
-  </div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="boardwrap"><div id="board"></div></div></div>
   <div class="foot">
     <div id="actions">
-      <button class="tool" id="flagMode" data-i18n="flagMode">🚩 Flag mode</button>
+      <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
       <button class="tool" id="radarBtn" hidden>📡 Radar</button>
-      <button class="tool mobonly" id="zoomOut">➖</button><button class="tool mobonly" id="zoomIn">➕</button>
+      <button class="tool mobonly" id="zoomOut">−</button><button class="tool mobonly" id="zoomIn">+</button>
     </div>
     <div><span data-i18n="best">Best:</span> <span class="best" id="best">—</span></div>
   </div>
@@ -579,7 +629,7 @@
 <canvas id="fx"></canvas>
 <div id="toast"></div>
 <div id="cool" hidden><div id="coolMsg"></div><div class="coolbar"><i id="coolFill"></i></div><button class="tool" id="coolSkip"></button></div>
-<div id="cpanel"><div class="tutbox cbox"><button class="x" id="cpX">✕</button><h2 id="cpT"></h2><div class="tabs" id="cpTabs"></div><div id="cpBody"></div></div></div>
+<i id="builder" hidden>:hammer:</i>
 <div id="askbox"><div class="modal"><div class="big" id="askE"></div><h2 id="askT"></h2><p id="askP"></p><div class="row" id="askB"></div></div></div>
 <div id="adbox"><div class="adc"><h3 id="adT"></h3><p id="adP"></p><div id="adLeft"></div></div></div>
 <div id="reviewbar" hidden><div id="rvText"></div><div class="rvbtns"><button class="tool" id="rvAgain" data-i18n="again">Play again</button><button class="tool" id="rvMenu" data-i18n="toMenu">Menu</button></div></div>
@@ -611,7 +661,7 @@ const RES=o=>{ // resolve {en,pt} para o idioma atual, recursivamente
 const STR={
   en:{
     title:'Mine Sweeper',sub:'Choose the mode, floor and difficulty',lblMode:'Mode',lblFloor:'Floor',lblDiff:'Difficulty',
-    play:'▼ PLAY ▼',menu:'← Menu',flagMode:'🚩 Flag mode',best:'Best:',again:'Play again',review:'🔍 Review',gotIt:'Got it',
+    play:'▼ PLAY ▼',menu:'← Menu',flagMode:':flag: Flag mode',best:'Best:',again:'Play again',review:'🔍 Review',gotIt:'Got it',
     toMenu:'Menu',tReset:'Restart',tSound:'Sound',tHow:'How it works',tMines:'Mines left',tSettings:'Settings',
     mines:'mines',bombs:'bombs',mixName:'Mix',mixDesc:'Combine several modes and play them all at once. Turn it on and pick which ones.',
     mixHint:'Pick 1 or more modes to combine (none = Classic)',floorWord:'Floor',torusHelp:'Edges wrap around (donut)',
@@ -630,7 +680,7 @@ const STR={
   },
   pt:{
     title:'Campo Minado',sub:'Escolha o modo, o piso e a dificuldade',lblMode:'Modo',lblFloor:'Piso',lblDiff:'Dificuldade',
-    play:'▼ JOGAR ▼',menu:'← Menu',flagMode:'🚩 Modo bandeira',best:'Recorde:',again:'Jogar de novo',review:'🔍 Revisar',gotIt:'Entendi',
+    play:'▼ JOGAR ▼',menu:'← Menu',flagMode:':flag: Modo bandeira',best:'Recorde:',again:'Jogar de novo',review:'🔍 Revisar',gotIt:'Entendi',
     toMenu:'Menu',tReset:'Reiniciar',tSound:'Som',tHow:'Como funciona',tMines:'Minas restantes',tSettings:'Configurações',
     mines:'minas',bombs:'bombas',mixName:'Mix',mixDesc:'Combine vários modos e jogue todos de uma vez. Ligue e marque quais quer.',
     mixHint:'Marque 1 ou mais modos para combinar (nenhum = Clássico)',floorWord:'Piso',torusHelp:'As bordas se conectam (donut)',
@@ -904,6 +954,7 @@ const SFX={
   tick(k){tone(k%2?520:880,.05,'square',.07)},
   tide(){noise(.8,.22,400,3000);tone(180,.7,'sine',.06,0,520)},
   alarm(){tone(880,.08,'square',.07);tone(660,.08,'square',.07,.1);tone(880,.08,'square',.07,.2)},
+  build(k){tone(170+(k%6)*55,.04,'square',.035)},
   coin(n){tone(900+Math.min(n,8)*60,.06,'square',.05);tone(1350+Math.min(n,8)*60,.08,'square',.04,.05)},
   shield(){tone(300,.1,'sawtooth',.07,0,900);tone(900,.15,'square',.05,.1)},
   buy(){[520,660,880].forEach((f,i)=>tone(f,.08,'triangle',.08,i*.06))},
@@ -927,7 +978,7 @@ const SFX={
   turn(){tone(480,.07,'triangle',.08);tone(640,.09,'triangle',.08,.07)},
   win(){SP.win.forEach((f,i)=>tone(f,.28,'triangle',.13,i*.09));noise(.4,.05,6000,3000,.5)}
 };
-function syncSound(){$('#sound').textContent=muted?'🔇':'🔊';const b=$('#setSound');if(b)b.textContent=muted?tr('off'):tr('on')}
+function syncSound(){$('#sound').textContent=muted?':spkoff:':':spk:';const b=$('#setSound');if(b)b.textContent=muted?tr('off'):tr('on')}
 const toggleSound=()=>{muted=!muted;try{localStorage.setItem('ms-mute',muted?'1':'0')}catch(e){}syncSound();SFX.menu()};
 $('#sound').onclick=toggleSound;
 syncSound();
@@ -1075,7 +1126,7 @@ function init(){
   $('#duel').hidden=!has('duel');$('#tide').hidden=!has('tide');updateTide();$('#radarBtn').hidden=!has('detector');
   updateDuel();updateRadar();
   boardEl.className=(shapes?'shapes ':'')+floor;boardEl.innerHTML='';boardEl.style.cssText='';
-  const mob=isMobile(),w=Math.floor((Math.min(innerWidth-(mob?28:90),1100))/C)-3;
+  const mob=isMobile(),w=Math.floor((custom&&!mob&&innerWidth>900?Math.min(innerWidth-540,620):Math.min(innerWidth-(mob?28:90),1100))/C)-3;
   userCell=0;const mx=custom?(mob?56:72):(mob?44:36),s=mob?Math.max(28,Math.min(mx,w)):Math.max(24,Math.min(mx,w));
   $('#zoomIn').hidden=$('#zoomOut').hidden=shapes;
   document.documentElement.style.setProperty('--cell',s+'px');
@@ -1171,9 +1222,9 @@ function setupCell(el,x,y){
   /* os dois botões (ou o botão do meio) num número = abrir vizinhos com efeito */
   el.addEventListener('mousedown',e=>{
     if(e.buttons!==3&&e.button!==1)suppress=false;
+    if(e.button===2)rDown=true; // (antes ficava depois do 'radarOn' e as bandeiras sumiam no Detector)
     if(radarOn)return;
     if(e.button===1){e.preventDefault();suppress=true;if(grid[y][x].o)move(x,y,true);return}
-    if(e.button===2)rDown=true;
     if(e.buttons===3){both=true;suppress=true;chordPreview(x,y,true)}
   });
   el.addEventListener('mouseup',e=>{
@@ -1413,7 +1464,7 @@ function disintegrate(layer,neg){
   const rs=imgs.map(i=>i.getBoundingClientRect());
   const top=Math.min(...rs.map(r=>r.top)),H=Math.max(1,Math.max(...rs.map(r=>r.bottom))-top),FR=14;
   imgs.forEach((img,k)=>{
-    const pix=spritePix.get(img.alt);if(!pix)return;const r=rs[k],ps=r.width/PXN;
+    const pix=spritePix.get(img.alt);if(!pix)return;const r=rs[k],ps=r.width/(img.naturalWidth||PXN);
     for(const q of pix){
       const py=r.top+q.y*ps,rel=(py-top)/H;
       let [cr,cg,cb]=q.rgb;if(neg)[cr,cg,cb]=hueRot180(cr,cg,cb);
@@ -1423,7 +1474,7 @@ function disintegrate(layer,neg){
   });
   loop();
 }
-function emo(ch){const u=sprite(ch);return u?`<img class="px" src="${u}" alt="${ch}" draggable="false">`:ch}
+function emo(ch){const nm=ch==='🚩'?'flag':ch==='💣'?'bomb':null;if(nm&&iconURL(nm))return iconImg(nm);const u=sprite(ch);return u?`<img class="px" src="${u}" alt="${ch}" draggable="false">`:ch}
 function stackHTML(ch,n,cls){ // n emojis desenhados, um por bandeira/bomba
   let h=`<div class="stack s${n}">`;
   for(let i=0;i<n;i++)h+=`<span class="${cls.trim()}" style="animation-delay:${i*90}ms">${emo(ch)}</span>`;
@@ -1442,7 +1493,7 @@ function updateTide(){ // falta 1 jogada: o texto pula alternando cores e aparec
   const was=bar.classList.contains('danger');
   bar.classList.toggle('danger',danger);$('#game').classList.toggle('tdanger',danger);
   if(danger){
-    bar.innerHTML='<span class="hs">⚠️</span><span class="tt">'+[...txt].map((c,i)=>`<span class="ch" style="--i:${i}">${c===' '?'&nbsp;':c}</span>`).join('')+'</span><span class="hs">⚠️</span>';
+    bar.innerHTML='<span class="hs">:warn:</span><span class="tt">'+[...txt].map((c,i)=>`<span class="ch" style="--i:${i}">${c===' '?'&nbsp;':c}</span>`).join('')+'</span><span class="hs">:warn:</span>';
     if(!was&&started)SFX.alarm();
   }else bar.innerHTML='<span class="tt">'+txt.replace(/(\d+)/,'<b>$1</b>')+'</span>';
 }
@@ -1802,9 +1853,8 @@ function syncSettings(){
 }
 function campLabels(){
   const set=(id,t)=>{const e=$(id);if(e)e.textContent=t};
-  set('#bShopL','🛒 '+ct('shop'));set('#bLoadL','🎛 '+ct('loadout'));set('#bDroneL','🤖 '+ct('drones'));set('#coolSkip',ct('skip'));set('#resetBtn',ct('resetBtn'));set('#introSkip',ct('skipIntro'));
-  const nx=$('#introNext');if(nx)nx.textContent='▼';
-  if($('#cpanel').classList.contains('show'))renderPanel();
+  set('#coolSkip',ct('skip'));set('#resetBtn',ct('resetBtn'));set('#introSkip',ct('skipIntro'));
+  if(camp){renderTabs();renderCards();renderYard()}
 }
 function applyLang(){
   document.documentElement.lang=lang==='pt'?'pt-BR':'en';document.title=tr('title');
@@ -1831,57 +1881,88 @@ $('#zoomIn').onclick=()=>zoomBoard(4);$('#zoomOut').onclick=()=>zoomBoard(-4);
 let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{const was=document.documentElement.classList.contains('mobile');applyDevice();
   if(document.documentElement.classList.contains('mobile')!==was&&$('#game').classList.contains('active'))gameLabels();
   if(!shapes&&!userCell&&$('#game').classList.contains('active')&&C){const m=isMobile(),w=Math.floor((Math.min(innerWidth-(m?28:90),1100))/C)-3;{const mx=custom?(m?56:72):(m?44:36);document.documentElement.style.setProperty('--cell',(m?Math.max(28,Math.min(mx,w)):Math.max(24,Math.min(mx,w)))+'px')}}},150)});
-$('#bShop').onclick=()=>openPanel('shop');$('#bLoad').onclick=()=>openPanel('loadout');$('#bDrone').onclick=()=>openPanel('drones');
-$('#cpX').onclick=closePanel;$('#cpanel').addEventListener('click',e=>{if(e.target.id==='cpanel')closePanel()});
-$('#cpTabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b){panelTab=b.dataset.tab;SFX.click();renderPanel()}});
-$('#cpBody').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
-  if(b.dataset.buy)buyItem(b.dataset.buy);
-  else if(b.dataset.eq){const k=b.dataset.eq;camp.eq[k]=!camp.eq[k];SFX.click();saveCamp();renderPanel()}
-  else if(b.dataset.eqf){const k=b.dataset.eqf;camp.eqFloor=camp.eqFloor===k?'':k;SFX.click();saveCamp();renderPanel()}});
-$('#coolSkip').onclick=()=>rewardedAd(()=>{coolLeft=0;campNewBoard()});
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)setTab(b.dataset.tab)});
+$('#cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b||b.disabled)return;const a=b.dataset.act;if(!a)return;
+  if(a.startsWith('buy:'))buyItem(a.slice(4));
+  else if(a.startsWith('eqf:')){const k=a.slice(4);camp.eqFloor=camp.eqFloor===k?'':k;SFX.click();saveCamp();renderCards()}
+  else if(a.startsWith('eq:')){const k=a.slice(3);camp.eq[k]=!camp.eq[k];SFX.click();saveCamp();renderCards()}});
+$('#coolSkip').onclick=()=>rewardedAd(()=>endCool());
 $('#resetBtn').onclick=()=>{closeSettings();resetCamp()};
-/* ===================== CAMPANHA (idle) com o Smily ===================== */
+/* ===================== CAMPANHA (idle) com o Smily — v2: abas à esquerda, mapa à direita ===================== */
 const SMILY='Smily';
 const SAVE_KEY='ms-camp-v1';
-let camp=null,campaign=false,custom=null,campCells=0,campBlock=false,coolT=0,coolLeft=0,coolTotal=10,idleAt=Date.now(),lastQuip=0,sayT=0,panelTab='shop',tickers=false;
+let camp=null,campaign=false,custom=null,campCells=0,campBlock=false,coolT=0,coolLeft=0,coolTotal=10,coolTimers=[],boardBuilt=false,idleAt=Date.now(),lastQuip=0,sayT=0,curTab=null,tickers=false,cardsDirty=false;
+
+/* ---------- ícones em pixel art, desenhados à mão (menos emoji) ---------- */
+const PALX={k:'#0b1020',w:'#ffffff',y:'#ffd166',Y:'#c98b1a',r:'#ff4d5e',R:'#a82636',b:'#4fa8ff',B:'#2d6fd0',c:'#4fd8e8',g:'#aebfd0',G:'#6a869f',p:'#ff5c93',o:'#ff9a4f',O:'#a35a22',n:'#53e69a'};
+const ICONS={
+  coin:["..kkkkkk..",".kyyyyyyk.","kyywyyyyYk","kywyyYyyYk","kywyyYyyYk","kywyyYyyYk","kyyyyYyyYk","kyyyyyyYYk",".kYYYYYYk.","..kkkkkk.."],
+  shield:[".kkkkkkkk.","kbbbbbbbbk","kbwbbbbbBk","kbwbbbbbBk","kbbbbbbbBk","kbbbbbbBBk",".kbbbbBBk.","..kbbBBk..","...kBBk...","....kk...."],
+  drone:["....kc....","....kk....",".kkkkkkkk.","kggggggggk","kgccggccgk","kgccggccgk","kggggggggk","kgkkkkkkgk","kGGGGGGGGk",".kkkkkkkk."],
+  flag:[".kw.......",".kwrrrr...",".kwrrrrrr.",".kwrrrrrR.",".kwrrrRR..",".kwrRR....",".kw.......",".kw.......",".kw.......","kkkkk....."],
+  bomb:[".......oy.","......ko..","....kkkk..","...kGGGGk.","..kGwGGGGk","..kGwGGGGk","..kGGGGGGk","..kGGGGGGk","...kGGGGk.","....kkkk.."],
+  star:["....yy....","....yy....","...yyyy...","yyyyyyyyyy",".yyyyyyyy.","..yyyyyy..","..yyyyyy..",".yyyyyyyy.",".yyy..yyy.",".yy....yy."],
+  clock:["..kkkkkk..",".kwwwwwwk.","kwwwwkwwwk","kwwwwkwwwk","kwwwwkkwwk","kwwwwwwwwk","kwwwwwwwwk",".kwwwwwwk.","..kkkkkk..",".........."],
+  grid:["cccc.cccc.","cccc.cccc.","cccc.cccc.","cccc.cccc.","..........","cccc.cccc.","cccc.cccc.","cccc.cccc.","cccc.cccc.",".........."],
+  lock:["...kkkk...","..kggggk..","..kg..gk..",".kkkkkkkk.",".kyyyyyyk.",".kyyyyyyk.",".kyykkyyk.",".kyykkyyk.",".kyyyyyyk.",".kkkkkkkk."],
+  gear:["....gg....",".g.gggg.g.",".gggggggg.","..gg..gg..","ggg....ggg","ggg....ggg","..gg..gg..",".gggggggg.",".g.gggg.g.","....gg...."],
+  spk:["..........",".....w....","....ww..w.","wwwww....w","wwwww.w..w","wwwww.w..w","wwwww....w","....ww..w.",".....w....",".........."],
+  spkoff:["..........",".....w....","....ww....","wwwww.r..r","wwwww..rr.","wwwww..rr.","wwwww.r..r","....ww....",".....w....",".........."],
+  warn:["....kk....","...kyyk...","..kyyyyk..","..kyykyk..",".kyyykkyyk",".kyyykkyyk","kyyyyyyyyk","kyyyykkyyk","kyyyyyyyyk","kkkkkkkkkk"],
+  hammer:["..kkkkk...",".kggggGk..",".kggggGk..","..kkkkk...","....ko....","....ko....","....ko....","....ko....","....ko....","....kk...."],
+  vault:["..........",".kkkkkkkk.","kyyyyyyyyk","kyYyyyyYyk","kkkkkkkkkk","kooooooook","kooookoook","kooooooook","kooooooook","kkkkkkkkkk"],
+  depot:["..kkkkkk..",".kGGGGGGk.","kGGGGGGGGk","kGGkkkkGGk","kGkkkkkkGk","kGkkkkkkGk","kGkkkkkkGk","kGkkkkkkGk","kkkkkkkkkk",".........."]
+};
+const iconCache=new Map();
+function iconURL(name){
+  if(iconCache.has(name))return iconCache.get(name);
+  const g=ICONS[name];if(!g)return null;
+  const cv=document.createElement('canvas');cv.width=cv.height=10;const c=cv.getContext('2d'),pix=[];
+  g.forEach((row,y)=>{for(let x=0;x<10;x++){const ch=row[x];if(ch&&ch!=='.'&&PALX[ch]){c.fillStyle=PALX[ch];c.fillRect(x,y,1,1);
+    const h=PALX[ch];pix.push({x,y,rgb:[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]})}}});
+  const url=cv.toDataURL();iconCache.set(name,url);spritePix.set(':'+name+':',pix);return url;
+}
+const iconImg=name=>`<img class="px" src="${iconURL(name)}" alt=":${name}:" draggable="false">`;
+
 const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
-const SIZE_COST=[0,40,160,520,1500,4500,12000,36000,100000];
-const DRONES=[{n:'Mk I',every:20,yield:3,need:0},{n:'Mk II',every:60,yield:45,need:2},{n:'Mk III',every:120,yield:420,need:4}];
-const MODS={negative:{r:30,k:8,min:4,cost:120},multi:{r:40,k:10,min:4,cost:250},liar:{r:35,k:8,min:5,cost:300},partial:{r:45,k:12,min:5,cost:450},
-  mirror:{r:50,k:10,min:4,cost:600},echo:{r:60,k:12,min:6,cost:900},tide:{r:80,k:15,min:6,cost:1500}};
-const FMODS={irr:{r:25,k:8,min:4,cost:200},torus:{r:40,k:8,min:4,cost:350},tri:{r:50,k:10,min:4,cost:500}};
-const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0});
+const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
+const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,need:2},{n:'Mk III',every:120,yield:300,need:4}];
+const MODS={negative:{r:30,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:40,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
+  liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
+const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
+const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false});
 function loadCamp(){
   camp=newCamp();
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(j&&typeof j==='object')camp={...camp,...j}}catch(e){}
+  if(!camp.newTab)camp.newTab={};
 }
 function saveCamp(){if(!camp)return;camp.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(camp))}catch(e){}}
 
 /* ---------- textos da campanha (inglês principal, português secundário) ---------- */
 const CSTR={
-  en:{shop:'Shop',loadout:'Loadout',drones:'Drones',coinsLbl:'coins',buy:'Buy',max:'MAX',owned:'Owned',unlock:'Unlock',equip:'Equip',equipped:'Equipped',locked:'Locked',
-    upSize:n=>`Bigger board ${n}×${n}`,upSizeD:'More cells, more coins, more mines.',upCpc:'Coins per cell',upCpcD:v=>`Each safe cell pays ${v} 🪙.`,
-    upClear:'Clear bonus',upClearD:m=>`Clearing a board pays ×${m} extra.`,upCool:'Faster reload',upCoolD:s=>`Next board in ${s}s.`,upShield:'Shield',upShieldD:'Absorbs one mine. Max 5.',
-    droneD:(e,y)=>`+${y} 🪙 every ${e}s`,droneNeed:n=>`Unlocks at ${n}×${n} boards`,droneHave:n=>`You have ${n}`,
-    modD:(r,k,m)=>`+${r}% coins · +${k}% loss · from ${m}×${m}`,modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,
-    coolMsg:s=>`Next board in ${s}s`,skip:'📺 Skip (ad)',
-    reviveT:'BOOM!',reviveP:(loss,pct)=>`You hit a mine. Lose ${loss} coins (${pct}%) — or revive and keep going.`,reviveBtn:'📺 Revive (ad)',takeLoss:'Take the loss',
-    offT:'Welcome back',offP:n=>`Your drones made ${n} coins while you were away.`,collect:'Collect',double:'📺 Double (ad)',
+  en:{shop:'Shop',items:'Items',drones:'Drones',loadout:'Loadout',
+    cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',
+    lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
+    yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
+    modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
+    build:s=>`Smily is building the next map… ${s}s`,skip:'Skip (watch ad)',
+    reviveT:'BOOM!',reviveP:(loss,pct)=>`You hit a mine. Lose ${loss} coins (${pct}%) — or revive and keep going.`,reviveBtn:'Revive (watch ad)',takeLoss:'Take the loss',
+    offT:'Welcome back',offP:n=>`Your drones made ${n} coins while you were away.`,collect:'Collect',double:'Double (watch ad)',
     adT:'Ad (placeholder)',adP:'The rewarded ad plays here.',adLeft:s=>`Reward in ${s}s`,
-    resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',
-    panelT:{shop:'🛒 Shop',drones:'🤖 Drones',loadout:'🎛 Loadout'},floorWord:'Floor',skipIntro:'Skip ▶▶',clickHint:'▼ click / tap / Enter'},
-  pt:{shop:'Loja',loadout:'Equipar',drones:'Drones',coinsLbl:'moedas',buy:'Comprar',max:'MÁX',owned:'Tenho',unlock:'Desbloquear',equip:'Equipar',equipped:'Equipado',locked:'Bloqueado',
-    upSize:n=>`Tabuleiro maior ${n}×${n}`,upSizeD:'Mais casas, mais moedas, mais minas.',upCpc:'Moedas por casa',upCpcD:v=>`Cada casa segura paga ${v} 🪙.`,
-    upClear:'Bônus de limpeza',upClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,upCool:'Recarga mais rápida',upCoolD:s=>`Próximo tabuleiro em ${s}s.`,upShield:'Escudo',upShieldD:'Absorve uma mina. Máx. 5.',
-    droneD:(e,y)=>`+${y} 🪙 a cada ${e}s`,droneNeed:n=>`Libera no tabuleiro ${n}×${n}`,droneHave:n=>`Você tem ${n}`,
-    modD:(r,k,m)=>`+${r}% moedas · +${k}% de perda · a partir de ${m}×${m}`,modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,
-    coolMsg:s=>`Próximo tabuleiro em ${s}s`,skip:'📺 Pular (anúncio)',
-    reviveT:'BOOM!',reviveP:(loss,pct)=>`Você pisou numa mina. Perde ${loss} moedas (${pct}%) — ou reviva e continue.`,reviveBtn:'📺 Reviver (anúncio)',takeLoss:'Aceitar a perda',
-    offT:'Bem-vindo de volta',offP:n=>`Seus drones fizeram ${n} moedas enquanto você estava fora.`,collect:'Coletar',double:'📺 Dobrar (anúncio)',
+    resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
+  pt:{shop:'Loja',items:'Itens',drones:'Drones',loadout:'Equipar',
+    cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',
+    lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
+    yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
+    modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
+    build:s=>`O Smily está construindo o próximo mapa… ${s}s`,skip:'Pular (ver anúncio)',
+    reviveT:'BOOM!',reviveP:(loss,pct)=>`Você pisou numa mina. Perde ${loss} moedas (${pct}%) — ou reviva e continue.`,reviveBtn:'Reviver (ver anúncio)',takeLoss:'Aceitar a perda',
+    offT:'Bem-vindo de volta',offP:n=>`Seus drones fizeram ${n} moedas enquanto você estava fora.`,collect:'Coletar',double:'Dobrar (ver anúncio)',
     adT:'Anúncio (exemplo)',adP:'Aqui toca o anúncio recompensado.',adLeft:s=>`Recompensa em ${s}s`,
-    resetBtn:'Reiniciar progresso',resetT:'Reiniciar tudo?',resetP:'Isso apaga suas moedas, melhorias e drones.',yes:'Sim, reiniciar',no:'Cancelar',
-    panelT:{shop:'🛒 Loja',drones:'🤖 Drones',loadout:'🎛 Equipar'},floorWord:'Piso',skipIntro:'Pular ▶▶',clickHint:'▼ clique / toque / Enter'}
+    resetBtn:'Reiniciar progresso',resetT:'Reiniciar tudo?',resetP:'Isso apaga suas moedas, melhorias e drones.',yes:'Sim, reiniciar',no:'Cancelar',skipIntro:'Pular >>'}
 };
 const ct=(k,...a)=>{const v=CSTR[lang][k];return typeof v==='function'?v(...a):v};
 
@@ -1890,10 +1971,14 @@ const LINES={
   start:[X("Here's your 3×3. Don't pop the champagne yet.","Aqui está seu 3×3. Não abra o champanhe ainda.")],
   firstCoin:[X("One coin. Don't spend it all in one place. It's the only one you have.","Uma moeda. Não gaste tudo num lugar só. É a única que você tem.")],
   win:[X("Fine. You cleared it. I let you. Strategically.","Tá. Você limpou. Eu deixei. Estrategicamente."),X("Board cleared. My ego has a small dent. Happy?","Tabuleiro limpo. Meu ego ficou com um arranhão. Feliz?"),
-    X("Winning is nice. I'm told. I've never tried it.","Ganhar é legal. Me disseram. Nunca tentei."),X("Impressive. Do it again, I dare you.","Impressionante. Faz de novo, eu duvido.")],
+    X("Winning is nice. I'm told. I've never tried it.","Ganhar é legal. Me disseram. Nunca tentei."),X("Impressive. Do it again, I dare you.","Impressionante. Faz de novo, eu duvido."),
+    X("Cleared. I'd applaud, but I'm a face. No hands.","Limpo. Eu aplaudiria, mas sou um rosto. Sem mãos."),
+    X("Another win. The developer is proud. I'm filing a complaint.","Mais uma vitória. O desenvolvedor está orgulhoso. Eu estou abrindo uma reclamação.")],
   lose:[X("KABOOM. That sound never gets old.","KABOOM. Esse som nunca enjoa."),X("You lost {loss} coins. I'll keep a few as a memory.","Você perdeu {loss} moedas. Vou guardar umas de lembrança."),
     X("I'd say sorry, but I'm contractually obligated to enjoy this.","Eu pediria desculpas, mas o contrato me obriga a curtir isso."),X("Call it a donation. To me.","Chame de doação. Para mim.")],
-  shield:[X("A shield? Seriously? I'll look away. Once.","Um escudo? Sério? Eu viro o rosto. Uma vez."),X("Blocked. I hate it. Respect, though.","Bloqueado. Odeio. Mas respeito.")],
+  shield:[X("A shield? Seriously? I'll look away. Once.","Um escudo? Sério? Eu viro o rosto. Uma vez."),X("Blocked. I hate it. Respect, though.","Bloqueado. Odeio. Mas respeito."),
+    X("Oh, a shield. How very... prepared of you. I hate it.","Ah, um escudo. Que... precavido da sua parte. Odeio isso."),
+    X("That mine worked so hard. All that planning, wasted on a piece of armor.","Aquela mina trabalhou tanto. Todo aquele planejamento, desperdiçado numa armadura.")],
   revive:[X("A little ad and you're back. Capitalism, huh.","Um anúncio pequeno e você volta. Capitalismo, hein."),X("Revived. I pretend I didn't see the first time.","Reviveu. Eu finjo que não vi da primeira vez.")],
   idle:[X("Hello? Did you fall asleep? The mines won't open themselves.","Alô? Dormiu? As minas não se abrem sozinhas."),X("I'm just standing here. Smiling. It's very awkward.","Tô aqui parado. Sorrindo. É muito constrangedor.")],
   fourth:[X("Fun fact: I'm just HTML and pixels. Don't tell the mines.","Curiosidade: eu sou só HTML e pixels. Não conta para as minas."),
@@ -1905,9 +1990,16 @@ const LINES={
   unlock:[X("New toys. I made these harder on purpose. You're welcome.","Brinquedos novos. Deixei mais difíceis de propósito. De nada.")],
   poke:[X("Hey! Personal space.","Ei! Espaço pessoal."),X("Stop poking me. I'm busy planning your defeat.","Para de me cutucar. Estou ocupado planejando sua derrota."),X("Yes, I'm clickable. No, it won't help.","Sim, eu sou clicável. Não, não vai ajudar.")],
   drone:[X("Your drones are working. Unlike you, they never complain.","Seus drones estão trabalhando. Diferente de você, nunca reclamam.")],
-  bigger:[X("A bigger board. Bold. Foolish. Bold again.","Um tabuleiro maior. Ousado. Tolo. Ousado de novo.")]
+  bigger:[X("A bigger board. Bold. Foolish. Bold again.","Um tabuleiro maior. Ousado. Tolo. Ousado de novo.")],
+  build:[X("Planning the next one. Don't peek.","Planejando o próximo. Não espie."),X("A mine here... no, there... ah, forget it. Everywhere.","Uma mina aqui... não, ali... ah, deixa. Em todo lugar."),
+    X("Building your next map. Hard hat on. Safety first. Mine, not yours.","Construindo seu próximo mapa. Capacete na cabeça. Segurança primeiro. A minha, não a sua.")],
+  unlock_shop:[X("You have coins now. Dangerous. There's a shop. Go on, spend them.","Você tem moedas agora. Perigoso. Tem uma loja. Vai, gasta.")],
+  unlock_items:[X("Items. For people who hate losing. So, everyone.","Itens. Para quem odeia perder. Ou seja, todo mundo.")],
+  unlock_drones:[X("Drones. They work while you stare at the screen. Disturbingly efficient.","Drones. Eles trabalham enquanto você encara a tela. Perturbadoramente eficientes.")],
+  unlock_loadout:[X("Loadout. You can make my mines meaner. Why would you do this to yourself?","Equipar. Você pode deixar minhas minas mais malvadas. Por que você faria isso consigo mesmo?")],
+  unlock_floors:[X("New floors. Same mines, weirder shapes. You're welcome.","Pisos novos. As mesmas minas, formas mais estranhas. De nada.")]
 };
-const MOODS={start:'🙂',firstCoin:'😐',win:'😒',lose:'😈',shield:'🙄',revive:'😏',idle:'😴',fourth:'🤨',buy:'😏',unlock:'😈',poke:'😠',drone:'😐',bigger:'😬'};
+const MOODS={start:'🙂',firstCoin:'😐',win:'😒',lose:'😈',shield:'🙄',revive:'😏',idle:'😴',fourth:'🤨',buy:'😏',unlock:'😈',poke:'😠',drone:'😐',bigger:'😬',build:'🤨',unlock_shop:'😏',unlock_items:'😏',unlock_drones:'😐',unlock_loadout:'😈',unlock_floors:'😈'};
 function setFace(e){faceEl.textContent=e}
 function quip(ctx,vars){
   const arr=LINES[ctx];if(!arr||!campaign)return;
@@ -1916,31 +2008,28 @@ function quip(ctx,vars){
   const b=$('#say');b.hidden=false;const tx=$('#sayText');tx.textContent='';lastQuip=Date.now();
   setFace(MOODS[ctx]||'🙂');
   let i=0;clearTimeout(sayT);
-  (function type(){i++;tx.textContent=t.slice(0,i);if(i<t.length)sayT=setTimeout(type,18);else sayT=setTimeout(()=>{b.hidden=true;if(!over||campBlock===false)setFace('🙂')},Math.max(4200,t.length*60))})();
+  (function type(){i++;tx.textContent=t.slice(0,i);if(i<t.length)sayT=setTimeout(type,18);else sayT=setTimeout(()=>{b.hidden=true;if(!campBlock)setFace('🙂')},Math.max(4200,t.length*60))})();
 }
 
 /* ---------- economia ---------- */
 const cpcVal=()=>1+camp.cpc;
 const clearMult=()=>1+camp.clear*.25;
-const coolSecs=()=>Math.max(2,10-camp.cool);
+const coolSecs=()=>Math.max(3,Math.round(6+SIZES[camp.size]*1.2-camp.cool)); // tabuleiros maiores esperam mais
 const activeMods=()=>Object.keys(MODS).filter(k=>camp.eq[k]&&camp.un[k]&&SIZES[camp.size]>=MODS[k].min);
 const activeFloor=()=>{const f=camp.eqFloor;return f&&camp.un[f]&&SIZES[camp.size]>=FMODS[f].min?f:''};
 const modReward=()=>1+(activeMods().reduce((s,k)=>s+MODS[k].r,0)+(activeFloor()?FMODS[activeFloor()].r:0))/100;
 const lossPct=()=>Math.min(60,12+activeMods().reduce((s,k)=>s+MODS[k].k,0)+(activeFloor()?FMODS[activeFloor()].k:0));
 const COST={
-  size:()=>SIZE_COST[camp.size+1],cpc:()=>Math.round(10*Math.pow(1.7,camp.cpc)),clear:()=>Math.round(25*Math.pow(1.8,camp.clear)),
-  cool:()=>Math.round(30*Math.pow(2,camp.cool)),shield:()=>Math.round(25*Math.pow(1.4,camp.shieldBought)),
-  drone:i=>Math.round([60,400,3000][i]*Math.pow([1.35,1.4,1.45][i],camp.drones[i]))
+  size:()=>SIZE_COST[camp.size+1],cpc:()=>Math.round(18*Math.pow(2,camp.cpc)),clear:()=>Math.round(45*Math.pow(2.2,camp.clear)),
+  cool:()=>Math.round(80*Math.pow(2.5,camp.cool)),shield:()=>Math.round(40*Math.pow(1.6,camp.shieldBought)),
+  drone:i=>Math.round([90,700,6000][i]*Math.pow([1.5,1.55,1.6][i],camp.drones[i]))
 };
 const fmtC=n=>n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e4?(n/1e3).toFixed(1)+'K':String(Math.floor(n));
 function addCoins(n){camp.coins+=n;if(n>0)camp.total+=n;setCoins()}
-let panelDirty=false;
 function setCoins(){
   const c=$('#coinN');c.textContent=fmtC(camp.coins);c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');
-  $('#shieldN').textContent='🛡 '+camp.shields;
-  const afford=[COST.cpc(),COST.clear(),camp.size<SIZES.length-1?COST.size():1e18,camp.cool<8?COST.cool():1e18,camp.shields<5?COST.shield():1e18,COST.drone(0)].some(c=>c<=camp.coins);
-  $('#dotShop').hidden=!afford;
-  if($('#cpanel').classList.contains('show')&&!panelDirty){panelDirty=true;requestAnimationFrame(()=>{panelDirty=false;renderPanel()})}
+  const sh=$('#shieldN');if(sh)sh.textContent=':shield: '+camp.shields;
+  if(!cardsDirty){cardsDirty=true;requestAnimationFrame(()=>{cardsDirty=false;renderCards()})}
 }
 function floatText(txt,anchor,cls){
   const r=anchor.getBoundingClientRect(),d=document.createElement('div');d.className='floaty '+(cls||'');d.textContent=txt;
@@ -1952,29 +2041,112 @@ function campPay(x,y){ // moedas por casa segura aberta (agrupadas por jogada)
   const first=camp.total===0;addCoins(gain);floatText('+'+gain,el(x,y),'coin');SFX.coin(n);
   if(first)setTimeout(()=>quip('firstCoin'),700);
 }
-
 function startBoardFast(x,y){ // campanha: procura rápida (≈90 ms) por um tabuleiro resolvível, sem zoom nem espera
   const s=y*C+x,t0=performance.now();let best=null;
   for(;;){const m=makeLayout(s),r=analyze(m,s);if(!best||r.frac>best.r.frac)best={m,r};if(best.r.frac>=1||performance.now()-t0>90)break}
   placeLayout(best.m);
 }
-/* ---------- novo tabuleiro / fim de tabuleiro ---------- */
-function campNewBoard(){
+
+/* ---------- progressão: abas, itens e modos aparecem aos poucos ---------- */
+function tabsAvail(){
+  const w=camp.wins,s=camp.size,t=[];
+  if(w>=1||camp.total>=40)t.push('shop');
+  if(camp.losses>=1||w>=5||camp.shields>0)t.push('items');
+  if(w>=12||s>=3||camp.drones.some(n=>n>0))t.push('drones');
+  if((s>=3&&w>=25)||Object.keys(camp.un).length)t.push('loadout');
+  return t;
+}
+const floorsAvail=()=>(camp.size>=4&&camp.wins>=40)||!!camp.eqFloor||Object.keys(FMODS).some(k=>camp.un[k]);
+function checkUnlocks(silent){
+  const now=tabsAvail(),have=camp.tabs||[],added=now.filter(t=>!have.includes(t)),fl=floorsAvail();
+  const firstRun=camp.tabs===null;camp.tabs=now;
+  if(!silent&&!firstRun){
+    added.forEach(t=>{camp.newTab[t]=true});
+    if(added.length){quip('unlock_'+added[0]);if(!curTab)curTab=added[0]}
+    else if(fl&&!camp.floorsOn&&camp.tabs.includes('loadout'))quip('unlock_floors');
+  }
+  camp.floorsOn=fl;
+  renderTabs();renderCards();
+}
+function setTab(t,keep){
+  curTab=(curTab===t&&!keep)?null:t; // clicar de novo recolhe
+  if(curTab)delete camp.newTab[curTab];
+  SFX.menu();renderTabs();renderCards();
+}
+function renderTabs(){
+  const box=$('#tabs');if(!box)return;
+  const tabs=camp.tabs||[];
+  box.hidden=!tabs.length;
+  box.innerHTML=tabs.map(k=>`<button class="tab${k===curTab?' sel':''}" data-tab="${k}">${ct(k)}${camp.newTab[k]?'<i class="dot"></i>':''}</button>`).join('')+
+    (tabs.includes('items')||camp.shields>0?`<span id="shieldN">:shield: ${camp.shields}</span>`:'');
+}
+const money=n=>`:coin: ${fmtC(n)}`;
+function card(o){
+  return `<button class="card${o.cls?' '+o.cls:''}"${o.act?` data-act="${o.act}"`:''}${o.dis?' disabled':''}${o.tip?` title="${o.tip}"`:''}>`+
+    `<span class="cic">${o.ic}</span><b>${o.name}</b><small>${o.sub||''}</small><span class="cpr">${o.pr||''}</span></button>`;
+}
+function renderCards(){
+  const box=$('#cards'),info=$('#cardsInfo');if(!box||!camp)return;
+  if(!curTab||!(camp.tabs||[]).includes(curTab)){box.innerHTML='';info.textContent='';return}
+  const cs=[];info.textContent='';
+  const ok=c=>camp.coins>=c?'ok':'';
+  if(curTab==='shop'){
+    if(camp.size<SIZES.length-1)cs.push(card({ic:':grid:',name:ct('cSize',SIZES[camp.size+1]),sub:ct('lvl',camp.size+1),pr:money(COST.size()),act:'buy:size',dis:camp.coins<COST.size(),cls:ok(COST.size()),tip:ct('cSizeD')}));
+    cs.push(card({ic:':coin:',name:ct('cCpc'),sub:ct('lvl',camp.cpc+1),pr:money(COST.cpc()),act:'buy:cpc',dis:camp.coins<COST.cpc(),cls:ok(COST.cpc()),tip:ct('cCpcD',cpcVal()+1)}));
+    if(camp.wins>=6){
+      cs.push(card({ic:':star:',name:ct('cClear'),sub:ct('lvl',camp.clear+1),pr:money(COST.clear()),act:'buy:clear',dis:camp.coins<COST.clear(),cls:ok(COST.clear()),tip:ct('cClearD',(clearMult()+.25).toFixed(2))}));
+      cs.push(camp.cool<8?card({ic:':clock:',name:ct('cCool'),sub:ct('lvl',camp.cool+1),pr:money(COST.cool()),act:'buy:cool',dis:camp.coins<COST.cool(),cls:ok(COST.cool()),tip:ct('cCoolD',coolSecs()-1)})
+        :card({ic:':clock:',name:ct('cCool'),sub:ct('max'),dis:true}));
+    }
+  }else if(curTab==='items'){
+    cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD')})
+      :card({ic:':shield:',name:ct('cShield'),sub:'5/5 '+ct('max'),dis:true}));
+  }else if(curTab==='drones'){
+    DRONES.forEach((d,i)=>{
+      if(camp.size>=d.need)cs.push(card({ic:':drone:',name:ct('droneName',d.n),sub:ct('droneD',d.every,d.yield)+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i))}));
+      else cs.push(card({ic:':lock:',name:ct('droneName',d.n),sub:ct('droneNeed',SIZES[d.need]),dis:true}));
+    });
+  }else if(curTab==='loadout'){
+    info.textContent=ct('modMult',modReward().toFixed(2),lossPct());
+    const mk=(k,m,nm,isFloor)=>{const un=camp.un[k],okSize=SIZES[camp.size]>=m.min,on=isFloor?camp.eqFloor===k:camp.eq[k];
+      if(!un)return card({ic:`<i class="tg">${m.tag}</i>`,name:nm,sub:ct('modD',m.r,m.k),pr:money(m.cost),act:'buy:unl:'+k,dis:camp.coins<m.cost,cls:ok(m.cost)});
+      return card({ic:`<i class="tg">${m.tag}</i>`,name:nm,sub:okSize?ct('modD',m.r,m.k):ct('needs',m.min),pr:on?ct('equipped'):ct('equip'),act:(isFloor?'eqf:':'eq:')+k,dis:!okSize,cls:on?'on':''})};
+    Object.keys(MODS).filter(k=>camp.size>=MODS[k].tier||camp.un[k]).forEach(k=>cs.push(mk(k,MODS[k],MODES[k].name,false)));
+    if(floorsAvail())Object.keys(FMODS).filter(k=>camp.size>=FMODS[k].tier||camp.un[k]).forEach(k=>cs.push(mk(k,FMODS[k],ct('floorWord')+' '+FLOORS[k].name,true)));
+  }
+  box.innerHTML=cs.join('');
+}
+function buyItem(key){
+  let c=0,ok=false;
+  if(key==='size'&&camp.size<SIZES.length-1){c=COST.size();if(camp.coins>=c){camp.size++;ok=true;quip('bigger')}}
+  else if(key==='cpc'){c=COST.cpc();if(camp.coins>=c){camp.cpc++;ok=true}}
+  else if(key==='clear'){c=COST.clear();if(camp.coins>=c){camp.clear++;ok=true}}
+  else if(key==='cool'&&camp.cool<8){c=COST.cool();if(camp.coins>=c){camp.cool++;ok=true}}
+  else if(key==='shield'&&camp.shields<5){c=COST.shield();if(camp.coins>=c){camp.shields++;camp.shieldBought++;ok=true}}
+  else if(key.startsWith('drone')){const i=+key.slice(5);c=COST.drone(i);if(camp.coins>=c&&camp.size>=DRONES[i].need){camp.drones[i]++;ok=true;quip('drone')}}
+  else if(key.startsWith('unl:')){const k=key.slice(4),m=MODS[k]||FMODS[k];c=m.cost;if(!camp.un[k]&&camp.coins>=c){camp.un[k]=true;ok=true;quip('unlock')}}
+  if(!ok)return;camp.coins-=c;SFX.buy();saveCamp();setCoins();renderYard();checkUnlocks();
+  if(!['size','unl','drone'].some(p=>key.startsWith(p))&&Math.random()<.25)quip('buy');
+}
+
+/* ---------- tabuleiro: novo, vitória, derrota, mina ---------- */
+function campNewBoard(build,secs){
   const n=SIZES[camp.size];custom={c:n,r:n,m:MINES[camp.size]};
   level=n<=4?'easy':n<=6?'medium':n<=9?'hard':'insane';
   const mods=activeMods();cur=new Set(mods.length?mods:['classic']);
   floor=activeFloor()||'square';shapes=isPoly(floor);
-  hideCool();campBlock=false;campCells=0;camp.boards++;
-  init();updateCampUI();
+  campCells=0;camp.boards++;
+  if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
+  init();setCoins();
+  if(build){boardBuilt=true;buildAnim(secs)}
 }
-function updateCampUI(){setCoins();$('#coinStat').hidden=false;}
 function defuse(x,y){const g=grid[y][x];fsum+=g.m-g.f;g.f=g.m;g.fo=0;renderFlag(x,y);setCounter()}
 function campMine(x,y){ // pisou numa mina: escudo > reviver com anúncio > perda de %
-  if(camp.shields>0){camp.shields--;saveCamp();setCoins();defuse(x,y);SFX.shield();quip('shield');return}
+  if(camp.shields>0){camp.shields--;saveCamp();setCoins();renderTabs();defuse(x,y);SFX.shield();quip('shield');return}
   campBlock=true;
   const pct=lossPct(),loss=Math.floor(camp.coins*pct/100);
   setFace('😰');
-  ask({emoji:'💥',title:ct('reviveT'),text:ct('reviveP',fmtC(loss),pct),buttons:[{label:ct('reviveBtn'),v:'revive'},{label:ct('takeLoss'),v:'lose',alt:true}]}).then(v=>{
+  ask({emoji:':bomb:',title:ct('reviveT'),text:ct('reviveP',fmtC(loss),pct),buttons:[{label:ct('reviveBtn'),v:'revive'},{label:ct('takeLoss'),v:'lose',alt:true}]}).then(v=>{
     if(v==='revive')rewardedAd(()=>{campBlock=false;defuse(x,y);quip('revive')});
     else{campBlock=false;lose(x,y)}
   });
@@ -1983,21 +2155,47 @@ function campAfterLose(){
   const pct=lossPct(),loss=Math.floor(camp.coins*pct/100);
   camp.coins-=loss;camp.losses++;camp.streak=0;saveCamp();setCoins();
   if(loss>0)floatText('-'+fmtC(loss),$('#coinStat'),'loss');
-  quip('lose',{loss:fmtC(loss)});startCooldown(coolSecs());
+  quip('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
 }
 function campWin(){
   over=true;
-  const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.5*clearMult()*modReward()));
+  const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()));
   addCoins(bonus);camp.wins++;camp.streak++;saveCamp();setFace('😎');
-  floatText('+'+fmtC(bonus)+' ★',$('#coinStat'),'bonus');SFX.win();pixelSparks(cells[cells.length>>1],30,['#4fd8e8','#ff5c93','#ffd166','#ffffff']);
-  boardEl.classList.add('win');quip('win');startCooldown(coolSecs());
+  floatText('+'+fmtC(bonus),$('#coinStat'),'bonus');SFX.win();pixelSparks(cells[cells.length>>1],30,['#4fd8e8','#ff5c93','#ffd166','#ffffff']);
+  boardEl.classList.add('win');quip('win');checkUnlocks();startCooldown(coolSecs(),1400);
 }
-function startCooldown(sec){
-  coolTotal=sec;coolLeft=sec;$('#cool').hidden=false;updateCool();clearInterval(coolT);
-  coolT=setInterval(()=>{coolLeft-=.1;if(coolLeft<=0){clearInterval(coolT);campNewBoard();return}updateCool()},100);
+
+/* ---------- intervalo: o Smily apaga o mapa e constrói o próximo ---------- */
+function clearCool(){clearInterval(coolT);coolTimers.forEach(clearTimeout);coolTimers=[]}
+function hideBuilder(){const b=$('#builder');if(b)b.hidden=true}
+function startCooldown(sec,showMs){
+  clearCool();boardBuilt=false;coolTotal=sec;coolLeft=sec;campBlock=true;$('#cool').hidden=false;updateCool();
+  showMs=Math.min(showMs,sec*300);const eraseMs=Math.min(700,sec*150);
+  coolTimers.push(setTimeout(()=>eraseBoard(eraseMs),showMs));
+  coolTimers.push(setTimeout(()=>campNewBoard(true,Math.max(.6,sec-(showMs+eraseMs)/1000)),showMs+eraseMs));
+  coolT=setInterval(()=>{coolLeft-=.1;if(coolLeft<=0){endCool();return}updateCool()},100);
 }
-function updateCool(){$('#coolMsg').textContent=ct('coolMsg',Math.ceil(coolLeft));$('#coolFill').style.width=Math.max(0,coolLeft/coolTotal*100)+'%'}
-function hideCool(){clearInterval(coolT);$('#cool').hidden=true}
+function eraseBoard(ms){cells.forEach((c,i)=>{c.style.animationDelay=(i*ms/cells.length)+'ms';c.classList.add('erase')});SFX.build(0)}
+function buildAnim(secs){
+  const N=cells.length,step=Math.max(14,secs*1000*.92/N);
+  cells.forEach(c=>{c.classList.remove('spawn');c.style.animationDelay='';c.classList.add('hid')});
+  quip('build');
+  const rects=cells.map(c=>c.getBoundingClientRect()),b=$('#builder');
+  cells.forEach((c,k)=>coolTimers.push(setTimeout(()=>{
+    c.classList.remove('hid');c.classList.add('built');setTimeout(()=>c.classList.remove('built'),420);
+    const r=rects[k];b.hidden=false;b.style.left=(r.left+r.width/2)+'px';b.style.top=(r.top+r.height/2)+'px';
+    if(k%2===0)SFX.build(k);
+    for(let q=0;q<2;q++)parts.push({x:r.left+Math.random()*r.width,y:r.top+r.height*.7,vx:(Math.random()-.5)*2.4,vy:-(.5+Math.random()*2),g:.18,life:1,d:.05,sz:2,c:['#c9bd96','#ffffff','#4fd8e8'][q%3],sq:true});
+    loop();
+  },k*step)));
+  coolTimers.push(setTimeout(hideBuilder,N*step+250));
+}
+function endCool(){
+  clearCool();$('#cool').hidden=true;hideBuilder();
+  if(!boardBuilt)campNewBoard(false);
+  cells.forEach(c=>{c.classList.remove('hid','erase')});campBlock=false;
+}
+function updateCool(){$('#coolMsg').textContent=ct('build',Math.ceil(coolLeft));$('#coolFill').style.width=Math.max(0,coolLeft/coolTotal*100)+'%'}
 
 /* ---------- caixas de diálogo e anúncio (o anúncio é só um exemplo; aqui entra o SDK do portal) ---------- */
 function ask({emoji,title,text,buttons}){
@@ -2014,57 +2212,45 @@ function rewardedAd(onDone){ // TODO: trocar pelo anúncio recompensado do SDK d
   const iv=setInterval(()=>{s--;if(s<=0){clearInterval(iv);box.classList.remove('show');onDone()}else upd();SFX.tick(s)},1000);
 }
 
-/* ---------- loja / drones / equipamentos ---------- */
-function openPanel(tab){panelTab=tab;renderPanel();$('#cpanel').classList.add('show');SFX.menu()}
-function closePanel(){$('#cpanel').classList.remove('show')}
-function renderPanel(){
-  const t=ct('panelT');$('#cpT').textContent=t[panelTab];
-  $('#cpTabs').innerHTML=['shop','drones','loadout'].map(k=>`<button class="tab${k===panelTab?' sel':''}" data-tab="${k}">${t[k]}</button>`).join('');
-  const body=$('#cpBody');let h=`<div class="cbal">🪙 <b>${fmtC(camp.coins)}</b></div>`;
-  const item=(icon,name,desc,right,key,extra)=>`<div class="citem"><div class="ci">${icon}</div><div class="cm"><b>${name}</b><span>${desc}</span>${extra||''}</div><div class="cb">${right}</div></div>`;
-  const buy=(key,cost,label)=>`<button class="tool buy" data-buy="${key}" ${camp.coins<cost?'disabled':''}>${label||ct('buy')}<small>🪙 ${fmtC(cost)}</small></button>`;
-  if(panelTab==='shop'){
-    if(camp.size<SIZES.length-1){const n=SIZES[camp.size+1];h+=item('🔲',ct('upSize',n),ct('upSizeD'),buy('size',COST.size()))}
-    h+=item('🪙',ct('upCpc')+` · ${camp.cpc+1}`,ct('upCpcD',cpcVal()+1),buy('cpc',COST.cpc()));
-    h+=item('⭐',ct('upClear')+` · ${camp.clear}`,ct('upClearD',(clearMult()+.25).toFixed(2)),buy('clear',COST.clear()));
-    h+=item('⏱',ct('upCool')+` · ${camp.cool}`,camp.cool<8?ct('upCoolD',coolSecs()-1):ct('max'),camp.cool<8?buy('cool',COST.cool()):`<b class="mx">${ct('max')}</b>`);
-    h+=item('🛡',ct('upShield')+` · ${camp.shields}/5`,ct('upShieldD'),camp.shields<5?buy('shield',COST.shield()):`<b class="mx">${ct('max')}</b>`);
-  }else if(panelTab==='drones'){
-    DRONES.forEach((d,i)=>{
-      const ok=camp.size>=d.need,pr=Math.min(100,camp.droneT[i]/d.every*100);
-      h+=item('🤖','Drone '+d.n,ct('droneD',d.every,d.yield)+' · '+(ok?ct('droneHave',camp.drones[i]):ct('droneNeed',SIZES[d.need])),
-        ok?buy('drone'+i,COST.drone(i)):`<b class="mx">🔒</b>`,'',camp.drones[i]?`<i class="dbar"><i style="width:${pr}%"></i></i>`:'');
-    });
-  }else{
-    h+=`<div class="cinfo">${ct('modMult',modReward().toFixed(2),lossPct())}</div>`;
-    Object.keys(MODS).forEach(k=>{const m=MODS[k],un=camp.un[k],okSize=SIZES[camp.size]>=m.min;
-      h+=item(MODES[k].icon,MODES[k].name,ct('modD',m.r,m.k,m.min),
-        !un?buy('unl:'+k,m.cost,ct('unlock')):`<button class="tool buy${camp.eq[k]?' on':''}" data-eq="${k}" ${okSize?'':'disabled'}>${camp.eq[k]?ct('equipped'):ct('equip')}</button>`)});
-    Object.keys(FMODS).forEach(k=>{const m=FMODS[k],un=camp.un[k],okSize=SIZES[camp.size]>=m.min;
-      h+=item(FLOORS[k].icon,ct('floorWord')+' '+FLOORS[k].name,ct('modD',m.r,m.k,m.min),
-        !un?buy('unl:'+k,m.cost,ct('unlock')):`<button class="tool buy${camp.eqFloor===k?' on':''}" data-eqf="${k}" ${okSize?'':'disabled'}>${camp.eqFloor===k?ct('equipped'):ct('equip')}</button>`)});
+/* ---------- pátio dos drones: eles trabalham, carregam moedas até o cofre e as moedas voam até o seu contador ---------- */
+function renderYard(){
+  const y=$('#yard');if(!y||!camp)return;
+  const owned=DRONES.map((d,i)=>i).filter(i=>camp.drones[i]>0);
+  y.hidden=!owned.length&&!(camp.tabs||[]).includes('drones');
+  if(y.hidden)return;
+  y.innerHTML=owned.length?owned.map(i=>`<div class="lane" data-i="${i}"><i class="ydepot">:depot:</i><div class="track"><i class="ybot" id="bot${i}">:drone:</i></div>`+
+    `<i class="yvault" id="vault${i}">:vault:</i><span class="ycnt">x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
+}
+function flyCoins(fromEl,amount){
+  const a=fromEl.getBoundingClientRect(),b=$('#coinStat').getBoundingClientRect();
+  const n=Math.min(8,3+Math.floor(Math.log10(amount+1)*2)),sx=a.left+a.width/2,sy=a.top+a.height/2,ex=b.left+b.width/2,ey=b.top+b.height/2;
+  for(let k=0;k<n;k++){
+    const c=document.createElement('img');c.className='flycoin';c.src=iconURL('coin');document.body.appendChild(c);
+    c.style.left=(sx-9)+'px';c.style.top=(sy-9)+'px';
+    const an=c.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${(ex-sx)*.5}px,${(ey-sy)*.5-50-Math.random()*30}px)`,opacity:1,offset:.5},{transform:`translate(${ex-sx}px,${ey-sy}px)`,opacity:.8}],{duration:650,delay:k*70,easing:'ease-in',fill:'both'});
+    an.onfinish=()=>{c.remove();SFX.coin(2);if(k===n-1)addCoins(amount)};
   }
-  body.innerHTML=h;
 }
-function buyItem(key){
-  let c=0,ok=false;
-  if(key==='size'&&camp.size<SIZES.length-1){c=COST.size();if(camp.coins>=c){camp.size++;ok=true;quip('bigger')}}
-  else if(key==='cpc'){c=COST.cpc();if(camp.coins>=c){camp.cpc++;ok=true}}
-  else if(key==='clear'){c=COST.clear();if(camp.coins>=c){camp.clear++;ok=true}}
-  else if(key==='cool'&&camp.cool<8){c=COST.cool();if(camp.coins>=c){camp.cool++;ok=true}}
-  else if(key==='shield'&&camp.shields<5){c=COST.shield();if(camp.coins>=c){camp.shields++;camp.shieldBought++;ok=true}}
-  else if(key.startsWith('drone')){const i=+key.slice(5);c=COST.drone(i);if(camp.coins>=c&&camp.size>=DRONES[i].need){camp.drones[i]++;ok=true;quip('drone')}}
-  else if(key.startsWith('unl:')){const k=key.slice(4),m=MODS[k]||FMODS[k];c=m.cost;if(!camp.un[k]&&camp.coins>=c){camp.un[k]=true;ok=true;quip('unlock')}}
-  if(!ok)return;camp.coins-=c;SFX.buy();saveCamp();setCoins();renderPanel();
-  if(!['size','unl'].some(p=>key.startsWith(p))&&Math.random()<.25)quip('buy');
+function deliver(i,amount){
+  const bot=$('#bot'+i),vault=$('#vault'+i);
+  if(!bot||!vault){addCoins(amount);return}
+  if(bot.dataset.busy){addCoins(amount);return}bot.dataset.busy='1';
+  bot.insertAdjacentHTML('beforeend','<img class="px carrycoin" alt="" src="'+iconURL('coin')+'">');
+  const dx=bot.parentElement.clientWidth-bot.offsetWidth;
+  bot.style.transition='transform .9s cubic-bezier(.4,0,.2,1)';bot.style.transform=`translateX(${dx}px)`;
+  setTimeout(()=>{ // chegou ao cofre: larga as moedas
+    const cc=bot.querySelector('.carrycoin');if(cc)cc.remove();
+    vault.classList.remove('bump');void vault.offsetWidth;vault.classList.add('bump');
+    flyCoins(vault,amount);
+    bot.style.transition='transform .8s ease-in-out';bot.style.transform='translateX(0)';
+    setTimeout(()=>{delete bot.dataset.busy},850);
+  },950);
 }
-
-/* ---------- drones (tick de 1 s) e salvamento ---------- */
 function campTick(){
   if(!camp||!campaign)return;
   DRONES.forEach((d,i)=>{const n=camp.drones[i];if(!n)return;camp.droneT[i]++;
-    if(camp.droneT[i]>=d.every){camp.droneT[i]=0;const g=n*d.yield;addCoins(g);floatText('+'+fmtC(g)+' 🤖',$('#coinStat'),'drone');SFX.coin(3)}});
-  if($('#cpanel').classList.contains('show')&&panelTab==='drones')renderPanel();
+    const bar=$('#ybar'+i);if(bar)bar.style.width=Math.min(100,camp.droneT[i]/d.every*100)+'%';
+    if(camp.droneT[i]>=d.every){camp.droneT[i]=0;deliver(i,n*d.yield)}});
   const now=Date.now();
   if(now-lastQuip>50000&&now-idleAt>40000)quip('idle');
   else if(now-lastQuip>80000)quip('fourth');
@@ -2121,28 +2307,28 @@ function introFlow(){
 
 /* ---------- entrada no jogo ---------- */
 function enterGame(){
-  campaign=true;
+  campaign=true;lastQuip=Date.now();
   const g=$('#game');g.classList.add('camp');show('game');
-  $('#coinStat').hidden=false;$('#timeStat').hidden=true;$('#campbar').hidden=false;
-  campNewBoard();setCoins();
+  $('#coinStat').hidden=false;$('#timeStat').hidden=true;
+  checkUnlocks(true);renderYard();campNewBoard();setCoins();
   if(!tickers){tickers=true;setInterval(campTick,1000);setInterval(saveCamp,5000);
     addEventListener('pagehide',saveCamp);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveCamp()});
     document.addEventListener('pointerdown',()=>{idleAt=Date.now()},true)}
 }
 async function bootCampaign(){
   loadCamp();
-  const away=Math.min((Date.now()-camp.last)/1000,4*3600);
+  const away=Math.min((Date.now()-camp.last)/1000,2*3600);
   if(!camp.introDone){await introFlow();camp.introDone=true;camp.last=Date.now();saveCamp();enterGame();setTimeout(()=>quip('start'),500);return}
   enterGame();
-  const earn=Math.floor(incomePerSec()*away);
+  const earn=Math.floor(incomePerSec()*away*.5); // offline rende metade, até 2 h
   if(earn>=1&&away>60){
-    const v=await ask({emoji:'🤖',title:ct('offT'),text:ct('offP',fmtC(earn)),buttons:[{label:ct('collect'),v:'1'},{label:ct('double'),v:'2',alt:true}]});
+    const v=await ask({emoji:':drone:',title:ct('offT'),text:ct('offP',fmtC(earn)),buttons:[{label:ct('collect'),v:'1'},{label:ct('double'),v:'2',alt:true}]});
     if(v==='2')rewardedAd(()=>{addCoins(earn*2);SFX.buy()});else{addCoins(earn);SFX.buy()}
   }
   camp.last=Date.now();saveCamp();
 }
 function resetCamp(){
-  ask({emoji:'⚠️',title:ct('resetT'),text:ct('resetP'),buttons:[{label:ct('yes'),v:'y'},{label:ct('no'),v:'n',alt:true}]}).then(v=>{
+  ask({emoji:':warn:',title:ct('resetT'),text:ct('resetP'),buttons:[{label:ct('yes'),v:'y'},{label:ct('no'),v:'n',alt:true}]}).then(v=>{
     if(v!=='y')return;try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload()});
 }
 
@@ -2155,6 +2341,9 @@ for(let i=0;i<(isMobile()?10:26);i++){const b=document.createElement('div'),z=2+
 /* ---------- emojis em pixel art: cada emoji vira um sprite 20×20 (sem suavização, poucas cores) ---------- */
 const EMO=/(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/u;
 const EMO_G=new RegExp(EMO.source,'gu');
+const TOKS='coin|shield|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot';
+const TOKRE=new RegExp(':('+TOKS+'):'),SPLIT=new RegExp('(:(?:'+TOKS+'):|'+EMO.source.slice(1,-1)+')','u');
+const HAS=v=>EMO.test(v)||TOKRE.test(v);
 const spriteCache=new Map(),spritePix=new Map(),PXN=20;
 function sprite(ch){
   if(spriteCache.has(ch))return spriteCache.get(ch);
@@ -2188,13 +2377,14 @@ function pixelate(root){
   for(let n=w.nextNode();n;n=w.nextNode()){
     const t=n.parentNode&&n.parentNode.nodeName;
     if(t==='SCRIPT'||t==='STYLE'||t==='TITLE'||t==='TEXTAREA')continue;
-    if(EMO.test(n.nodeValue))nodes.push(n);
+    if(HAS(n.nodeValue))nodes.push(n);
   }
   for(const n of nodes){
-    const parts=n.nodeValue.split(EMO),frag=document.createDocumentFragment();
+    const parts=n.nodeValue.split(SPLIT),frag=document.createDocumentFragment();
     parts.forEach((part,i)=>{
       if(i%2===0){if(part)frag.appendChild(document.createTextNode(part));return}
-      const u=sprite(part);
+      const isIcon=part.length>2&&part[0]===':'&&part.endsWith(':');
+      const u=isIcon?iconURL(part.slice(1,-1)):sprite(part);
       if(!u){frag.appendChild(document.createTextNode(part));return}
       const img=document.createElement('img');img.className='px';img.src=u;img.alt=part;img.draggable=false;frag.appendChild(img);
     });
@@ -2203,8 +2393,8 @@ function pixelate(root){
 }
 const pxObs=new MutationObserver(ms=>{
   for(const m of ms){
-    if(m.type==='characterData'){if(m.target.parentNode&&EMO.test(m.target.nodeValue))pixelate(m.target.parentNode);continue}
-    m.addedNodes.forEach(n=>{if(n.nodeType===3){if(n.parentNode&&EMO.test(n.nodeValue))pixelate(n.parentNode)}else if(n.nodeType===1&&n.nodeName!=='IMG')pixelate(n)});
+    if(m.type==='characterData'){if(m.target.parentNode&&HAS(m.target.nodeValue))pixelate(m.target.parentNode);continue}
+    m.addedNodes.forEach(n=>{if(n.nodeType===3){if(n.parentNode&&HAS(n.nodeValue))pixelate(n.parentNode)}else if(n.nodeType===1&&n.nodeName!=='IMG')pixelate(n)});
   }
 });
 (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{
