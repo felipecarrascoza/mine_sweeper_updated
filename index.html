@@ -1987,7 +1987,7 @@ function saveCamp(){if(!camp)return;camp.last=Date.now();try{localStorage.setIte
 
 /* ---------- textos da campanha (inglês principal, português secundário) ---------- */
 const CSTR={
-  en:{shop:'Shop',items:'Items',drones:'Drones',loadout:'Loadout',
+  en:{shop:'Upgrades',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
     cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
@@ -1998,7 +1998,7 @@ const CSTR={
     offT:'Welcome back',offP:n=>`Your drones made ${n} coins while you were away.`,collect:'Collect',double:'Double (watch ad)',
     adT:'Ad (placeholder)',adP:'The rewarded ad plays here.',adLeft:s=>`Reward in ${s}s`,
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
-  pt:{shop:'Loja',items:'Itens',drones:'Drones',loadout:'Equipar',
+  pt:{shop:'Melhorias',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
     cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
@@ -2039,7 +2039,7 @@ const LINES={
   bigger:[X("A bigger board. Bold. Foolish. Bold again.","Um tabuleiro maior. Ousado. Tolo. Ousado de novo.")],
   build:[X("Planning the next one. Don't peek.","Planejando o próximo. Não espie."),X("A mine here... no, there... ah, forget it. Everywhere.","Uma mina aqui... não, ali... ah, deixa. Em todo lugar."),
     X("Building your next map. Hard hat on. Safety first. Mine, not yours.","Construindo seu próximo mapa. Capacete na cabeça. Segurança primeiro. A minha, não a sua.")],
-  unlock_shop:[X("You have coins now. Dangerous. There's a shop. Go on, spend them.","Você tem moedas agora. Perigoso. Tem uma loja. Vai, gasta.")],
+  unlock_shop:[X("You have coins now. Dangerous. There are upgrades. Go on, spend them.","Você tem moedas agora. Perigoso. Tem melhorias. Vai, gasta.")],
   unlock_items:[X("Items. For people who hate losing. So, everyone.","Itens. Para quem odeia perder. Ou seja, todo mundo.")],
   unlock_drones:[X("Drones. They work while you stare at the screen. Disturbingly efficient.","Drones. Eles trabalham enquanto você encara a tela. Perturbadoramente eficientes.")],
   unlock_loadout:[X("Loadout. You can make my mines meaner. Why would you do this to yourself?","Equipar. Você pode deixar minhas minas mais malvadas. Por que você faria isso consigo mesmo?")],
