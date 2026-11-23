@@ -2559,10 +2559,13 @@ const ROOTURL=(()=>{ // raízes em pixels que entram pela borda (ou pelo canto) 
 })();
 const BUSH_NEED=4; // basta quebrar (abrir ou marcar) quaisquer 4 dos 8 blocos em volta
 function bushRoots(){ // as raízes aparecem embaixo de cada bloco em volta do arbusto que já foi quebrado (ou marcado)
-  const want=new Map(),OFF=[[0,-1,'b'],[1,0,'l'],[0,1,'t'],[-1,0,'r'],[-1,-1,'br'],[1,-1,'bl'],[-1,1,'tr'],[1,1,'tl']];
+  const want=new Map(),OFF=[[0,-1,'b','t'],[1,0,'l','r'],[0,1,'t','b'],[-1,0,'r','l'],[-1,-1,'br','tl'],[1,-1,'bl','tr'],[-1,1,'tr','bl'],[1,1,'tl','br']];
   bushList.forEach(i=>{const x=i%C,y=i/C|0;
-    OFF.forEach(([dx,dy,side])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
-      const g=grid[b][a];if(g.o||g.f!==0){const k=b*C+a;if(!want.has(k))want.set(k,new Set());want.get(k).add(side)}})});
+    OFF.forEach(([dx,dy,side,own])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
+      const g=grid[b][a];if(g.o||g.f!==0){const k=b*C+a,kb=i;
+        if(!want.has(k))want.set(k,new Set());want.get(k).add(side);
+        if(!want.has(kb))want.set(kb,new Set());want.get(kb).add(own)}}) // o arbusto também ganha o pedaço de raiz que liga ao vizinho: tudo vira uma raiz só
+  });
   cells.forEach((c,i)=>{const w=want.get(i),key=w?[...w].sort().join(','):'';if((c.dataset.rts||'')===key)return;c.dataset.rts=key;
     if(!key){c.classList.remove('hasroot');c.style.removeProperty('--roots');return}
     c.style.setProperty('--roots',[...w].map(sd=>ROOTURL[sd]).join(','));c.classList.add('hasroot')});
