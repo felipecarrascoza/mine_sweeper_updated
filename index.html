@@ -251,7 +251,7 @@
   #board .cell.open.op0{background:#0b2a57}
   #board .cell.open.op1{background:#40230d}
   .tool[hidden]{display:none}
-  .tidebar{display:flex;gap:8px;justify-content:center;align-items:center;margin:-4px 0 12px;font-size:15px;color:var(--cyan)}
+  .tidebar{display:flex;gap:8px;justify-content:center;align-items:center;margin:0 0 8px;min-height:24px;font-size:15px;color:var(--cyan)}
   .tidebar[hidden]{display:none}
   .tidebar b{font-family:var(--pix);font-size:15px;color:#fff;text-shadow:-2px 0 var(--pink),2px 0 var(--cyan)}
   .tidebar.danger{font-family:var(--pix);font-size:13px;gap:10px;min-height:34px}
@@ -774,12 +774,11 @@
   <div id="cardsInfo"></div>
   <div id="cards"></div>
   <div id="yard" hidden></div>
-  <div class="tidebar" id="tide" hidden></div>
   <div class="duelbar" id="duel" hidden>
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div id="phase"><span id="phaseTxt"></span><i class="pbar"><i id="phaseFill"></i></i></div><div class="boardwrap"><div id="board"></div></div></div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><span id="phaseTxt"></span><i class="pbar"><i id="phaseFill"></i></i></div><div class="boardwrap"><div id="board"></div></div></div>
   <div class="foot" id="footAct">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
