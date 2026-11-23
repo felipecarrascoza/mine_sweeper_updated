@@ -3013,21 +3013,21 @@ function botFrame(now,dt){
   if(house.parentNode!==document.body)document.body.appendChild(house); // coordenadas de página, como os bots
   const show=campaign&&camp&&camp.miners.length>0&&cells&&cells.length&&!shapes;
   if(yard)yard.style.display=show?'block':'none';
-  const list=show&&botCan()?camp.miners.filter(m=>m.world===camp.world):[];
+  const assigned=show?camp.miners.filter(m=>m.world===camp.world):[],list=botCan()?assigned:[]; // a oficina fica sempre lá; os bots só saem quando dá para minerar
   Object.values(BOTS).forEach(b=>{if(!list.includes(b.m))botDestroy(b)});
   if(!show){return}
   const c0=cells[0].getBoundingClientRect(),c1=cells[1]?cells[1].getBoundingClientRect():c0,cc=cells[C]?cells[C].getBoundingClientRect():c0;
   const P={ox:c0.left+scrollX+c0.width/2,oy:c0.top+scrollY+c0.height/2,px:(c1.left-c0.left)||c0.width,py:(cc.top-c0.top)||c0.height};
   const yh=Math.round(Math.max(56,Math.min(104,P.py*1.9)));yard.style.height=yh+'px';
   if(!house.firstChild)house.innerHTML=houseSVG()+'<i class="smoke"></i><i class="smoke s2"></i><i class="bslot s0"><i></i></i><i class="bslot s1"><i></i></i><i class="need">!</i>';
-  if(!list.length){house.style.display='none';return}
+  if(!assigned.length){house.style.display='none';return}
   house.style.display='block';
   const hw=Math.max(54,Math.min(92,P.py*2));house.style.width=hw+'px';house.style.height=(hw*24/32)+'px';
   const hp=botGrid(P,(C-1)/2,BOT_GROUND);house.style.left=hp.x+'px';house.style.top=hp.y+'px';
   const sm=house.querySelectorAll('.smoke');sm.forEach(s=>{s.style.left=(hw*.84)+'px';s.style.top='0px'});
   list.forEach((m,k)=>{const b=botRT(m);botTick(b,now,dt,k,list.length,P);
     const sl=house.querySelector('.bslot.s'+k+' i');if(sl)sl.style.width=(b.ph==='rest'?b.rest*100:(b.ph==='idle'?100:0))+'%'});
-  house.classList.toggle('need',list.every(m=>{const b=BOTS[m.id];return b&&b.ph==='idle'&&b.wait}));
+  house.classList.toggle('need',list.length>0&&list.every(m=>{const b=BOTS[m.id];return b&&b.ph==='idle'&&b.wait}));
   house.classList.toggle('work',list.some(m=>{const b=BOTS[m.id];return b&&b.ph==='rest'})); // bot sendo consertado lá dentro: faíscas de solda e engrenagem girando
 }
 let botLast=0;
