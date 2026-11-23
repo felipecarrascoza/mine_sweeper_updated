@@ -505,7 +505,8 @@
   @keyframes blockShake{0%{transform:translate(-1px,0) scale(.98)}33%{transform:translate(1px,-1px) scale(.97)}66%{transform:translate(0,1px) scale(.98)}100%{transform:translate(-1px,1px) scale(.97)}}
   .cell .flaglayer{z-index:2}
   .weed{position:absolute;inset:0;z-index:1;pointer-events:none;background:#1f5a26;box-shadow:inset 0 0 0 1px #0f3a16;transform-origin:50% 90%;transform:scale(calc(1 - var(--p,0)*.12));transition:transform .1s}
-  .weed svg{position:absolute;inset:0;width:100%;height:100%;shape-rendering:crispEdges;overflow:hidden}
+  .weed svg{position:absolute;inset:0;width:100%;height:100%;shape-rendering:crispEdges;image-rendering:pixelated;overflow:hidden}
+  .weed svg{left:50%;top:50%;right:auto;bottom:auto;width:round(down,var(--cell),12px);height:round(down,var(--cell),12px);transform:translate(-50%,-50%)}
   .weed b{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-family:var(--pix);font-weight:400;font-size:calc(var(--cell)*.26);color:#fff;text-shadow:1px 1px 0 #0b2a12,-1px -1px 0 #0b2a12,1px -1px 0 #0b2a12,-1px 1px 0 #0b2a12}
   .weed.hit{animation:weedHit .14s steps(2)}
   .weed.cut{animation:weedCut .2s steps(4) forwards}
@@ -533,8 +534,8 @@
   html[data-world="grass"] .tab.sel{background:#1f4a2c;color:var(--cyan)}
   html[data-world="grass"] .boardwrap{background:#17381d;border-color:#5aa85a}
   html[data-world="grass"] .cell:not(.open){background-color:#4aa83a;background-image:repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);box-shadow:inset 3px 3px 0 #86d65a,inset -3px -3px 0 #2d7a2b}
-  html[data-world="grass"] .cell.fl:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:34%,auto;image-rendering:pixelated}
-  html[data-world="grass"] .cell.fl2:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:34%,auto;image-rendering:pixelated}
+  html[data-world="grass"] .cell.fl:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.4),7px),auto;image-rendering:pixelated}
+  html[data-world="grass"] .cell.fl2:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.4),7px),auto;image-rendering:pixelated}
   html[data-world="grass"] .cell.open{background:#4a3220;box-shadow:inset 0 0 0 1px #6b4a2d}
   html[data-world="grass"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
   html[data-world="grass"] .bub{background:#ffd6ea;opacity:.5;border-radius:0}
@@ -2451,12 +2452,22 @@ async function bossCine(){
   document.addEventListener('mouseenter',()=>{if(on)cur.classList.add('on')});
 })();
 /* ---------- mundos / bioma Grasslands: ervas daninhas ---------- */
-function weedSVG(){ // talos entrelaçados com florzinhas amarelas em posições aleatórias
-  const R=(a,b)=>a+Math.random()*(b-a),cols=['#173f1c','#276f2c','#3a9a3a','#5cc04a'],f=v=>v.toFixed(1);let h='<svg viewBox="0 0 16 16">';
-  for(let i=0;i<9;i++)h+=`<path data-t="${f(R(.05,.9))}" d="M${f(R(1,15))} 16Q${f(R(-3,19))} ${f(R(2,12))} ${f(R(-1,17))} ${f(R(0,5))}" stroke="${cols[i%4]}" stroke-width="${i%3?1.1:1.6}" fill="none"/>`;
-  for(let i=0;i<4;i++)h+=`<path data-t="${f(R(.05,.9))}" d="M${f(R(-1,2))} ${f(R(4,14))}Q${f(R(4,12))} ${f(R(0,16))} ${f(R(14,17))} ${f(R(3,15))}" stroke="${cols[(i+1)%4]}" stroke-width="1" fill="none"/>`;
-  for(let i=0,n=2+(Math.random()*2|0);i<n;i++){const x=Math.floor(R(1,13)),y=Math.floor(R(1,12));
-    h+=`<g data-t="${f(R(.1,.95))}"><rect x="${x}" y="${y}" width="2" height="2" fill="#ffd166"/><rect x="${x-1}" y="${y}" width="1" height="1" fill="#fff0a0"/><rect x="${x+2}" y="${y+1}" width="1" height="1" fill="#fff0a0"/><rect x="${x}" y="${y}" width="1" height="1" fill="#f5b72e"/></g>`}
+function weedSVG(){ // pixel art: talos entrelaçados e florzinhas desenhados em grade 12×12 (tudo em pixels inteiros)
+  const N=12,cols=['#173f1c','#276f2c','#3a9a3a','#5cc04a'],ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),f=v=>v.toFixed(2);
+  let h=`<svg viewBox="0 0 ${N} ${N}">`;
+  const px=(x,y,c)=>(x>=0&&y>=0&&x<N&&y<N)?`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`:'';
+  for(let i=0;i<9;i++){ // talos que sobem do chão, ondulando
+    let x=ri(0,N-1),tx=ri(0,N-1),g='';const c=cols[i%4],thick=i%3===0;
+    for(let y=N-1;y>=ri(0,3);y--){g+=px(x,y,c)+(thick?px(x+1,y,c):'');
+      const r=Math.random();x+=r<.3?(tx>x?1:-1):(r<.5?(Math.random()<.5?-1:1):0)}
+    h+=`<g data-t="${f(.05+Math.random()*.85)}">${g}</g>`}
+  for(let i=0;i<3;i++){ // talos cruzando na horizontal para dar o aspecto entrelaçado
+    let y=ri(3,9),g='';const c=cols[(i+1)%4];
+    for(let x=0;x<N;x++){g+=px(x,y,c);const r=Math.random();y+=r<.3?-1:(r<.6?1:0)}
+    h+=`<g data-t="${f(.05+Math.random()*.85)}">${g}</g>`}
+  for(let i=0,n=2+ri(0,1);i<n;i++){ // florzinhas amarelas em posições aleatórias (cruz de 3×3 pixels)
+    const cx=ri(1,N-2),cy=ri(1,N-3);
+    h+=`<g data-t="${f(.1+Math.random()*.85)}">${px(cx,cy-1,'#ffd166')+px(cx-1,cy,'#ffd166')+px(cx+1,cy,'#ffd166')+px(cx,cy+1,'#ffd166')+px(cx,cy,'#f5b72e')}</g>`}
   return h+'</svg>';
 }
 function decorateGrass(){ // flores decorativas em posições aleatórias dentro da casa (nunca fixas no centro)
