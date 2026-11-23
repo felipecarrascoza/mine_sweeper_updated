@@ -2002,7 +2002,7 @@ const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
 const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,need:2},{n:'Mk III',every:120,yield:300,need:4}];
-const MODS={negative:{r:30,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:40,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
+const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
   liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
 const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
 const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false});
@@ -2093,6 +2093,51 @@ function sayText(t,mood,hold){
     if(i<t.length)sayT=setTimeout(type,hold?16:18);
     else if(!hold)sayT=setTimeout(()=>{b.hidden=true;if(!campBlock)setFace('🙂')},Math.max(4200,t.length*60))})();
 }
+/* ---------- Smily lembra do que você fez (memória) e quebra a quarta parede ---------- */
+function memLine(ctx){
+  const sz=SIZES[camp.size],said=camp.mem||(camp.mem={});const c=[];
+  const once=(k,t,m)=>{if(!said[k])c.push({k,t,m,once:1})};
+  if(ctx==='lose'){
+    if((camp.lstreak||0)>=3)c.push({t:X(`That's ${camp.lstreak} losses in a row on the ${sz}×${sz}. Want me to lower the difficulty? Kidding. I don't do that.`,`São ${camp.lstreak} derrotas seguidas no ${sz}×${sz}. Quer que eu baixe a dificuldade? Brincadeira. Eu não faço isso.`),m:'😈'});
+    if(camp.losses===1)once('firstLoss',X("Your first loss. It's like your first haircut: it'll happen again, and it'll hurt.","Sua primeira derrota. É que nem o primeiro corte de cabelo: vai acontecer de novo, e vai doer."),'😈');
+    if(camp.shields>=3)c.push({t:X(`You're hoarding ${camp.shields} shields like a dragon, and still stepped on a mine. Impressive.`,`Você junta ${camp.shields} escudos feito dragão e mesmo assim pisou na mina. Impressionante.`),m:'😏'});
+    if(camp.bossLost)c.push({t:X(`${camp.bossLost} boss${camp.bossLost>1?'es':''} took everything from you. I'm not saying I'm proud. I'm saying I'm proud.`,`${camp.bossLost} chefe${camp.bossLost>1?'s':''} levou${camp.bossLost>1?'ram':''} tudo de você. Não estou dizendo que tenho orgulho. Estou dizendo que tenho orgulho.`),m:'😈'});
+  }else{
+    if(camp.streak>=5)c.push({t:X(`${camp.streak} wins in a row. Are you cheating? Asking for me. Mostly for me.`,`${camp.streak} vitórias seguidas. Está trapaceando? Pergunto por mim. Principalmente por mim.`),m:'🤨'});
+    [10,25,50,100].forEach(n=>{if(camp.wins===n)once('w'+n,X(`Win number ${n}. I'm not counting. I'm absolutely counting.`,`Vitória número ${n}. Não estou contando. Estou contando sim.`),'😒')});
+    if(camp.coins>=4000&&camp.coins>COST.cpc()*20)c.push({t:X(`You're sitting on ${fmtC(camp.coins)} coins. Spend them or I'll start charging rent.`,`Você está com ${fmtC(camp.coins)} moedas paradas. Gaste, ou eu começo a cobrar aluguel.`),m:'😏'});
+    if(camp.shields===0&&camp.wins>8)once('noShield',X("No shields at all? Bold. Or foolish. I'll know in about three boards.","Sem nenhum escudo? Ousado. Ou tolo. Eu descubro em umas três fases."),'😏');
+    if(camp.bossWon)c.push({t:X(`You beat ${camp.bossWon} boss${camp.bossWon>1?'es':''}. I'm still angry about it.`,`Você venceu ${camp.bossWon} chefe${camp.bossWon>1?'s':''}. Ainda estou bravo com isso.`),m:'😠'});
+    if(camp.losses===0&&camp.wins>=5)once('perfect',X("Zero losses so far. Enjoy it. Statistics are on my side.","Zero derrotas até agora. Aproveite. A estatística está do meu lado."),'🙄');
+  }
+  if(!c.length)return null;const k=c[Math.random()*c.length|0];if(k.once){said[k.k]=1;saveCamp()}return {t:RES(k.t),mood:k.m};
+}
+function quipOr(ctx,vars){
+  const m=campaign&&!tutorial&&camp?memLine(ctx):null;
+  if(m&&Math.random()<.6){sayText(m.t,m.mood,false)}else quip(ctx,vars);
+}
+function sayOne(en,pt,mood){if(!campaign||tutorial||!camp||bossOn&&!over)return;sayText(RES(X(en,pt)),mood||'🤨',false)}
+(function fourthWall(){
+  let hiddenAt=0,clicks=[],lastFW=0;const ok=()=>Date.now()-lastFW>25000;const mark=()=>{lastFW=Date.now()};
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden){hiddenAt=Date.now();return}
+    const away=(Date.now()-hiddenAt)/1000;if(!hiddenAt||!campaign||tutorial)return;hiddenAt=0;
+    if(away>300){mark();setTimeout(()=>sayOne("Oh, you're back. It's been ages. I rebuilt the whole board twice out of boredom.","Ah, você voltou. Faz séculos. Reconstruí o tabuleiro duas vezes de tédio.",'😒'),500)}
+    else if(away>20){mark();setTimeout(()=>sayOne("Oh, you switched tabs. I saw. I always see. What was in the other tab? Be honest.","Ah, você trocou de aba. Eu vi. Eu sempre vejo. O que tinha na outra aba? Seja sincero.",'🤨'),500)}
+  });
+  addEventListener('pointerdown',e=>{
+    if(!campaign||tutorial||!e.target.closest||!e.target.closest('.cell'))return;
+    const n=Date.now();clicks=clicks.filter(t=>n-t<2000);clicks.push(n);
+    if(clicks.length>=9&&ok()){clicks=[];mark();sayOne("Easy! You're clicking like the board owes you money.","Calma! Você clica como se o tabuleiro te devesse dinheiro.",'😬')}
+  },true);
+  let hourDone=false;
+  setInterval(()=>{if(hourDone||!campaign||tutorial||!camp||!ok()||Date.now()-lastQuip<8000)return;
+    const h=new Date().getHours();
+    if(h>=0&&h<5){hourDone=true;mark();sayOne(`It's ${h}:${String(new Date().getMinutes()).padStart(2,'0')} in the morning. Go to sleep. The mines will still be here. Sadly.`,`São ${h}:${String(new Date().getMinutes()).padStart(2,'0')} da manhã. Vai dormir. As minas vão estar aqui. Infelizmente.`,'😴')}
+    else if(h>=5&&h<7){hourDone=true;mark();sayOne("Playing before 7 AM? Either dedication or a long night. I won't ask.","Jogando antes das 7 da manhã? Ou é dedicação ou foi uma noite longa. Não vou perguntar.",'🤨')}
+  },20000);
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#sound'))setTimeout(()=>{if(muted&&ok()){mark();sayOne("You muted me. Rude. I'm still talking though. Just louder, in my head.","Você me silenciou. Grosseiro. Continuo falando. Só que mais alto, na minha cabeça.",'😠')}},60)});
+})();
 function quip(ctx,vars){
   const arr=LINES[ctx];if(!arr||!campaign||tutorial)return;
   let t=RES(arr[Math.random()*arr.length|0]);
@@ -2109,7 +2154,7 @@ const activeFloor=()=>{const f=camp.eqFloor;return f&&camp.un[f]&&SIZES[camp.siz
 const modReward=()=>1+(activeMods().reduce((s,k)=>s+MODS[k].r,0)+(activeFloor()?FMODS[activeFloor()].r:0))/100;
 const lossPct=()=>Math.min(60,12+activeMods().reduce((s,k)=>s+MODS[k].k,0)+(activeFloor()?FMODS[activeFloor()].k:0));
 const COST={
-  size:()=>SIZE_COST[camp.size+1],cpc:()=>Math.round(18*Math.pow(2,camp.cpc)),clear:()=>Math.round(45*Math.pow(2.2,camp.clear)),
+  size:()=>SIZE_COST[camp.size+1],cpc:()=>Math.round(18*Math.pow(1.3,camp.cpc)),clear:()=>Math.round(45*Math.pow(2.2,camp.clear)),
   cool:()=>Math.round(80*Math.pow(2.5,camp.cool)),shield:()=>Math.round(40*Math.pow(1.6,camp.shieldBought)),
   drone:i=>Math.round([90,700,6000][i]*Math.pow([1.5,1.55,1.6][i],camp.drones[i]))
 };
@@ -2342,18 +2387,18 @@ function campMine(x,y){ // pisou numa mina: escudo > reviver com anúncio > perd
 }
 function campAfterLose(){
   const pct=bossOn?100:lossPct(),loss=Math.floor(camp.coins*pct/100);
-  camp.coins-=loss;camp.losses++;camp.streak=0;saveCamp();setCoins();
+  camp.coins-=loss;camp.losses++;camp.streak=0;camp.lstreak=(camp.lstreak||0)+1;if(bossOn)camp.bossLost=(camp.bossLost||0)+1;saveCamp();setCoins();
   if(loss>0)floatText('-'+fmtC(loss),$('#coinStat'),'loss');
-  if(bossOn){sayText(ct('bossLost'),'😈')}else quip('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
+  if(bossOn){sayText(ct('bossLost'),'😈')}else quipOr('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
 }
 function campWin(){
   if(tutorial){over=true;tutFinish();return}
   over=true;
   const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()));
   const boss=bossOn,prize=boss?bossPrize():0;
-  addCoins(bonus+prize);camp.wins++;camp.streak++;saveCamp();setFace('😎');
+  addCoins(bonus+prize);camp.wins++;camp.streak++;camp.lstreak=0;if(boss)camp.bossWon=(camp.bossWon||0)+1;saveCamp();setFace('😎');
   floatText('+'+fmtC(bonus),$('#coinStat'),'bonus');SFX.win();pixelSparks(cells[cells.length>>1],30,['#4fd8e8','#ff5c93','#ffd166','#ffffff']);
-  boardEl.classList.add('win');if(boss){floatText('+'+fmtC(prize),$('#coinStat'),'bonus');sayText(ct('bossWon',fmtC(prize)),'😎')}else quip('win');checkUnlocks();startCooldown(coolSecs(),1400);
+  boardEl.classList.add('win');if(boss){floatText('+'+fmtC(prize),$('#coinStat'),'bonus');sayText(ct('bossWon',fmtC(prize)),'😎')}else quipOr('win');checkUnlocks();startCooldown(coolSecs(),1400);
 }
 
 /* ---------- intervalo: o Smily apaga o mapa e constrói o próximo ---------- */
