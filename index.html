@@ -567,7 +567,7 @@
   #worlds .wl small{color:var(--muted);font-size:11px}
   #worlds .wl.sel{border-color:var(--cyan);background:var(--panel2);box-shadow:0 0 14px #4fd8e844}
   #worlds .wl.lock{opacity:.55}
-  #game.camp #demoWorlds{display:flex;grid-column:2;grid-row:12;justify-self:center;gap:8px;align-items:center;margin-top:6px;font-size:11px;color:var(--muted)}
+  #game.camp #demoWorlds{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;align-items:center;margin-top:6px;font-size:11px;color:var(--muted)}
   html.mobile #game.camp>#worlds{order:4}html.mobile #game.camp>#demoWorlds{order:4}
   @media(max-width:900px){#game.camp #worlds{grid-column:1;grid-row:auto;flex-direction:row;width:auto;flex-wrap:wrap}#worlds .wl{flex:1;min-width:92px}#worlds .wt{display:none}#game.camp #demoWorlds{grid-column:1;grid-row:auto;justify-self:start}}
   /* ===== bioma: Grasslands ===== */
@@ -694,7 +694,8 @@
   #game.camp{display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr) auto;column-gap:22px;align-items:start;width:min(1100px,100%)}
   #game.camp>*{grid-column:1;min-width:0}
   #game.camp>.boardbox{grid-column:2;grid-row:1 / span 10;justify-self:center}
-  #game.camp>#footAct{grid-column:2;grid-row:11;justify-self:center;margin-top:10px;justify-content:center}
+  #game.camp .boardbox>#footAct{margin-top:-2px;justify-content:center}
+  #game.camp .boardbox>#footAct #flagMode{border-radius:0 0 3px 3px;padding-top:6px}
   #game.camp .boardwrap{max-height:none;max-width:100%}
   #tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;min-height:40px}
   #tabs[hidden]{display:none}
@@ -721,28 +722,32 @@
   #cardsInfo:empty{display:none}
   #yard{margin-top:12px;border:2px solid var(--line);background:#030812;padding:8px 10px}
   #yard[hidden]{display:none}
-  .lane{display:flex;align-items:center;gap:6px;margin:5px 0}
-  .ydepot,.yvault,.ywall{display:inline-block;width:26px;height:26px;font-style:normal;flex:none}
-  .ydepot .px,.yvault .px,.ywall .px{width:26px;height:26px}
-  .ywall{box-shadow:2px 0 0 #3a2410}
-  .track{position:relative;flex:1;height:28px;border-bottom:2px dashed #1f4062}
-  .ybot{position:absolute;left:0;top:-2px;width:26px;height:28px;font-style:normal;animation:botBob 1s steps(2) infinite}
-  .ybot>.px{width:26px;height:26px}
-  .lane.t2 .ybot{filter:drop-shadow(0 0 4px #4fd8e8aa);animation-duration:.8s}
-  .lane.t3 .ybot{filter:drop-shadow(0 0 6px #ff5c93cc);animation:botHover .5s steps(2) infinite}
-  @keyframes botHover{50%{margin-top:-5px}}
-  .lane.t2 .ypick{animation-duration:.4s}.lane.t3 .ypick{animation-duration:.3s}
-  .ybot .carrycoin{position:absolute;left:5px;top:-13px;width:14px;height:14px}
-  .ypick{position:absolute;left:-15px;top:-9px;width:22px;height:22px;font-style:normal;transform-origin:70% 100%;animation:swing .5s steps(2) infinite}
-  .ypick .px{width:22px;height:22px}
-  .ybot.carry .ypick{display:none}
-  @keyframes swing{0%{transform:rotate(-65deg)}50%{transform:rotate(-15deg)}}
-  @keyframes botBob{50%{margin-top:-3px}}
+  .lane{display:flex;align-items:center;gap:10px;margin:6px 0;border-bottom:1px dashed #1f4062;padding-bottom:6px}
+  .lane .desk{flex:none;width:168px;height:96px}
+  .lane .desk svg{width:100%;height:100%;display:block;shape-rendering:crispEdges;overflow:visible}
+  .lane .linfo{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+  .desk .arm{transform-box:view-box;transform-origin:14px 13px;animation:typeA .16s steps(2) infinite alternate}
+  .desk .arm.b{animation-delay:.08s}
+  .lane.t2 .desk .arm{animation-duration:.13s}.lane.t3 .desk .arm{animation-duration:.1s}
+  @keyframes typeA{from{transform:rotate(-3deg)}to{transform:rotate(6deg)}}
+  .desk .ln{animation:lnBlink .55s steps(2) infinite}
+  @keyframes lnBlink{50%{opacity:.25}}
+  .desk .led{animation:lnBlink 1s steps(2) infinite}
+  .desk .kb.rgb{animation:rgbK 2s linear infinite}
+  @keyframes rgbK{to{filter:hue-rotate(360deg)}}
+  .desk .holo{transform-box:fill-box;transform-origin:center;animation:holoSpin 2.2s linear infinite}
+  @keyframes holoSpin{to{transform:rotate(360deg) scale(1.2)}}
+  .desk .dollar{display:none}
+  .desk.win .dollar{display:block}
+  .desk.win .scrbg{fill:#1f6a3a}
+  .desk.win .arm{animation:none;transform:rotate(-150deg);transition:transform .22s}
+  .desk.win .hk{animation:cheer .28s steps(2) infinite alternate}
+  @keyframes cheer{to{transform:translateY(-2px)}}
   .yvault.bump{animation:bump .3s steps(3)}
   .yrate{font-family:var(--pix);font-size:9px;color:#ffd166;white-space:nowrap;display:inline-flex;align-items:center;gap:3px;flex:none;width:96px}
   .yrate .px{width:12px;height:12px}
-  .ycnt{font-family:var(--pix);font-size:10px;color:var(--cyan);width:32px;text-align:right}
-  .ybar{width:48px;height:8px;border:2px solid var(--line);background:#02060d;flex:none}
+  .ycnt{font-family:var(--pix);font-size:10px;color:var(--cyan);width:auto;text-align:left;white-space:nowrap}
+  .ybar{width:100%;max-width:120px;height:8px;border:2px solid var(--line);background:#02060d;flex:none}
   .ybar i{display:block;height:100%;width:0;background:var(--cyan)}
   .yempty{font-size:13px;color:var(--muted);text-align:center;padding:6px}
   .flycoin{position:fixed;z-index:80;width:18px;height:18px;image-rendering:pixelated;pointer-events:none}
@@ -824,7 +829,7 @@
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><span class="pic" id="phaseIcL"></span><div class="pmid"><div class="prow"><span id="phaseL"></span><span id="phaseTxt"></span><span id="phaseR"></span></div><i class="pbar"><i id="phaseFill"></i></i></div><span class="pic" id="phaseIcR"></span></div><div id="botyard"><div id="bhouse"></div></div><div class="boardwrap"><div id="board"></div></div></div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><span class="pic" id="phaseIcL"></span><div class="pmid"><div class="prow"><span id="phaseL"></span><span id="phaseTxt"></span><span id="phaseR"></span></div><i class="pbar"><i id="phaseFill"></i></i></div><span class="pic" id="phaseIcR"></span></div><div id="botyard"><div id="bhouse"></div></div><div class="boardwrap"><div id="board"></div></div>
   <div class="foot" id="footAct">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
@@ -833,8 +838,9 @@
     </div>
     <div><span data-i18n="best">Best:</span> <span class="best" id="best">—</span></div>
   </div>
-  <div id="worlds"></div>
   <div id="demoWorlds"><span>DEMO</span><button class="tool" data-w="mine"></button><button class="tool" data-w="grass"></button><button class="tool" data-w="forest"></button><button class="tool" data-w="desert"></button></div>
+  </div>
+  <div id="worlds"></div>
   <div class="foot" id="help"></div>
 </div>
 
@@ -3116,13 +3122,57 @@ function rewardedAd(onDone){ // TODO: trocar pelo anúncio recompensado do SDK d
 }
 
 /* ---------- pátio dos drones: eles trabalham, carregam moedas até o cofre e as moedas voam até o seu contador ---------- */
+function deskSVG(t){ // bot hacker sentado diante do computador: quanto melhor o drone, melhor o PC, a mesa e a cadeira
+  const R=(x,y,w,h,c,cl)=>`<rect${cl?` class="${cl}"`:''} x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+  const K=[{desk:['#b07a4a','#8b5a2b','#6b431f'],seat:'#6b7a99',seatD:'#4a5878',body:'#6b7a99',bodyD:'#4a5878',bez:'#d8cfa8',scr:'#0a1f12',ln:'#7fff9f'},
+           {desk:['#7d8ea8','#5b6b82','#3f4c61'],seat:'#3f78c8',seatD:'#2b5aa0',body:'#3f78c8',bodyD:'#2b5aa0',bez:'#1a2236',scr:'#0e1c36',ln:'#4fd8e8'},
+           {desk:['#2a1a4a','#1a1030','#0f0a1f'],seat:'#d9364f',seatD:'#9a2238',body:'#d9364f',bodyD:'#9a2238',bez:'#0f0a1f',scr:'#06140c',ln:'#7fff9f'}][t];
+  let o=R(0,31,56,1,'#1b2a44');
+  if(t===2)o+=R(0,30,56,1,'#ff5c93aa')+R(2,29,22,2,'#3a1a5a'); // tapete neon
+  // rack de servidores atrás (tier 3)
+  if(t===2){o+=R(50,2,5,19,'#1a1030')+R(51,3,3,17,'#0f0a1f');for(let k=0;k<6;k++)o+=R(52,4+k*3,1,1,k%2?'#7fff9f':'#ff5c93','led');}
+  // cadeira
+  o+=R(4,9,3,12,K.seat)+R(4,9,1,12,K.seatD);
+  if(t>=1)o+=R(3,4,5,5,K.seat)+R(3,4,1,5,K.seatD)+R(5,5,2,2,K.seatD);
+  o+=R(5,21,14,2,K.seat)+R(5,23,14,1,K.seatD);
+  if(t===0){o+=R(6,24,1,7,'#2b3550')+R(17,24,1,7,'#2b3550')}
+  else{o+=R(11,24,2,4,'#2b3550')+R(5,28,14,1,'#2b3550')+R(5,29,2,2,'#2b3550')+R(11,29,2,2,'#2b3550')+R(17,29,2,2,'#2b3550')}
+  if(t===2)o+=R(12,17,7,1,K.seatD)+R(18,15,1,3,K.seatD)+R(4,22,16,1,'#ff5c93aa');
+  // perna e pé
+  o+=R(13,21,10,3,K.bodyD)+R(21,24,3,6,K.bodyD)+R(21,30,5,2,'#2b3550');
+  // mesa
+  o+=R(21,22,34,2,K.desk[0])+R(21,24,34,1,K.desk[1])+R(23,25,2,6,K.desk[2])+R(52,25,2,6,K.desk[2])+R(40,25,10,5,K.desk[1])+R(42,27,6,1,K.desk[2]);
+  if(t===2)o+=R(21,22,34,1,'#ff5c93');
+  // torre do PC
+  if(t===0)o+=R(27,26,6,5,'#d8cfa8')+R(28,27,4,1,'#9aa7bd')+R(31,29,1,1,'#7fff9f');
+  else if(t===1)o+=R(27,25,7,6,'#1a2236')+R(28,26,5,1,'#4fd8e8','led')+R(28,29,5,1,'#2b3550');
+  else o+=R(27,24,8,7,'#0f0a1f')+R(28,25,6,1,'#ff5c93','led')+R(28,27,6,1,'#7fff9f','led')+R(28,29,6,1,'#4fd8e8','led');
+  // monitor(es)
+  const lines=(x,y,w,n,c)=>{let q='';for(let k=0;k<n;k++){const ww=Math.max(2,w-((k*5)%5)-(k%3));q+=R(x,y+k*2,ww,1,c,'ln')}return q.replace(/class="ln"/g,(m,off)=>`class="ln" style="animation-delay:${((off%7)*.09).toFixed(2)}s"`)};
+  let mon='';
+  if(t===0)mon=R(38,9,14,12,K.bez)+R(40,11,10,8,K.scr,'scrbg')+lines(41,12,7,4,K.ln)+R(43,21,4,1,K.bez)+R(42,21,6,1,'#9aa7bd');
+  else if(t===1)mon=R(34,9,10,11,K.bez)+R(35,10,8,9,K.scr,'scrbg')+lines(36,11,5,4,K.ln)+R(38,20,2,1,'#5b6b82')+R(36,21,6,1,'#5b6b82')+R(46,10,9,10,K.bez)+R(47,11,7,8,K.scr,'scrbg')+lines(48,12,4,4,'#ffd166')+R(49,20,2,1,'#5b6b82')+R(47,21,5,1,'#5b6b82');
+  else mon=R(32,10,7,10,K.bez)+R(33,11,5,8,K.scr,'scrbg')+lines(34,12,3,4,K.ln)+R(40,8,10,12,K.bez)+R(41,9,8,10,K.scr,'scrbg')+lines(42,10,5,5,K.ln)+R(51,10,4,10,K.bez)+R(52,11,2,8,K.scr,'scrbg')+lines(52,12,2,3,K.ln)+R(43,20,4,1,'#5b6b82')+R(41,21,8,1,'#5b6b82');
+  const dollar=R(44,11,2,1,'#7fff9f')+R(43,12,1,2,'#7fff9f')+R(44,14,2,1,'#7fff9f')+R(46,15,1,2,'#7fff9f')+R(43,17,3,1,'#7fff9f')+R(44,10,1,8,'#7fff9f');
+  o+=`<g class="mon">${mon}<g class="dollar">${dollar}</g></g>`;
+  // teclado
+  o+=R(26,21,10,1,t===0?'#c0c7d4':'#2b3550',t>=1?'kb rgb':'kb');
+  if(t===2)o+=`<g class="holo">${R(42,1,4,4,'#7fe8ff')+R(43,2,2,2,'#ffffff')}</g>`;
+  // bot hacker sentado
+  const hd=t===0?R(9,3,7,7,'#2b3550')+R(10,4,5,5,'#9aa7bd')+R(12,6,1,1,'#2b3550')+R(14,6,1,1,'#2b3550')
+          :t===1?R(12,1,2,2,'#ff5c93')+R(9,3,7,7,'#2b3550')+R(10,4,5,5,'#9aa7bd')+R(11,6,5,2,'#1b6f80')+R(12,6,3,1,'#4fd8e8')
+          :R(9,0,7,3,'#ff8fc2')+R(11,0,2,1,'#ffd1e8')+R(8,3,9,7,'#2b3550')+R(9,4,7,5,'#d9e4f5')+R(9,5,7,2,'#1b6f80')+R(10,5,5,2,'#7fe8ff')+R(12,5,1,2,'#fff')+R(14,5,1,2,'#fff');
+  const body=R(8,11,7,10,K.body)+R(9,12,5,2,K.bodyD)+R(8,19,7,1,K.bodyD);
+  const armB=`<g class="arm b">${R(14,14,9,2,K.bodyD)+R(22,14,3,2,'#c0c7d4')}</g>`,armF=`<g class="arm">${R(14,12,9,2,K.body)+R(22,12,3,2,'#c0c7d4')}</g>`;
+  o+=`<g class="hk">${body}${hd}${armB}${armF}</g>`;
+  return `<svg viewBox="0 0 56 32" shape-rendering="crispEdges">${o}</svg>`;
+}
 function renderYard(){
   const y=$('#yard');if(!y||!camp)return;
   const owned=DRONES.map((d,i)=>i).filter(i=>camp.drones[i]>0);
   y.hidden=!owned.length&&!(camp.tabs||[]).includes('bots');
   if(y.hidden)return;
-  y.innerHTML=owned.length?owned.map(i=>`<div class="lane t${i+1}" data-i="${i}"><i class="ywall">:${['dirt','stone','crystal'][i]}:</i><div class="track"><i class="ybot" id="bot${i}">:drone${i+1}:<i class="ypick">:pick${i+1}:</i></i></div>`+
-    `<i class="yvault" id="vault${i}">:vault:</i><span class="yrate" title="${ct('perMinT')}">:coin: ${perMin(i)}${ct('perMin')}</span><span class="ycnt">x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
+  y.innerHTML=owned.length?owned.map(i=>`<div class="lane t${i+1}" data-i="${i}"><div class="desk" id="desk${i}">${deskSVG(i)}</div><div class="linfo"><span class="yrate" title="${ct('perMinT')}">:coin: ${perMin(i)}${ct('perMin')}</span><span class="ycnt">${ct('droneName',DRONES[i].n)} x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
 }
 const perMin=i=>{const v=camp.drones[i]*DRONES[i].yield*60/DRONES[i].every;return fmtC(v)===String(Math.floor(v))&&v!==Math.floor(v)?v.toFixed(1):(v>=1e4?fmtC(v):(Number.isInteger(v)?String(v):v.toFixed(1)))};
 function flyCoins(fromEl,amount){
@@ -3135,31 +3185,19 @@ function flyCoins(fromEl,amount){
     an.onfinish=()=>{c.remove();SFX.coin(2);if(k===n-1)addCoins(amount)};
   }
 }
-function deliver(i,amount){
-  const bot=$('#bot'+i),vault=$('#vault'+i);
-  if(!bot||!vault){addCoins(amount);return}
-  if(bot.dataset.busy){addCoins(amount);return}bot.dataset.busy='1';
-  bot.classList.add('carry'); // larga a picareta, pega a moeda e leva até o baú
-  bot.insertAdjacentHTML('beforeend','<img class="px carrycoin" alt="" src="'+iconURL('coin')+'">');
-  const dx=bot.parentElement.clientWidth-bot.offsetWidth;
-  bot.style.transition='transform .9s cubic-bezier(.4,0,.2,1)';bot.style.transform=`translateX(${dx}px)`;
-  setTimeout(()=>{ // chegou ao cofre: larga as moedas
-    const cc=bot.querySelector('.carrycoin');if(cc)cc.remove();
-    vault.classList.remove('bump');void vault.offsetWidth;vault.classList.add('bump');
-    flyCoins(vault,amount);
-    bot.style.transition='transform .8s ease-in-out';bot.style.transform='translateX(0)';
-    setTimeout(()=>{delete bot.dataset.busy;bot.classList.remove('carry')},850);
-  },950);
+function deliver(i,amount){ // conseguiu o dinheiro: o hacker levanta as mãos em comemoração e as moedas voam do computador até o contador
+  const d=$('#desk'+i);
+  if(!d){addCoins(amount);return}
+  if(d.dataset.busy){addCoins(amount);return}d.dataset.busy='1';
+  d.classList.add('win');SFX.win&&SFX.coin(3);
+  pixelSparks(d,18,['#ffd166','#4fd8e8','#ff5c93','#ffffff']);
+  setTimeout(()=>flyCoins(d.querySelector('.mon')||d,amount),380);
+  setTimeout(()=>{d.classList.remove('win');delete d.dataset.busy},1400);
 }
 function campTick(){
   if(!camp||!campaign)return;
   DRONES.forEach((d,i)=>{const n=camp.drones[i];if(!n)return;camp.droneT[i]++;
     const bar=$('#ybar'+i);if(bar)bar.style.width=Math.min(100,camp.droneT[i]/d.every*100)+'%';
-    const bot=$('#bot'+i);if(bot&&!bot.dataset.busy){ // poeira de terra voando da parede enquanto ele pica
-      const r=bot.getBoundingClientRect();
-      for(let k=0;k<3;k++)parts.push({x:r.left-8,y:r.top+6+Math.random()*12,vx:-(.4+Math.random()*1.6),vy:-(.6+Math.random()*1.6),g:.16,life:1,d:.05,sz:2,c:['#8b5a2b','#b07a4a','#5c3b1c'][k],sq:true});
-      loop();
-    }
     if(camp.droneT[i]>=d.every){camp.droneT[i]=0;deliver(i,Math.round(n*d.yield))}});
   camp.miners.forEach(m=>{if(m.world===camp.world)return;m.acc=(m.acc||0)+bgRate(m);const g=Math.floor(m.acc);if(g>=1){m.acc-=g;addCoins(g);bgShow+=g}});
   if(++bgTick%8===0&&bgShow>0){floatText('+'+fmtC(bgShow),$('#coinStat'),'coin');bgShow=0}
