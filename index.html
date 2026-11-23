@@ -17,8 +17,9 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html{min-height:100%}
   body{margin:0;min-height:100vh}
+  *,*::before,*::after{font-variant-ligatures:none;font-feature-settings:"liga" 0,"clig" 0,"calt" 0,"dlig" 0;font-kerning:none}
   body{
-    font-family:var(--ui);color:var(--text);font-size:16px;
+    font-family:var(--ui);color:var(--text);font-size:16px;letter-spacing:.4px;
     background:radial-gradient(ellipse 90% 60% at 50% -8%,#0c3a55 0%,transparent 62%),linear-gradient(#050b17,#02060e);
     background-attachment:fixed;
     display:flex;padding:40px 16px;overflow-x:hidden;user-select:none;
@@ -463,6 +464,16 @@
   @keyframes bump{50%{transform:scale(1.35)}}
   .dot{position:absolute;top:-5px;right:-5px;width:12px;height:12px;background:var(--pink);border:2px solid #000;animation:upd .8s steps(2) infinite}
   .dot[hidden]{display:none}
+  #phase{display:none;margin:0 0 6px;font-size:12px;color:var(--muted);text-align:center}
+  #game.camp #phase{display:block}
+  #phase .pbar{display:block;height:6px;margin-top:4px;background:#030812;border:1px solid var(--line)}
+  #phase .pbar i{display:block;height:100%;width:0;background:var(--cyan);transition:width .4s}
+  #game.boss #phase{color:#ff9aa8}#game.boss #phase .pbar i{background:#ff2d55}
+  #cine{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#030812b0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:16px}
+  #cine[hidden]{display:none}
+  #cineFace{width:150px;height:150px;font-size:96px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:var(--panel2);border-radius:3px;box-shadow:0 0 40px #ff2d5555}
+  #cineBox{max-width:min(520px,92vw);min-height:92px;display:flex;align-items:center;justify-content:center;background:var(--panel);border:2px solid var(--cyan);padding:14px 18px;font-size:16px;line-height:1.5;text-align:center}
+  #cineHint{color:var(--muted);font-size:11px}
   #bossTag{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:26;background:#b3122f;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border:2px solid #ff9aa8;letter-spacing:.5px;animation:bossP 1.1s infinite alternate;pointer-events:none;text-align:center;max-width:92vw}
   #bossTag[hidden]{display:none}
   @keyframes bossP{to{box-shadow:0 0 22px #ff2d55}}
@@ -638,7 +649,7 @@
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="boardwrap"><div id="board"></div></div></div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div id="phase"><span id="phaseTxt"></span><i class="pbar"><i id="phaseFill"></i></i></div><div class="boardwrap"><div id="board"></div></div></div>
   <div class="foot">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
@@ -655,6 +666,7 @@
 <canvas id="fx"></canvas>
 <div id="toast"></div>
 <div id="bossTag" hidden></div>
+<div id="cine" hidden><div id="cineFace">😏</div><div id="cineBox"><span id="cineText"></span></div><small id="cineHint"></small></div>
 <div id="cool" hidden><div id="coolMsg"></div><div class="coolbar"><i id="coolFill"></i></div><button class="tool" id="coolSkip"></button></div>
 <i id="builder" hidden>:hammer:</i>
 <i id="tutHand" hidden>:hand:</i>
@@ -1989,7 +2001,7 @@ function saveCamp(){if(!camp)return;camp.last=Date.now();try{localStorage.setIte
 const CSTR={
   en:{shop:'Upgrades',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
-    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
@@ -2000,7 +2012,7 @@ const CSTR={
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Melhorias',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
-    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
@@ -2045,6 +2057,16 @@ const LINES={
   unlock_loadout:[X("Loadout. You can make my mines meaner. Why would you do this to yourself?","Equipar. Você pode deixar minhas minas mais malvadas. Por que você faria isso consigo mesmo?")],
   unlock_floors:[X("New floors. Same mines, weirder shapes. You're welcome.","Pisos novos. As mesmas minas, formas mais estranhas. De nada.")]
 };
+const CINE_FIRST=[
+ [X("Oh. You don't know, do you.","Ah. Você não sabe, né."),'🤨'],
+ [X("Every 50 boards, I stop being nice. Okay, I stop being THIS nice.","A cada 50 tabuleiros, eu paro de ser legal. Tá, paro de ser ESSE nível de legal."),'😏'],
+ [X("See that counter above the board? It's counting down to the Boss. Yes, I made it. Yes, it's ominous.","Viu o contador em cima do tabuleiro? Ele conta até o Chefe. Sim, fui eu que fiz. Sim, é ameaçador."),'😒'],
+ [X("The Boss board has way more mines. Shields don't work. And if you lose... you lose ALL your coins. Every single one.","O tabuleiro Chefe tem bem mais minas. Escudo não funciona. E se você perder... perde TODAS as moedas. Todinhas."),'😈'],
+ [X("But if you win, you get a lot. Like, a LOT. I hate that part. Rude.","Mas se ganhar, leva muito. Tipo, MUITO. Eu odeio essa parte. Que grosseria."),'😠'],
+ [X("Anyway. Let me finish building. Good luck. You'll need it.","Enfim. Deixa eu terminar de construir. Boa sorte. Você vai precisar."),'😏']];
+const CINE_AGAIN=[
+ [X("Fifty boards. You know what that means.","Cinquenta tabuleiros. Você sabe o que isso significa."),'😏'],
+ [X("Boss time. Shields off, coins on the line. Hehe.","Hora do Chefe. Sem escudo, moedas na mesa. Hehe."),'😈']];
 const MOODS={start:'🙂',firstCoin:'😐',win:'😒',lose:'😈',shield:'🙄',revive:'😏',idle:'😴',fourth:'🤨',buy:'😏',unlock:'😈',poke:'😠',drone:'😐',bigger:'😬',build:'🤨',unlock_shop:'😏',unlock_items:'😏',unlock_drones:'😐',unlock_loadout:'😈',unlock_floors:'😈'};
 function setFace(e){faceEl.textContent=e}
 function sayText(t,mood,hold){
@@ -2186,6 +2208,67 @@ let bossOn=false;
 const isBossNo=k=>k>0&&k%BOSS_EVERY===0;
 function bossMines(){const n=SIZES[camp.size];return Math.min(n*n-2,Math.ceil(MINES[camp.size]*1.6)+1)}
 function bossPrize(){const safe=C*R-countMineCells(),base=Math.round(safe*cpcVal()*clearMult()*modReward());return Math.max(base*40,Math.round(camp.coins*.6),200)}
+function updatePhase(){
+  const t=$('#phaseTxt'),f=$('#phaseFill');if(!t||!camp)return;
+  const n=((camp.boards-1)%BOSS_EVERY)+1;
+  t.textContent=bossOn?ct('phaseBoss'):ct('phase',n,BOSS_EVERY)+' · '+ct('phaseLeft',BOSS_EVERY-n);
+  f.style.width=(bossOn?100:n/BOSS_EVERY*100)+'%';
+}
+const cineWait=ms=>new Promise(r=>setTimeout(r,ms));
+function cineSay(t){return new Promise(res=>{
+  const c=$('#cine'),tx=$('#cineText');let i=0,tm,state='typing';tx.textContent='';
+  const adv=()=>{clearTimeout(tm);if(state==='typing'){tx.textContent=t;state='wait';tm=setTimeout(adv,1800+t.length*25)}else{c.removeEventListener('click',adv);res()}};
+  c.addEventListener('click',adv);
+  (function type(){if(state!=='typing')return;i++;tx.textContent=t.slice(0,i);if(i%3===0)SFX.talk();
+    if(i<t.length)tm=setTimeout(type,24);else{state='wait';tm=setTimeout(adv,1800+t.length*25)}})();
+})}
+function cineFly(inward){
+  const cf=$('#cineFace'),a=faceEl.getBoundingClientRect(),b=cf.getBoundingClientRect();
+  const dx=a.left+a.width/2-(b.left+b.width/2),dy=a.top+a.height/2-(b.top+b.height/2),sc=a.width/b.width;
+  const kf=[{transform:`translate(${dx}px,${dy}px) scale(${sc})`},{transform:`translate(${dx*.4}px,${dy*.4-110}px) scale(1.2) rotate(-8deg)`,offset:.45},
+    {transform:'translate(0,8px) scale(1.05,.9)',offset:.78},{transform:'none'}];
+  if(!inward){kf.reverse();[0,.22,.55,1].forEach((o,i)=>kf[i].offset=o)}
+  return cf.animate(kf,{duration:inward?800:520,easing:'ease-in-out',fill:'both'}).finished;
+}
+async function bossCine(){
+  const first=!camp.bossSeen,lines=first?CINE_FIRST:CINE_AGAIN,c=$('#cine'),cf=$('#cineFace');
+  hideBuilder();
+  setFace('😏');sayText(ct('bossHeh'),'😏',true);
+  faceEl.animate([{transform:'rotate(-7deg)'},{transform:'rotate(7deg)'}],{duration:110,iterations:14,direction:'alternate'});
+  await cineWait(1600);$('#say').hidden=true;
+  cf.textContent='😏';$('#cineText').textContent='';$('#cineHint').textContent=ct('tapHint');
+  c.hidden=false;c.animate([{opacity:0},{opacity:1}],{duration:350});
+  faceEl.style.visibility='hidden';
+  await cineFly(true);SFX.talk();
+  for(const [t,m] of lines){cf.textContent=m;await cineSay(RES(t))}
+  cf.textContent='😈';
+  const sh=cf.animate([{transform:'translateY(0) rotate(-4deg)'},{transform:'translateY(-14px) rotate(4deg)'}],{duration:130,iterations:16,direction:'alternate'});
+  $('#cineText').textContent='HA HA HA HA HA';for(let i=0;i<8;i++){SFX.talk();await cineWait(180)}
+  sh.cancel();
+  await cineFly(false);
+  c.animate([{opacity:1},{opacity:0}],{duration:300}).finished.then(()=>{c.hidden=true});
+  faceEl.style.visibility='';setFace('😈');
+  camp.bossSeen=true;saveCamp();
+  await cineWait(250);
+}
+/* atalho de demo: Smily x2, bandeira x1, contador de moedas x5 -> chama o boss */
+const DEMO_SEQ=['f','f','m','c','c','c','c','c'];let demoI=0,demoT=0;
+document.addEventListener('click',e=>{
+  if(!campaign||tutorial||!e.target.closest)return;
+  const k=e.target.closest('#face')?'f':e.target.closest('#coinStat')?'c':(e.target.closest('.stat')&&e.target.closest('.stat').querySelector('#mines'))?'m':null;
+  if(!k)return;
+  const now=Date.now();if(now-demoT>3000)demoI=0;demoT=now;
+  if(k===DEMO_SEQ[demoI])demoI++;else demoI=k==='f'?1:0;
+  if(demoI===DEMO_SEQ.length){demoI=0;callBoss()}
+},true);
+function callBoss(){
+  if(!camp||$('#askbox').classList.contains('show')||$('#adbox').classList.contains('show'))return;
+  campBlock=true;setFace('🤨');
+  ask({emoji:':bomb:',title:ct('demoT'),text:ct('demoQ'),buttons:[{label:ct('demoYes'),v:'y'},{label:ct('demoNo'),v:'n',alt:true}]}).then(v=>{
+    if(v!=='y'){campBlock=false;setFace('🙂');return}
+    camp.boards=BOSS_EVERY-1;saveCamp();SFX.build(0);startCooldown(coolSecs(),600);
+  });
+}
 function setBoss(on){bossOn=on;const g=$('#game');if(g)g.classList.toggle('boss',on);const t=$('#bossTag');if(t){t.hidden=!on;t.textContent=on?ct('bossTag'):''}}
 function campNewBoard(build,secs){
   const n=SIZES[camp.size];
@@ -2198,7 +2281,8 @@ function campNewBoard(build,secs){
   if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
   setBoss(boss);
   init();setCoins();
-  if(boss){sayText(ct('bossIntro',fmtC(bossPrize())),'😈')}
+  if(boss&&!build)sayText(ct('bossIntro',fmtC(bossPrize())),'😈');
+  updatePhase();
   if(build){boardBuilt=true;buildAnim(secs)}
 }
 function defuse(x,y){const g=grid[y][x];fsum+=g.m-g.f;g.f=g.m;g.fo=0;renderFlag(x,y);setCounter()}
@@ -2237,22 +2321,29 @@ function startCooldown(sec,showMs){
   showMs=Math.min(showMs,sec*300);const eraseMs=Math.min(700,sec*150);
   coolTimers.push(setTimeout(()=>eraseBoard(eraseMs),showMs));
   coolTimers.push(setTimeout(()=>campNewBoard(true,Math.max(.6,sec-(showMs+eraseMs)/1000)),showMs+eraseMs));
-  coolT=setInterval(()=>{coolLeft-=.1;if(coolLeft<=0){endCool();return}updateCool()},100);
+  coolTick();
 }
 function eraseBoard(ms){cells.forEach((c,i)=>{c.style.animationDelay=(i*ms/cells.length)+'ms';c.classList.add('erase')});SFX.build(0)}
+function coolTick(){clearInterval(coolT);coolT=setInterval(()=>{coolLeft-=.1;if(coolLeft<=0){endCool();return}updateCool()},100)}
 function buildAnim(secs){
-  const N=cells.length,step=Math.max(14,secs*1000*.92/N);
+  const N=cells.length,step=Math.max(14,secs*1000*.92/N),boss=bossOn,mid=boss?Math.max(1,N>>1):N;
   cells.forEach(c=>{c.classList.remove('spawn');c.style.animationDelay='';c.classList.add('hid')});
-  quip('build');
+  if(!boss)quip('build');
   const rects=cells.map(c=>c.getBoundingClientRect()),b=$('#builder');
-  cells.forEach((c,k)=>coolTimers.push(setTimeout(()=>{
+  const place=k=>{const c=cells[k];if(!c)return;
     c.classList.remove('hid');c.classList.add('built');setTimeout(()=>c.classList.remove('built'),420);
     const r=rects[k];b.hidden=false;b.style.left=(r.left+r.width/2)+'px';b.style.top=(r.top+r.height/2)+'px';
     if(k%2===0)SFX.build(k);
     for(let q=0;q<2;q++)parts.push({x:r.left+Math.random()*r.width,y:r.top+r.height*.7,vx:(Math.random()-.5)*2.4,vy:-(.5+Math.random()*2),g:.18,life:1,d:.05,sz:2,c:['#c9bd96','#ffffff','#4fd8e8'][q%3],sq:true});
-    loop();
-  },k*step)));
-  coolTimers.push(setTimeout(hideBuilder,N*step+250));
+    loop()};
+  const run=(from,to)=>{for(let k=from;k<to;k++)coolTimers.push(setTimeout(()=>place(k),(k-from)*step));
+    coolTimers.push(setTimeout(()=>{if(to>=N)hideBuilder()},(to-from)*step+250))};
+  if(!boss){run(0,N);return}
+  run(0,mid);
+  coolTimers.push(setTimeout(()=>{clearInterval(coolT);
+    bossCine().then(()=>{if(!campaign)return;
+      sayText(ct('bossIntro',fmtC(bossPrize())),'😈');
+      run(mid,N);coolTick()})},mid*step+80));
 }
 function endCool(){
   clearCool();$('#cool').hidden=true;hideBuilder();
