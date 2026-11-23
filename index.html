@@ -520,6 +520,7 @@
   #game.camp{display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr);column-gap:22px;align-items:start;width:min(1100px,100%)}
   #game.camp>*{grid-column:1;min-width:0}
   #game.camp>.boardbox{grid-column:2;grid-row:1 / span 10;justify-self:center}
+  #game.camp>#footAct{grid-column:2;grid-row:11;justify-self:center;margin-top:10px;justify-content:center}
   #game.camp .boardwrap{max-height:none;max-width:100%}
   #tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;min-height:40px}
   #tabs[hidden]{display:none}
@@ -589,11 +590,11 @@
   #builder[hidden]{display:none}
   #builder .px{width:34px;height:34px}
   @keyframes hammer{50%{transform:translate(-25%,-95%) rotate(-28deg)}}
-  @media(max-width:900px){#game.camp{grid-template-columns:minmax(0,1fr)}#game.camp>*{grid-column:1}#game.camp>.boardbox{grid-column:1;grid-row:auto}}
+  @media(max-width:900px){#game.camp{grid-template-columns:minmax(0,1fr)}#game.camp>*{grid-column:1}#game.camp>.boardbox{grid-column:1;grid-row:auto}#game.camp>#footAct{grid-column:1;grid-row:auto}}
   html.mobile #game.camp{grid-template-columns:minmax(0,1fr);width:100%}
   html.mobile #game.camp>*{grid-column:1}
   html.mobile #game.camp>.hud{order:1}html.mobile #game.camp>#say{order:2}html.mobile #game.camp>#tide{order:3}html.mobile #game.camp>.boardbox{order:4;grid-column:1;grid-row:auto}
-  html.mobile #game.camp>#tabs{order:5}html.mobile #game.camp>#cardsInfo{order:6}html.mobile #game.camp>#cards{order:7}html.mobile #game.camp>#yard{order:8}html.mobile #game.camp>.foot{order:9}
+  html.mobile #game.camp>#tabs{order:5}html.mobile #game.camp>#cardsInfo{order:6}html.mobile #game.camp>#cards{order:7}html.mobile #game.camp>#yard{order:8}html.mobile #game.camp>.foot{order:9}html.mobile #game.camp>#footAct{order:4}
   html.mobile #cards{grid-template-columns:repeat(3,minmax(0,1fr))}
   html.mobile .hud .stat{min-width:0;flex:1}
   html.mobile #face{flex:none}
@@ -651,7 +652,7 @@
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
   <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div id="phase"><span id="phaseTxt"></span><i class="pbar"><i id="phaseFill"></i></i></div><div class="boardwrap"><div id="board"></div></div></div>
-  <div class="foot">
+  <div class="foot" id="footAct">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
       <button class="tool" id="radarBtn" hidden>📡 Radar</button>
