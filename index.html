@@ -504,13 +504,13 @@
   .cell.botshake{animation:blockShake .08s linear infinite!important;filter:brightness(1.25)}
   @keyframes blockShake{0%{transform:translate(-1px,0) scale(.98)}33%{transform:translate(1px,-1px) scale(.97)}66%{transform:translate(0,1px) scale(.98)}100%{transform:translate(-1px,1px) scale(.97)}}
   .cell .flaglayer{z-index:2}
-  .weed{position:absolute;inset:0;z-index:1;pointer-events:none;display:flex;align-items:center;justify-content:center;
-    background:repeating-linear-gradient(80deg,#1f5a24 0 3px,#2f7f2f 3px 6px,#43a23c 6px 8px);
-    clip-path:polygon(0 22%,8% 4%,16% 20%,25% 0,34% 22%,44% 2%,54% 20%,64% 0,74% 22%,84% 4%,92% 20%,100% 8%,100% 100%,0 100%);
-    transform:scale(calc(1 - var(--p,0)*.3));opacity:calc(1 - var(--p,0)*.4);transition:transform .1s,opacity .1s}
-  .weed b{font-family:var(--pix);font-weight:400;font-size:calc(var(--cell)*.3);color:#fff;text-shadow:1px 1px 0 #0b2a12,-1px -1px 0 #0b2a12,1px -1px 0 #0b2a12,-1px 1px 0 #0b2a12;margin-top:20%}
+  .weed{position:absolute;inset:0;z-index:1;pointer-events:none;background:#1f5a26;box-shadow:inset 0 0 0 1px #0f3a16;transform-origin:50% 90%;transform:scale(calc(1 - var(--p,0)*.12));transition:transform .1s}
+  .weed svg{position:absolute;inset:0;width:100%;height:100%;shape-rendering:crispEdges;overflow:hidden}
+  .weed b{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-family:var(--pix);font-weight:400;font-size:calc(var(--cell)*.26);color:#fff;text-shadow:1px 1px 0 #0b2a12,-1px -1px 0 #0b2a12,1px -1px 0 #0b2a12,-1px 1px 0 #0b2a12}
   .weed.hit{animation:weedHit .14s steps(2)}
-  @keyframes weedHit{0%{transform:translate(-2px,1px) rotate(-7deg) scale(1.06)}100%{transform:translate(2px,-1px) rotate(5deg) scale(1.03)}}
+  .weed.cut{animation:weedCut .2s steps(4) forwards}
+  @keyframes weedHit{0%{transform:translate(-2px,1px) rotate(-6deg) scale(1.05)}100%{transform:translate(2px,-1px) rotate(5deg) scale(1.02)}}
+  @keyframes weedCut{to{transform:scale(1.4) rotate(9deg);opacity:0}}
   #worlds,#demoWorlds{display:none}
   #game.camp #worlds{display:flex;flex-direction:column;gap:8px;grid-column:3;grid-row:1 / span 10;align-self:start;width:96px}
   #worlds .wt{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center}
@@ -533,8 +533,8 @@
   html[data-world="grass"] .tab.sel{background:#1f4a2c;color:var(--cyan)}
   html[data-world="grass"] .boardwrap{background:#17381d;border-color:#5aa85a}
   html[data-world="grass"] .cell:not(.open){background-color:#4aa83a;background-image:repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);box-shadow:inset 3px 3px 0 #86d65a,inset -3px -3px 0 #2d7a2b}
-  html[data-world="grass"] .cell:not(.open):nth-child(13n+5){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:50% 50%,0 0;background-size:46%,auto;image-rendering:pixelated}
-  html[data-world="grass"] .cell:not(.open):nth-child(19n+11){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:50% 50%,0 0;background-size:46%,auto;image-rendering:pixelated}
+  html[data-world="grass"] .cell.fl:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ff8fc2'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:34%,auto;image-rendering:pixelated}
+  html[data-world="grass"] .cell.fl2:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7' shape-rendering='crispEdges'%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='4' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23ffd166'/%3E%3Crect x='3' y='5' width='1' height='2' fill='%23236b24'/%3E%3C/svg%3E"),repeating-linear-gradient(95deg,transparent 0 5px,#3f9a33 5px 7px,transparent 7px 12px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:34%,auto;image-rendering:pixelated}
   html[data-world="grass"] .cell.open{background:#4a3220;box-shadow:inset 0 0 0 1px #6b4a2d}
   html[data-world="grass"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
   html[data-world="grass"] .bub{background:#ffd6ea;opacity:.5;border-radius:0}
@@ -2451,14 +2451,29 @@ async function bossCine(){
   document.addEventListener('mouseenter',()=>{if(on)cur.classList.add('on')});
 })();
 /* ---------- mundos / bioma Grasslands: ervas daninhas ---------- */
+function weedSVG(){ // talos entrelaçados com florzinhas amarelas em posições aleatórias
+  const R=(a,b)=>a+Math.random()*(b-a),cols=['#173f1c','#276f2c','#3a9a3a','#5cc04a'],f=v=>v.toFixed(1);let h='<svg viewBox="0 0 16 16">';
+  for(let i=0;i<9;i++)h+=`<path data-t="${f(R(.05,.9))}" d="M${f(R(1,15))} 16Q${f(R(-3,19))} ${f(R(2,12))} ${f(R(-1,17))} ${f(R(0,5))}" stroke="${cols[i%4]}" stroke-width="${i%3?1.1:1.6}" fill="none"/>`;
+  for(let i=0;i<4;i++)h+=`<path data-t="${f(R(.05,.9))}" d="M${f(R(-1,2))} ${f(R(4,14))}Q${f(R(4,12))} ${f(R(0,16))} ${f(R(14,17))} ${f(R(3,15))}" stroke="${cols[(i+1)%4]}" stroke-width="1" fill="none"/>`;
+  for(let i=0,n=2+(Math.random()*2|0);i<n;i++){const x=Math.floor(R(1,13)),y=Math.floor(R(1,12));
+    h+=`<g data-t="${f(R(.1,.95))}"><rect x="${x}" y="${y}" width="2" height="2" fill="#ffd166"/><rect x="${x-1}" y="${y}" width="1" height="1" fill="#fff0a0"/><rect x="${x+2}" y="${y+1}" width="1" height="1" fill="#fff0a0"/><rect x="${x}" y="${y}" width="1" height="1" fill="#f5b72e"/></g>`}
+  return h+'</svg>';
+}
+function decorateGrass(){ // flores decorativas em posições aleatórias dentro da casa (nunca fixas no centro)
+  if(!camp||camp.world!=='grass')return;
+  cells.forEach(c=>{if(Math.random()<.09){c.classList.add(Math.random()<.5?'fl':'fl2');c.style.setProperty('--fx',(12+Math.random()*60).toFixed(0)+'%');c.style.setProperty('--fy',(12+Math.random()*60).toFixed(0)+'%')}});
+}
 function weedUpdate(i){const g=grid[i/C|0][i%C],w=cells[i]&&cells[i].querySelector('.weed');if(!w)return;
-  w.style.setProperty('--p',((g.wmax-g.w)/Math.max(1,g.wmax)).toFixed(2));w.firstChild.textContent=g.w}
+  const p=(g.wmax-g.w)/Math.max(1,g.wmax);
+  w.style.setProperty('--p',p.toFixed(2));w.querySelector('b').textContent=g.w;
+  w.querySelectorAll('[data-t]').forEach(e=>{e.style.display=p>+e.dataset.t?'none':''}); // os talos vão sendo cortados aos poucos
+}
 function placeWeeds(sx,sy){
   const N=C*R,s0=sy*C+sx,ban=new Set([s0,...NA[s0]]),c=[];
   for(let i=0;i<N;i++)if(!ban.has(i))c.push(i);
   shuffle(c);const k=Math.max(2,Math.round(N*.12)),h=weedHits();
   c.slice(0,k).forEach(i=>{const g=grid[i/C|0][i%C];g.w=g.wmax=h;
-    const w=document.createElement('i');w.className='weed';w.innerHTML='<b></b>';cells[i].appendChild(w);weedUpdate(i)});
+    const w=document.createElement('i');w.className='weed';w.innerHTML=weedSVG()+'<b></b>';cells[i].appendChild(w);weedUpdate(i)});
 }
 function weedHit(x,y){
   const g=grid[y][x],e=el(x,y),i=y*C+x,w=e.querySelector('.weed');
@@ -2469,10 +2484,11 @@ function weedHit(x,y){
   for(let k=0;k<6;k++)parts.push({x:r.left+r.width/2,y:r.top+r.height*.4,vx:(Math.random()-.5)*5,vy:-(1+Math.random()*3),g:.25,life:1,d:.05,sz:2+(Math.random()*2|0),c:['#7bd04f','#2f7f2f','#a6e05a','#3f8f3f'][k%4],sq:true});loop();
   SFX.click();
   if(g.w>0){w.classList.remove('hit');void w.offsetWidth;w.classList.add('hit');weedUpdate(i);return}
-  g.w=0;g.wmax=0;w.remove();
-  for(let k=0;k<16;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*2|0),c:['#7bd04f','#2f7f2f','#a6e05a','#ffd166'][k%4],sq:true})}loop();
+  g.w=0;g.wmax=0;w.classList.add('cut');
+  for(let k=0;k<22;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:2+(Math.random()*3|0),c:['#5cc04a','#276f2c','#3a9a3a','#ffd166','#fff0a0'][k%5],sq:true})}loop();
   if(g.m===0)campCells+=2; // bônus: quebrar a erva rende 3× o valor da casa
-  move(x,y);
+  setTimeout(()=>{if(!g.o)move(x,y)},180);
+  return;
 }
 function renderWorlds(){
   const box=$('#worlds');if(!box||!camp)return;
@@ -2609,7 +2625,7 @@ function campNewBoard(build,secs){
   campCells=0;botOpened=0;camp.boards++;
   if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
   setBoss(boss,!(boss&&build)); // na construção, a borda vermelha só aparece depois das falas
-  init();setCoins();
+  init();decorateGrass();setCoins();
   if(boss&&!build)sayText(ct('bossIntro',fmtC(bossPrize())),'😈');
   updatePhase();
   if(build){boardBuilt=true;buildAnim(secs)}
