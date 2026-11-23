@@ -458,6 +458,9 @@
   #game.camp #face{width:92px;height:92px;font-size:56px;cursor:pointer;animation:faceBob 2.6s ease-in-out infinite}
   .say{position:relative;margin:2px 0 14px;padding:10px 14px;border:2px solid var(--cyan);background:#0b1d36;font-size:16px;line-height:1.4;min-height:46px}
   .say[hidden]{display:none}
+  #game.camp .say{box-sizing:border-box;height:128px;overflow:visible;display:flex;align-items:center}
+  #game.camp .say[hidden]{display:flex;visibility:hidden}
+  html.mobile #game.camp .say{height:116px;font-size:15px}
   .say::before{content:"";position:absolute;top:-10px;left:50%;margin-left:-8px;width:14px;height:14px;background:#0b1d36;border-left:2px solid var(--cyan);border-top:2px solid var(--cyan);transform:rotate(45deg)}
   #coinStat{color:#ffd166;text-shadow:-2px 0 var(--pink),2px 0 var(--cyan)}
   #coinN.bump{animation:bump .25s steps(3)}
