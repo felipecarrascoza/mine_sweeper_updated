@@ -2073,6 +2073,7 @@ const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
 const WORLDS=[{id:'mine',mult:1,cost:0,need:0,ic:':wclassic:'},{id:'grass',mult:1.6,cost:6000,need:3,ic:':wgrass:'}];
+const bestSize=()=>Math.max(...Object.values(camp.ws).map(w=>w.size));
 const worldOf=id=>WORLDS.find(w=>w.id===id)||WORLDS[0],worldMult=()=>worldOf(camp.world).mult;
 const WEED_BASE=20,weedHits=()=>Math.max(1,WEED_BASE-camp.weed),WEED_MAX=19,weedCost=()=>Math.round(350*Math.pow(1.42,camp.weed));
 const BOT_NEED=3,BOT_MAX={spd:8,rch:8,eff:5};
@@ -2083,14 +2084,24 @@ const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,ne
 const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
   liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
 const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
-const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,bot:{own:false,spd:0,rch:0,eff:0},worlds:{mine:true},world:'mine',wvis:{},weed:0,weedTip:false});
+/* cada mundo tem os seus próprios upgrades (tabuleiro, moedas/casa, bônus, recarga, drones, robô, podador) */
+const WKEYS=['size','cpc','clear','cool','drones','droneT','bot','weed'];
+const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,drones:[0,0,0],droneT:[0,0,0],bot:{own:false,spd:0,rch:0,eff:0},weed:0});
+const newCamp=()=>({coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew()}});
+function bindWorld(){WKEYS.forEach(k=>Object.defineProperty(camp,k,{get(){return camp.ws[camp.world][k]},set(v){camp.ws[camp.world][k]=v},enumerable:false,configurable:true}))}
 function loadCamp(){
   camp=newCamp();
-  try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(j&&typeof j==='object')camp={...camp,...j}}catch(e){}
+  try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
+    if(j&&typeof j==='object'){
+      if(!j.ws){const m=wsNew();WKEYS.forEach(k=>{if(j[k]!==undefined)m[k]=j[k]});j.ws={mine:m}} // save antigo: o progresso vira o do Classic
+      camp={...camp,...j};
+    }}catch(e){}
+  WKEYS.forEach(k=>delete camp[k]);
   if(!camp.newTab)camp.newTab={};
   if(camp.tabs)camp.tabs=camp.tabs.filter(t=>t!=='loadout'&&t!=='floors');
-  if(!camp.bot)camp.bot={own:false,spd:0,rch:0,eff:0};
-  if(!camp.worlds)camp.worlds={mine:true};if(!camp.world)camp.world='mine';if(!camp.wvis)camp.wvis={};if(!camp.weed)camp.weed=0;
+  if(!camp.worlds)camp.worlds={mine:true};if(!camp.world||!camp.ws[camp.world]&&!WORLDS.some(w=>w.id===camp.world))camp.world='mine';if(!camp.wvis)camp.wvis={};
+  WORLDS.forEach(w=>{camp.ws[w.id]={...wsNew(),...(camp.ws[w.id]||{})}});
+  bindWorld();
 }
 let noSave=false;
 function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(camp))}catch(e){}}
@@ -2319,14 +2330,14 @@ function renderCards(){
     }
     WORLDS.forEach(w=>{if(w.id==='mine'||camp.worlds[w.id])return;
       const nm=ct('wGrass');
-      cs.push(camp.size>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wBuyD',w.mult),desc:ct('wBuyD',w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
+      cs.push(bestSize()>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wBuyD',w.mult),desc:ct('wBuyD',w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
     if(camp.wvis.grass)cs.push(camp.weed<WEED_MAX?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
   }else if(curTab==='items'){
     cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD'),desc:ct('cShieldD')})
       :card({ic:':shield:',name:ct('cShield'),sub:'5/5 '+ct('max'),dis:true}));
   }else if(curTab==='drones'){
     DRONES.forEach((d,i)=>{
-      if(camp.size>=d.need)cs.push(card({ic:':drone'+(i+1)+':',name:ct('droneName',d.n),sub:ct('droneD',d.every,d.yield)+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i)),desc:ct('droneDesc')}));
+      if(camp.size>=d.need)cs.push(card({ic:':drone'+(i+1)+':',name:ct('droneName',d.n),sub:ct('droneD',d.every,Math.round(d.yield*worldMult()))+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i)),desc:ct('droneDesc')}));
       else cs.push(card({ic:':lock:',name:ct('droneName',d.n),sub:ct('droneNeed',SIZES[d.need]),dis:true}));
     });
     if(camp.size>=BOT_NEED||camp.bot.own){
@@ -2352,7 +2363,7 @@ function buyItem(key){
   else if(key==='clear'){c=COST.clear();if(camp.coins>=c){camp.clear++;ok=true}}
   else if(key==='cool'&&camp.cool<8){c=COST.cool();if(camp.coins>=c){camp.cool++;ok=true}}
   else if(key==='shield'&&camp.shields<5){c=COST.shield();if(camp.coins>=c){camp.shields++;camp.shieldBought++;ok=true}}
-  else if(key.startsWith('world:')){const id=key.slice(6),w=worldOf(id);c=w.cost;if(w.id!=='mine'&&!camp.worlds[id]&&camp.size>=w.need&&camp.coins>=c){camp.worlds[id]=true;ok=true;setTimeout(()=>sayText(RES(X('You bought a new world. Pick it on the right. I will pretend to be excited.','Você comprou um mundo novo. Escolha à direita. Vou fingir empolgação.')),'😏',false),300)}}
+  else if(key.startsWith('world:')){const id=key.slice(6),w=worldOf(id);c=w.cost;if(w.id!=='mine'&&!camp.worlds[id]&&bestSize()>=w.need&&camp.coins>=c){camp.worlds[id]=true;ok=true;setTimeout(()=>sayText(RES(X('You bought a new world. Pick it on the right. I will pretend to be excited.','Você comprou um mundo novo. Escolha à direita. Vou fingir empolgação.')),'😏',false),300)}}
   else if(key==='weed'){c=weedCost();if(camp.weed<WEED_MAX&&camp.coins>=c){camp.weed++;ok=true;
     grid.forEach((row,y)=>row.forEach((g,x)=>{if(g.w>0){g.wmax=Math.max(1,g.wmax-1);g.w=Math.max(1,g.w-1);weedUpdate(y*C+x)}}))}}
   else if(key==='bot'){c=BOT_COST.buy();if(!camp.bot.own&&camp.coins>=c){camp.bot.own=true;ok=true;setTimeout(()=>sayText(ct('botBought'),'😏',false),300)}}
@@ -2475,7 +2486,7 @@ function pickWorld(id,force){
   if(camp.world===id)return;
   if(!force&&(bossOn||tutorial||$('#askbox').classList.contains('show'))){SFX.deny();return}
   if(force)camp.worlds[id]=true;
-  camp.world=id;camp.wvis[id]=true;saveCamp();SFX.menu();renderWorlds();renderCards();
+  camp.world=id;camp.wvis[id]=true;saveCamp();SFX.menu();checkUnlocks(true);renderYard();setCoins();
   startCooldown(coolSecs(),400);
   if(id==='grass'&&!camp.wFirst){camp.wFirst=true;saveCamp();setTimeout(()=>sayText(ct('wFirstGrass'),'😏',false),900)}
 }
@@ -2694,7 +2705,7 @@ function renderYard(){
   y.innerHTML=owned.length?owned.map(i=>`<div class="lane t${i+1}" data-i="${i}"><i class="ywall">:${['dirt','stone','crystal'][i]}:</i><div class="track"><i class="ybot" id="bot${i}">:drone${i+1}:<i class="ypick">:pick${i+1}:</i></i></div>`+
     `<i class="yvault" id="vault${i}">:vault:</i><span class="yrate" title="${ct('perMinT')}">:coin: ${perMin(i)}${ct('perMin')}</span><span class="ycnt">x${camp.drones[i]}</span><i class="ybar"><i id="ybar${i}"></i></i></div>`).join(''):`<div class="yempty">${ct('yardEmpty')}</div>`;
 }
-const perMin=i=>{const v=camp.drones[i]*DRONES[i].yield*60/DRONES[i].every;return fmtC(v)===String(Math.floor(v))&&v!==Math.floor(v)?v.toFixed(1):(v>=1e4?fmtC(v):(Number.isInteger(v)?String(v):v.toFixed(1)))};
+const perMin=i=>{const v=camp.drones[i]*DRONES[i].yield*worldMult()*60/DRONES[i].every;return fmtC(v)===String(Math.floor(v))&&v!==Math.floor(v)?v.toFixed(1):(v>=1e4?fmtC(v):(Number.isInteger(v)?String(v):v.toFixed(1)))};
 function flyCoins(fromEl,amount){
   const a=fromEl.getBoundingClientRect(),b=$('#coinStat').getBoundingClientRect();
   const n=Math.min(8,3+Math.floor(Math.log10(amount+1)*2)),sx=a.left+a.width/2,sy=a.top+a.height/2,ex=b.left+b.width/2,ey=b.top+b.height/2;
@@ -2730,12 +2741,12 @@ function campTick(){
       for(let k=0;k<3;k++)parts.push({x:r.left-8,y:r.top+6+Math.random()*12,vx:-(.4+Math.random()*1.6),vy:-(.6+Math.random()*1.6),g:.16,life:1,d:.05,sz:2,c:['#8b5a2b','#b07a4a','#5c3b1c'][k],sq:true});
       loop();
     }
-    if(camp.droneT[i]>=d.every){camp.droneT[i]=0;deliver(i,n*d.yield)}});
+    if(camp.droneT[i]>=d.every){camp.droneT[i]=0;deliver(i,Math.round(n*d.yield*worldMult()))}});
   const now=Date.now();
   if(now-lastQuip>50000&&now-idleAt>40000)quip('idle');
   else if(now-lastQuip>80000)quip('fourth');
 }
-const incomePerSec=()=>DRONES.reduce((s,d,i)=>s+camp.drones[i]*d.yield/d.every,0);
+const incomePerSec=()=>DRONES.reduce((s,d,i)=>s+camp.drones[i]*d.yield*worldMult()/d.every,0);
 
 /* ---------- conversa de abertura (tela cheia) ---------- */
 const INTRO_A=[
