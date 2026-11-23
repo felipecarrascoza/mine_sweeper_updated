@@ -539,6 +539,48 @@
   html[data-world="grass"] .cell.open{background:#4a3220;box-shadow:inset 0 0 0 1px #6b4a2d}
   html[data-world="grass"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
   html[data-world="grass"] .bub{background:#ffd6ea;opacity:.5;border-radius:0}
+  /* ===== bioma: Floresta ===== */
+  html[data-world="forest"]{--panel:#0f2a1a;--panel2:#143622;--line:#2f6b3a;--cyan:#8fd35b;--pink:#e08a5a;--text:#e3f2d0;--muted:#7fae80}
+  html[data-world="forest"] body{background:repeating-linear-gradient(90deg,transparent 0 120px,#1a120a30 120px 150px,transparent 150px 330px),radial-gradient(ellipse 80% 40% at 50% 0%,#2a5a2a55 0%,transparent 70%),linear-gradient(#0b2214 0,#12341d 45%,#08180e 100%);background-attachment:fixed}
+  html[data-world="forest"] .screen{background:#0a1f12ee}
+  html[data-world="forest"] .stat{background:#07160d}
+  html[data-world="forest"] .say,html[data-world="forest"] .say::before{background:#123020}
+  html[data-world="forest"] #cool,html[data-world="forest"] .modal{background:#0f2a1a}
+  html[data-world="forest"] .tab.sel{background:#17402a;color:var(--cyan)}
+  html[data-world="forest"] .boardwrap{background:#0c2413;border-color:#2f6b3a}
+  html[data-world="forest"] .cell:not(.open){background-color:#2a7030;background-image:repeating-linear-gradient(95deg,transparent 0 4px,#1b5320 4px 8px,transparent 8px 12px);box-shadow:inset 3px 3px 0 #46963f,inset -3px -3px 0 #174a1b}
+  html[data-world="forest"] .cell.open{background:#2a1d12;box-shadow:inset 0 0 0 1px #4a3322}
+  html[data-world="forest"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
+  html[data-world="forest"] .bub{background:#4f8a2a;opacity:.45;border-radius:0}
+  .bush{position:absolute;inset:0;z-index:1;pointer-events:none;transform-origin:50% 80%}
+  .bush svg{position:absolute;left:50%;top:50%;width:round(down,var(--cell),12px);height:round(down,var(--cell),12px);transform:translate(-50%,-50%);shape-rendering:crispEdges;overflow:visible}
+  .bush .rt{position:absolute;width:22%;height:22%;max-width:9px;max-height:9px;min-width:5px;min-height:5px;background:#6b4423;border:1px solid #2a1a0c;z-index:2;font-style:normal;transition:background .15s}
+  .bush .rt.t{left:50%;top:1px;transform:translateX(-50%)}.bush .rt.b{left:50%;bottom:1px;transform:translateX(-50%)}
+  .bush .rt.l{top:50%;left:1px;transform:translateY(-50%)}.bush .rt.r{top:50%;right:1px;transform:translateY(-50%)}
+  .bush .rt.lit{background:#ffd166;border-color:#a87a1a;box-shadow:0 0 6px #ffd166}
+  .bush.ready svg{filter:brightness(1.3)}
+  .bush.ready{animation:bushBob .9s ease-in-out infinite}
+  .bush.deny{animation:bushDeny .18s steps(3)}
+  .bush.cut{animation:weedCut .2s steps(4) forwards}
+  @keyframes bushBob{50%{transform:translateY(-2px) scale(1.04)}}
+  @keyframes bushDeny{0%{transform:translateX(-3px)}50%{transform:translateX(3px)}100%{transform:none}}
+  /* ===== bioma: Deserto ===== */
+  html[data-world="desert"]{--panel:#3a2a18;--panel2:#4a3520;--line:#a07a44;--cyan:#f2c35c;--pink:#ff9a6a;--text:#fdf0d0;--muted:#cfae7a}
+  html[data-world="desert"] body{background:radial-gradient(ellipse 70% 35% at 50% 0%,#fff3c4 0%,transparent 72%),linear-gradient(#f2b45a 0,#f8d99a 30%,#e8c07a 30.2%,#d2a05a 60%,#a8763a 100%);background-attachment:fixed}
+  html[data-world="desert"] .screen{background:#2a1d10ee}
+  html[data-world="desert"] .stat{background:#1f1409}
+  html[data-world="desert"] .say,html[data-world="desert"] .say::before{background:#4a3520}
+  html[data-world="desert"] #cool,html[data-world="desert"] .modal{background:#3a2a18}
+  html[data-world="desert"] .tab.sel{background:#5a4326;color:var(--cyan)}
+  html[data-world="desert"] .boardwrap{background:#4a3520;border-color:#c99a55}
+  html[data-world="desert"] .cell:not(.open){background-color:#e3bd74;background-image:radial-gradient(#0000001a 1px,transparent 1.5px);background-size:7px 7px;box-shadow:inset 3px 3px 0 #f6dc9f,inset -3px -3px 0 #b88f4a}
+  html[data-world="desert"] .cell.open{background:#6a4d2b;box-shadow:inset 0 0 0 1px #8a6a3d}
+  html[data-world="desert"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
+  html[data-world="desert"] .cell.cac:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10' shape-rendering='crispEdges'%3E%3Crect x='3' y='1' width='2' height='9' fill='%233f9a46'/%3E%3Crect x='4' y='1' width='1' height='9' fill='%2326702e'/%3E%3Crect x='1' y='4' width='1' height='3' fill='%233f9a46'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%233f9a46'/%3E%3Crect x='6' y='3' width='1' height='3' fill='%233f9a46'/%3E%3Crect x='5' y='5' width='1' height='1' fill='%233f9a46'/%3E%3Crect x='4' y='0' width='1' height='1' fill='%23ff8fc2'/%3E%3C/svg%3E"),radial-gradient(#0000001a 1px,transparent 1.5px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.5),8px) auto,7px 7px;image-rendering:pixelated}
+  html[data-world="desert"] .bub{background:#f6dc9f;opacity:.5;border-radius:0}
+  html[data-world="desert"] .tidewave .fill{background:linear-gradient(#fff3c4 0 7px,#f1d58b 7px 14px,transparent 14px),repeating-linear-gradient(0deg,#d9b46a 0 8px,#c39a52 8px 16px);box-shadow:0 0 30px #e8c982}
+  html[data-world="desert"] .tidewave .edge{background:repeating-linear-gradient(0deg,#fff3c4 0 6px,#e8c982 6px 12px);box-shadow:0 0 18px #ffe9a8}
+  html[data-world="desert"] .tidewarn{border-color:#e8c982;background:#e8c98222}
   html.hascur,html.hascur *{cursor:none!important}
   #cur{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:26px;height:26px;margin:0;opacity:0;transition:opacity .15s;will-change:transform}
   #cur.on{opacity:1}
@@ -738,7 +780,7 @@
     <div><span data-i18n="best">Best:</span> <span class="best" id="best">—</span></div>
   </div>
   <div id="worlds"></div>
-  <div id="demoWorlds"><span>DEMO</span><button class="tool" data-w="mine"></button><button class="tool" data-w="grass"></button></div>
+  <div id="demoWorlds"><span>DEMO</span><button class="tool" data-w="mine"></button><button class="tool" data-w="grass"></button><button class="tool" data-w="forest"></button><button class="tool" data-w="desert"></button></div>
   <div class="foot" id="help"></div>
 </div>
 
@@ -833,6 +875,9 @@ const LEVELS_SRC={
 };
 const RADAR={easy:3,medium:5,hard:8,insane:12};
 const TIDE={easy:6,medium:5,hard:4,insane:3};
+const SAND={tideLbl:X('Sandstorm in','Tempestade em'),tideUnit:X('moves','jogadas'),tideUnit1:X('move','jogada'),tideWarn:X('Sandstorm incoming!','Tempestade de areia chegando!'),tideToast:X('A sandstorm buried a row!','A tempestade enterrou uma fileira!')};
+const isDesert=()=>campaign&&camp&&camp.world==='desert';
+const tw=k=>isDesert()?RES(SAND[k]):tr(k);
 const LIARS={easy:1,medium:2,hard:3,insane:5};
 
 /* quadros dos mini-tutoriais: cada frame é uma grade 5×3 de "tokens"
@@ -1619,7 +1664,7 @@ function toggleFlag(x,y){
 /* jogada do jogador: abre casa/vizinhos; no duelo pontua e passa a vez */
 function updateTide(){ // falta 1 jogada: o texto pula alternando cores e aparecem placas de perigo nos lados
   const n=TIDE[level],left=n-(moves%n),danger=has('tide')&&left===1;
-  const bar=$('#tide'),txt=`${tr('tideLbl')} ${left} ${left===1?tr('tideUnit1'):tr('tideUnit')}${danger?'!':''}`;
+  const bar=$('#tide'),txt=`${tw('tideLbl')} ${left} ${left===1?tw('tideUnit1'):tw('tideUnit')}${danger?'!':''}`;
   const was=bar.classList.contains('danger');
   bar.classList.toggle('danger',danger);$('#game').classList.toggle('tdanger',danger);
   if(danger){
@@ -1638,19 +1683,20 @@ let tideBusy=false;
 /* a maré: aviso piscando → onda enorme chega com espuma → cobre a fileira → volta e a linha reaparece "refeita", casa por casa */
 function startTide(){
   const id=genId,open=[];
-  grid.forEach((row,y)=>row.forEach((g,x)=>{if(g.o)open.push(y*C+x)}));
+  const des=isDesert();
+  grid.forEach((row,y)=>row.forEach((g,x)=>{if(g.o||(des&&g.f!==0))open.push(y*C+x)}));
   if(open.length<4)return;
   const pick=open[Math.random()*open.length|0],band=[];
   if(!shapes){const r=pick/C|0;for(let x=0;x<C;x++)band.push(r*C+x)}
   else{const py=pts[pick][1];for(let i=0;i<C*R;i++)if(Math.abs(pts[i][1]-py)<.55)band.push(i)}
-  if(!band.some(i=>grid[i/C|0][i%C].o))return;
+  if(!band.some(i=>{const g=grid[i/C|0][i%C];return g.o||(des&&g.f!==0)}))return;
   tideBusy=true;
   const rects=band.map(i=>cells[i].getBoundingClientRect());
   const x0=Math.min(...rects.map(r=>r.left)),x1=Math.max(...rects.map(r=>r.right)),y0=Math.min(...rects.map(r=>r.top)),y1=Math.max(...rects.map(r=>r.bottom));
   const W=x1-x0,H=y1-y0,pad=Math.round(H*.5),E=30,T=1900;
   const warn=document.createElement('div');warn.className='tidewarn';
   warn.style.cssText=`left:${x0-4}px;top:${y0-4}px;width:${W+8}px;height:${H+8}px`;document.body.appendChild(warn);
-  SFX.tideWarn();toast(tr('tideWarn'));
+  SFX.tideWarn();toast(tw('tideWarn'));
   setTimeout(()=>{
     warn.remove();
     if(id!==genId||over){tideBusy=false;return}
@@ -1662,7 +1708,7 @@ function startTide(){
     wave.children[1].animate(xs.map((x,k)=>({offset:kf[k],transform:`translateX(${x-E}px)`})),{duration:T,easing:'linear',fill:'forwards'});
     SFX.tideIn();
     // espuma voando na frente da onda (chegando) e pingando atrás dela (voltando)
-    const t0=performance.now(),cols=['#ffffff','#bff6ff','#4fd8e8'];
+    const t0=performance.now(),cols=des?['#fff3c4','#e8c982','#c9a05a']:['#ffffff','#bff6ff','#4fd8e8'];
     const foam=setInterval(()=>{
       if(id!==genId){clearInterval(foam);return}
       const f=(performance.now()-t0)/T;if(f>=1){clearInterval(foam);return}
@@ -1673,7 +1719,8 @@ function startTide(){
       loop();
     },45);
     setTimeout(()=>{if(id===genId&&!over)kick(.7)},T*.42);                  // a onda bate
-    setTimeout(()=>{if(id===genId&&!over)band.forEach(i=>coverCell(i))},T*.48); // escondida debaixo da água
+    setTimeout(()=>{if(id===genId&&!over)band.forEach(i=>coverCell(i));
+      if(des){band.forEach(i=>{const g=grid[i/C|0][i%C];if(g.f!==0){const pv=g.f;fsum-=pv;g.f=0;renderFlag(i%C,i/C|0,pv)}});setCounter();toast(tw('tideToast'))}},T*.48); // escondida debaixo da água
     band.forEach((i,k)=>{ // a linha volta refeita, casa por casa, conforme a água recua
       const fx=rects[k].left+rects[k].width/2-x0,f=.55+.45*(1-fx/(W+E));
       setTimeout(()=>{if(id!==genId)return;const c=cells[i];c.classList.add('rebuild');setTimeout(()=>c.classList.remove('rebuild'),560);
@@ -1694,6 +1741,7 @@ function move(x,y,loud){
     }
   }
   if(campaign&&grid[y][x].w>0&&!grid[y][x].o){if(grid[y][x].f===0)weedHit(x,y);return}
+  if(campaign&&grid[y][x].b&&!grid[y][x].o&&grid[y][x].f===0){if(bushLocked(x,y))bushDeny(x,y);else bushBreak(x,y);return}
   const before=opened,seen0=seenCount;
   reveal(x,y,loud);
   if(campaign)campPay(x,y);
@@ -1714,7 +1762,7 @@ function reveal(x,y,loud){
     const nb=areaPairs(x,y);
     const fl=nb.filter(([a,b])=>grid[b][a].f!==0).length;
     const sum=nb.reduce((s,[a,b])=>s+grid[b][a].f,0);
-    if(fl>0&&sum===g.dn){chordFx(x,y,true);nb.forEach(([a,b])=>{if(grid[b][a].f===0&&!grid[b][a].o&&!grid[b][a].w)reveal(a,b)})}
+    if(fl>0&&sum===g.dn){chordFx(x,y,true);nb.forEach(([a,b])=>{if(grid[b][a].f===0&&!grid[b][a].o&&!grid[b][a].w&&!(grid[b][a].b&&bushLocked(a,b)))reveal(a,b)})}
     else if(loud||fl>0)chordFx(x,y,false);
     return;
   }
@@ -1724,14 +1772,14 @@ function reveal(x,y,loud){
   while(q.length){
     const [cx,cy,d]=q.shift();openCell(cx,cy,d);depths.add(d);
     if(grid[cy][cx].a===0)for(const [a,b] of neighbors(cx,cy)){const t=grid[b][a];
-      if(!t.o&&t.f===0&&t.m===0&&!t.w){t.o=true;q.push([a,b,d+1])}}
+      if(!t.o&&t.f===0&&t.m===0&&!t.w&&!(t.b&&bushLocked(a,b))){t.o=true;q.push([a,b,d+1])}}
   }
   [...depths].sort((a,b)=>a-b).slice(0,16).forEach(d=>setTimeout(()=>SFX.open(d),d*35));
   if(opened===C*R-countMineCells())pendingWin=true;
 }
 function countMineCells(){let k=0;for(const row of grid)for(const g of row)if(g.m!==0)k++;return k}
 function openCell(x,y,d){
-  const g=grid[y][x],e=el(x,y);opened++;
+  const g=grid[y][x],e=el(x,y);g.b=0;opened++;
   if(!g.seen){g.seen=true;seenCount++;if(campaign)campCells++}
   e.innerHTML='';e.classList.remove('flagged','negflag','spawn','ghost');e.classList.add('open');
   e.style.animationDelay=(d*35)+'ms';
@@ -2028,7 +2076,7 @@ const SAVE_KEY='ms-camp-v1';
 let camp=null,campaign=false,tutorial=false,tutIdx=0,custom=null,campCells=0,campBlock=false,coolT=0,coolLeft=0,coolTotal=10,coolTimers=[],boardBuilt=false,idleAt=Date.now(),lastQuip=0,sayT=0,curTab=null,tickers=false,cardsDirty=false;
 
 /* ---------- ícones em pixel art, desenhados à mão (menos emoji) ---------- */
-const PALX={u:'#17446f',U:'#3a7db5',v:'#0b2a47',L:'#7bd04f',l:'#3f8f3f',D:'#245c2e',k:'#0b1020',w:'#ffffff',y:'#ffd166',Y:'#c98b1a',r:'#ff4d5e',R:'#a82636',b:'#4fa8ff',B:'#2d6fd0',c:'#4fd8e8',g:'#aebfd0',G:'#6a869f',p:'#ff5c93',o:'#ff9a4f',O:'#a35a22',n:'#53e69a',e:'#8b5a2b',E:'#5c3b1c',s:'#b07a4a',m:'#9b5de5',M:'#5a3a8c',q:'#ffe27a'};
+const PALX={a:'#e3bd74',A:'#f6dc9f',h:'#3f9a46',H:'#26702e',u:'#17446f',U:'#3a7db5',v:'#0b2a47',L:'#7bd04f',l:'#3f8f3f',D:'#245c2e',k:'#0b1020',w:'#ffffff',y:'#ffd166',Y:'#c98b1a',r:'#ff4d5e',R:'#a82636',b:'#4fa8ff',B:'#2d6fd0',c:'#4fd8e8',g:'#aebfd0',G:'#6a869f',p:'#ff5c93',o:'#ff9a4f',O:'#a35a22',n:'#53e69a',e:'#8b5a2b',E:'#5c3b1c',s:'#b07a4a',m:'#9b5de5',M:'#5a3a8c',q:'#ffe27a'};
 const ICONS={
   coin:["..kkkkkk..",".kyyyyyyk.","kyywyyyyYk","kywyyYyyYk","kywyyYyyYk","kywyyYyyYk","kyyyyYyyYk","kyyyyyyYYk",".kYYYYYYk.","..kkkkkk.."],
   shield:[".kkkkkkkk.","kbbbbbbbbk","kbwbbbbbBk","kbwbbbbbBk","kbbbbbbbBk","kbbbbbbBBk",".kbbbbBBk.","..kbbBBk..","...kBBk...","....kk...."],
@@ -2047,6 +2095,8 @@ const ICONS={
   warn:["....kk....","...kyyk...","..kyyyyk..","..kyykyk..",".kyyykkyyk",".kyyykkyyk","kyyyyyyyyk","kyyyykkyyk","kyyyyyyyyk","kkkkkkkkkk"],
   hammer:["..kkkkk...",".kggggGk..",".kggggGk..","..kkkkk...","....ko....","....ko....","....ko....","....ko....","....ko....","....kk...."],
   vault:["..........",".kkkkkkkk.","kyyyyyyyyk","kyYyyyyYyk","kkkkkkkkkk","kooooooook","kooookoook","kooooooook","kooooooook","kkkkkkkkkk"],
+  wforest:["kkkkkkkkkk","kllllllllk","klllDDllLk","kllDDDDllk","klDDlDDDlk","klDDDDDDlk","kllDDDDllk","klllDDlllk","kllllllllk","kkkkkkkkkk"],
+  wdesert:["kkkkkkkkkk","kAAAAAAAAk","kAAAhhAAAk","kAhAhHAAAk","kAhAhHAhAk","kAhhhHhhAk","kAAAhHAAAk","kaaahHaaak","kaaaaaaaak","kkkkkkkkkk"],
   wclassic:["UUUUUUUUUU","UUUUUUUUUU","UUuuuuuuvv","UUuuuuuuvv","UUuuuuuuvv","UUuuuuuuvv","UUuuuuuuvv","UUuuuuuuvv","vvvvvvvvvv","vvvvvvvvvv"],
   wgrass:["kkkkkkkkkk","kbbbbbbbbk","kbbbbwwbbk","kbbbbbbbbk","kLLLLLLLLk","kLlLLpLLlk","klLLLyLLLk","kLLlLLLLLk","klllllllLk","kkkkkkkkkk"],
   dirt:["eeeeEeeeee","eEeeeeeEee","eeeseeeeee","eeeeeEeese","EeeeeeeeEe","eeseeEeeee","eeeeeeeese","eEeeseeeee","eeeeeeEeee","EEEEEEEEEE"],
@@ -2073,7 +2123,9 @@ const iconImg=name=>`<img class="px" src="${iconURL(name)}" alt=":${name}:" drag
 const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
-const WORLDS=[{id:'mine',mult:1,up:1,cost:0,need:0,ic:':wclassic:'},{id:'grass',mult:1.6,up:1.3,cost:6000,need:3,ic:':wgrass:'}];
+const WORLDS=[{id:'mine',mult:1,up:1,cost:0,need:0,ic:':wclassic:'},{id:'grass',mult:1.6,up:1.3,cost:6000,need:3,ic:':wgrass:'},{id:'forest',mult:2.3,up:1.7,cost:20000,need:4,ic:':wforest:'},{id:'desert',mult:3.2,up:2.3,cost:60000,need:5,ic:':wdesert:',mode:'tide'}]
+const WN={mine:'wMine',grass:'wGrass',forest:'wForest',desert:'wDesert'};
+const worldModes=()=>{const m=worldOf(camp.world).mode;return m?[m]:[]};;
 const bestSize=()=>Math.max(...Object.values(camp.ws).map(w=>w.size));
 const upMul=()=>worldOf(camp.world).up||1; // upgrades de mundos mais avançados custam mais
 const worldOf=id=>WORLDS.find(w=>w.id===id)||WORLDS[0],worldMult=()=>worldOf(camp.world).mult;
@@ -2089,7 +2141,7 @@ const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:
 /* cada mundo tem os seus próprios upgrades (tabuleiro, moedas/casa, bônus, recarga, drones, robô, podador) */
 const WKEYS=['size','cpc','clear','cool','drones','droneT','bot','weed'];
 const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,drones:[0,0,0],droneT:[0,0,0],bot:{own:false,spd:0,rch:0,eff:0},weed:0});
-const newCamp=()=>({coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew()}});
+const newCamp=()=>({coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew(),forest:wsNew(),desert:wsNew()}});
 function bindWorld(){WKEYS.forEach(k=>Object.defineProperty(camp,k,{get(){return camp.ws[camp.world][k]},set(v){camp.ws[camp.world][k]=v},enumerable:false,configurable:true}))}
 function loadCamp(){
   camp=newCamp();
@@ -2112,7 +2164,7 @@ function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorag
 const CSTR={
   en:{shop:'Upgrades',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
-    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',wMine:'Classic',wGrass:'Grasslands',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',wMine:'Classic',wGrass:'Grasslands',wForest:'Forest',wDesert:'Desert',wd_grass:m=>`Weeds need ${WEED_BASE} hits to break. Pays ×${m}.`,wd_forest:m=>`Rooted bushes: open or flag the 4 blocks around first. Pays ×${m}.`,wd_desert:m=>`Sandstorms bury a row and its flags. Pays ×${m}.`,wFirstForest:'A forest. Bushes with roots. Open or flag the four blocks around one and it lets go. Nature is rude.',wFirstDesert:'A desert. Sand gets everywhere. Especially over your flags. Enjoy.',bushTip:'That bush is rooted. Open or flag the 4 blocks around it first. See the little roots? They light up.',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
@@ -2123,7 +2175,7 @@ const CSTR={
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Melhorias',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
-    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',wMine:'Clássico',wGrass:'Campos',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',wMine:'Clássico',wGrass:'Campos',wForest:'Floresta',wDesert:'Deserto',wd_grass:m=>`Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wd_forest:m=>`Arbustos com raiz: abra ou marque os 4 blocos em volta antes. Paga ×${m}.`,wd_desert:m=>`Tempestades de areia cobrem uma linha e as bandeiras. Paga ×${m}.`,wFirstForest:'Uma floresta. Arbustos com raiz. Abra ou marque os quatro blocos em volta e ele solta. A natureza é grossa.',wFirstDesert:'Um deserto. Areia entra em tudo. Principalmente nas suas bandeiras. Aproveite.',bushTip:'Esse arbusto tem raiz. Abra ou marque os 4 blocos em volta primeiro. Viu as raizinhas? Elas acendem.',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
@@ -2277,6 +2329,7 @@ function startBoardFast(x,y){ // campanha: procura rápida (≈90 ms) por um tab
   for(;;){const m=makeLayout(s),r=analyze(m,s);if(!best||r.frac>best.r.frac)best={m,r};if(best.r.frac>=1||performance.now()-t0>90)break}
   placeLayout(best.m);
   if(campaign&&!tutorial&&camp.world==='grass')placeWeeds(x,y);
+  if(campaign&&!tutorial&&camp.world==='forest')placeBushes(x,y);
 }
 
 /* ---------- progressão: abas, itens e modos aparecem aos poucos ---------- */
@@ -2331,8 +2384,8 @@ function renderCards(){
         :card({ic:':clock:',name:ct('cCool'),sub:ct('max'),dis:true}));
     }
     WORLDS.forEach(w=>{if(w.id==='mine'||camp.worlds[w.id])return;
-      const nm=ct('wGrass');
-      cs.push(bestSize()>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wBuyD',w.mult),desc:ct('wBuyD',w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
+      const nm=ct(WN[w.id]);
+      cs.push(bestSize()>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wd_'+w.id,w.mult),desc:ct('wd_'+w.id,w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
     if(camp.wvis.grass)cs.push(camp.weed<WEED_MAX?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
   }else if(curTab==='items'){
     cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD'),desc:ct('cShieldD')})
@@ -2471,10 +2524,55 @@ function weedSVG(){ // pixel art: talos entrelaçados e florzinhas desenhados em
     h+=`<g data-t="${f(.1+Math.random()*.85)}">${px(cx,cy-1,'#ffd166')+px(cx-1,cy,'#ffd166')+px(cx+1,cy,'#ffd166')+px(cx,cy+1,'#ffd166')+px(cx,cy,'#f5b72e')}</g>`}
   return h+'</svg>';
 }
-function decorateGrass(){ // flores decorativas em posições aleatórias dentro da casa (nunca fixas no centro)
-  if(!camp||camp.world!=='grass')return;
-  cells.forEach(c=>{if(Math.random()<.09){c.classList.add(Math.random()<.5?'fl':'fl2');c.style.setProperty('--fx',(12+Math.random()*60).toFixed(0)+'%');c.style.setProperty('--fy',(12+Math.random()*60).toFixed(0)+'%')}});
+function decorateGrass(){ // decoração aleatória e sem efeito no jogo: flores (campo) e cactos (deserto), dentro da própria casa
+  if(!camp)return;
+  if(camp.world==='grass')cells.forEach(c=>{if(Math.random()<.09){c.classList.add(Math.random()<.5?'fl':'fl2');c.style.setProperty('--fx',(12+Math.random()*60).toFixed(0)+'%');c.style.setProperty('--fy',(12+Math.random()*60).toFixed(0)+'%')}});
+  if(camp.world==='desert')cells.forEach(c=>{if(Math.random()<.1){c.classList.add('cac');c.style.setProperty('--fx',(8+Math.random()*84).toFixed(0)+'%');c.style.setProperty('--fy',(8+Math.random()*84).toFixed(0)+'%')}});
 }
+function bushPips(x,y){ // [cima,direita,baixo,esquerda]: true = bloco em volta já aberto (ou marcado com bandeira)
+  const ok=(a,b)=>a<0||b<0||a>=C||b>=R||grid[b][a].o||grid[b][a].f!==0;
+  return [ok(x,y-1),ok(x+1,y),ok(x,y+1),ok(x-1,y)];
+}
+const bushLocked=(x,y)=>bushPips(x,y).some(v=>!v);
+function bushSVG(){ // arbusto: nuvenzinha circular verde-escura, em pixels
+  const N=12,ri=(a,b)=>a+Math.random()*(b-a),d=[[6,6,4.6]];
+  for(let i=0;i<4;i++){const a=Math.random()*6.283;d.push([6+Math.cos(a)*2.6,6+Math.sin(a)*2.4,ri(2.3,3.3)])}
+  let h=`<svg viewBox="0 0 ${N} ${N}">`;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){
+    const inn=d.some(([cx,cy,r])=>Math.hypot(x+.5-cx,y+.5-cy)<=r);if(!inn)continue;
+    const edge=!d.some(([cx,cy,r])=>Math.hypot(x+.5-cx,y+.5-cy)<=r-1.1);
+    const c=edge?(y<5?'#1f6a2c':'#0f3a18'):(y<5?(x<6?'#1b5a27':'#174d22'):'#123f1c');
+    h+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`}
+  for(let k=0;k<3;k++){const x=Math.floor(ri(2,9)),y=Math.floor(ri(2,6));h+=`<rect x="${x}" y="${y}" width="1" height="1" fill="#2c8a3a"/>`}
+  return h+'</svg>';
+}
+function placeBushes(sx,sy){
+  if(C<3||R<3)return;const ban=new Set([sy*C+sx,...NA[sy*C+sx]]),c=[];
+  for(let y=1;y<R-1;y++)for(let x=1;x<C-1;x++)if(!ban.has(y*C+x))c.push(y*C+x);
+  shuffle(c);const k=Math.max(1,Math.round(C*R*.07)),ch=[];
+  for(const i of c){if(ch.length>=k)break;const x=i%C,y=i/C|0;
+    if(ch.some(j=>Math.abs((j%C)-x)+Math.abs((j/C|0)-y)<=1))continue;ch.push(i)}
+  ch.forEach(i=>{grid[i/C|0][i%C].b=1;
+    const b=document.createElement('i');b.className='bush';b.innerHTML=bushSVG()+'<em class="rt t"></em><em class="rt r"></em><em class="rt b"></em><em class="rt l"></em>';cells[i].appendChild(b);bushRefresh(i)});
+}
+function bushRefresh(i){
+  const x=i%C,y=i/C|0,g=grid[y][x],b=cells[i]&&cells[i].querySelector('.bush');if(!b||!g.b)return;
+  const pp=bushPips(x,y);['t','r','b','l'].forEach((k,n)=>b.querySelector('.rt.'+k).classList.toggle('lit',pp[n]));
+  const rd=pp.every(Boolean);if(rd&&!b.classList.contains('ready')&&started)SFX.build(i);
+  b.classList.toggle('ready',rd);
+}
+function bushDeny(x,y){
+  const b=el(x,y).querySelector('.bush');if(!b)return;
+  if(!camp.bushTip){camp.bushTip=true;saveCamp();setTimeout(()=>sayText(ct('bushTip'),'😏',false),200)}
+  b.classList.remove('deny');void b.offsetWidth;b.classList.add('deny');SFX.deny();
+}
+function bushBreak(x,y){
+  const g=grid[y][x],e=el(x,y),b=e.querySelector('.bush');g.b=0;if(b)b.classList.add('cut');
+  const r=e.getBoundingClientRect();
+  for(let k=0;k<20;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#123f1c','#1b5a27','#2c8a3a','#0f3a18'][k%4],sq:true})}loop();SFX.click();
+  setTimeout(()=>{if(b&&b.parentNode)b.remove();if(!g.o)move(x,y)},180);
+}
+setInterval(()=>{if(campaign&&camp&&camp.world==='forest'&&cells&&cells.length)cells.forEach((c,i)=>{if(c.querySelector('.bush'))bushRefresh(i)})},150);
 function weedUpdate(i){const g=grid[i/C|0][i%C],w=cells[i]&&cells[i].querySelector('.weed');if(!w)return;
   const p=(g.wmax-g.w)/Math.max(1,g.wmax);
   w.style.setProperty('--p',p.toFixed(2));w.querySelector('b').textContent=g.w;
@@ -2504,9 +2602,9 @@ function weedHit(x,y){
 }
 function renderWorlds(){
   const box=$('#worlds');if(!box||!camp)return;
-  box.innerHTML=`<div class="wt">${ct('wTitle')}</div>`+WORLDS.map(w=>{const own=!!camp.worlds[w.id],nm=ct(w.id==='mine'?'wMine':'wGrass');
+  box.innerHTML=`<div class="wt">${ct('wTitle')}</div>`+WORLDS.map(w=>{const own=!!camp.worlds[w.id],nm=ct(WN[w.id]);
     return `<button class="wl${camp.world===w.id?' sel':''}${own?'':' lock'}" data-world="${w.id}">${own?w.ic:':lock:'}<b>${nm}</b><small>×${w.mult}</small></button>`}).join('');
-  document.querySelectorAll('#demoWorlds button').forEach(b=>{b.textContent=ct(b.dataset.w==='mine'?'wMine':'wGrass')});
+  document.querySelectorAll('#demoWorlds button').forEach(b=>{b.textContent=ct(WN[b.dataset.w])});
 }
 function pickWorld(id,force){
   if(!camp)return;
@@ -2516,7 +2614,8 @@ function pickWorld(id,force){
   if(force)camp.worlds[id]=true;
   camp.world=id;camp.wvis[id]=true;saveCamp();SFX.menu();checkUnlocks(true);renderYard();setCoins();
   startCooldown(coolSecs(),400);
-  if(id==='grass'&&!camp.wFirst){camp.wFirst=true;saveCamp();setTimeout(()=>sayText(ct('wFirstGrass'),'😏',false),900)}
+  camp.wf=camp.wf||{};const fk={grass:'wFirstGrass',forest:'wFirstForest',desert:'wFirstDesert'}[id];
+  if(fk&&!camp.wf[id]&&!(id==='grass'&&camp.wFirst)){camp.wf[id]=true;saveCamp();setTimeout(()=>sayText(ct(fk),'😏',false),900)}
 }
 document.addEventListener('click',e=>{
   const b=e.target.closest&&e.target.closest('#worlds .wl');if(b)pickWorld(b.dataset.world);
@@ -2545,7 +2644,7 @@ function botSolve(){
         const d=B.u.filter(j=>!A.set.has(j)),key=d.join(',')+':'+(B.T-A.T);if(seen.has(key))continue;seen.add(key);cons.push({v:d,T:B.T-A.T});added++}}
     if(!added)break;
   }
-  const out=[];for(let i=0;i<N;i++)if(!op[i]&&lo[i]===0&&hi[i]===0){const g=grid[i/C|0][i%C];if(g.f===0&&g.m===0&&!g.w)out.push(i)} // g.m===0: trava de segurança, nunca abre mina
+  const out=[];for(let i=0;i<N;i++)if(!op[i]&&lo[i]===0&&hi[i]===0){const g=grid[i/C|0][i%C];if(g.f===0&&g.m===0&&!g.w&&!g.b)out.push(i)} // g.m===0: trava de segurança, nunca abre mina
   return out;
 }
 const BOT={ph:'off',t0:0,dur:0,tx:-1,ty:-1,cx:0,cy:0,lastSolve:0,spark:0};
@@ -2632,7 +2731,7 @@ function campNewBoard(build,secs){
   const boss=isBossNo(camp.boards+1);
   custom={c:n,r:n,m:boss?bossMines():MINES[camp.size]};
   level=n<=4?'easy':n<=6?'medium':n<=9?'hard':'insane';
-  const mods=activeMods();cur=new Set(mods.length?mods:['classic']);
+  const mods=worldModes();cur=new Set(mods.length?mods:['classic']);
   floor=activeFloor()||'square';shapes=isPoly(floor);
   campCells=0;botOpened=0;camp.boards++;
   if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
@@ -2912,7 +3011,7 @@ for(let i=0;i<(isMobile()?10:26);i++){const b=document.createElement('div'),z=2+
 /* ---------- emojis em pixel art: cada emoji vira um sprite 20×20 (sem suavização, poucas cores) ---------- */
 const EMO=/(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/u;
 const EMO_G=new RegExp(EMO.source,'gu');
-const TOKS='wclassic|wgrass|coin|shield|drone1|drone2|drone3|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot|dirt|pick1|pick2|pick3|pick|stone|crystal|hand';
+const TOKS='wforest|wdesert|wclassic|wgrass|coin|shield|drone1|drone2|drone3|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot|dirt|pick1|pick2|pick3|pick|stone|crystal|hand';
 const TOKRE=new RegExp(':('+TOKS+'):'),SPLIT=new RegExp('(:(?:'+TOKS+'):|'+EMO.source.slice(1,-1)+')','u');
 const HAS=v=>EMO.test(v)||TOKRE.test(v);
 const spriteCache=new Map(),spritePix=new Map(),PXN=20;
