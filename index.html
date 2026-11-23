@@ -558,6 +558,8 @@
   .bush .rt.t{left:50%;top:1px;transform:translateX(-50%)}.bush .rt.b{left:50%;bottom:1px;transform:translateX(-50%)}
   .bush .rt.l{top:50%;left:1px;transform:translateY(-50%)}.bush .rt.r{top:50%;right:1px;transform:translateY(-50%)}
   .bush .rt.lit{background:#ffd166;border-color:#a87a1a;box-shadow:0 0 6px #ffd166}
+  html[data-world="forest"] .cell.hasroot.open{background-image:var(--roots);background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated}
+  html[data-world="forest"] .cell.hasroot:not(.open){background-image:var(--roots),repeating-linear-gradient(95deg,transparent 0 4px,#1b5320 4px 8px,transparent 8px 12px);background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated}
   .bush.ready svg{filter:brightness(1.3)}
   .bush.ready{animation:bushBob .9s ease-in-out infinite}
   .bush.deny{animation:bushDeny .18s steps(3)}
@@ -1612,7 +1614,7 @@ function flagLayer(f,cls){
   const d=document.createElement('div');d.className='flaglayer'+cls;
   d.innerHTML=stackHTML('🚩',Math.abs(f),f<0?' flag neg':' flag');return d;
 }
-const clrCell=e=>[...e.children].forEach(c=>{if(!c.classList.contains('weed'))c.remove()});
+const clrCell=e=>[...e.children].forEach(c=>{if(!c.classList.contains('weed')&&!c.classList.contains('bush'))c.remove()});
 function renderFlag(x,y,prev){
   const g=grid[y][x],e=el(x,y),f=g.f;
   e.classList.toggle('flagged',f>0);e.classList.toggle('negflag',f<0);
@@ -2529,6 +2531,22 @@ function decorateGrass(){ // decoração aleatória e sem efeito no jogo: flores
   if(camp.world==='grass')cells.forEach(c=>{if(Math.random()<.09){c.classList.add(Math.random()<.5?'fl':'fl2');c.style.setProperty('--fx',(12+Math.random()*60).toFixed(0)+'%');c.style.setProperty('--fy',(12+Math.random()*60).toFixed(0)+'%')}});
   if(camp.world==='desert')cells.forEach(c=>{if(Math.random()<.1){c.classList.add('cac');c.style.setProperty('--fx',(8+Math.random()*84).toFixed(0)+'%');c.style.setProperty('--fy',(8+Math.random()*84).toFixed(0)+'%')}});
 }
+let bushList=[];
+const ROOTURL=(()=>{ // raiz em pixels que entra pela borda do bloco quebrado voltada para o arbusto
+  const dk='#5c3b1c',lt='#8b5a2b',P=[[5,8,dk],[6,8,dk],[5,9,dk],[6,9,dk],[5,10,dk],[6,10,dk],[5,11,dk],[6,11,dk],[4,9,lt],[3,10,lt],[7,10,lt],[8,9,lt],[9,10,lt],[2,11,lt],[10,11,lt],[5,7,lt],[6,7,lt]];
+  const base=P.map(([x,y,c])=>`<rect x='${x}' y='${y}' width='1' height='1' fill='${c}'/>`).join(''),rot={b:0,l:90,t:180,r:270},o={};
+  for(const k in rot)o[k]='url("data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' shape-rendering='crispEdges'><g transform='rotate(${rot[k]} 6 6)'>${base}</g></svg>`)+'")';
+  return o;
+})();
+function bushRoots(){ // as raízes aparecem embaixo de cada bloco em volta do arbusto que já foi quebrado (ou marcado)
+  const want=new Map();
+  bushList.forEach(i=>{const x=i%C,y=i/C|0;
+    [[0,-1,'b'],[1,0,'l'],[0,1,'t'],[-1,0,'r']].forEach(([dx,dy,side])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
+      const g=grid[b][a];if(g.o||g.f!==0){const k=b*C+a;if(!want.has(k))want.set(k,new Set());want.get(k).add(side)}})});
+  cells.forEach((c,i)=>{const w=want.get(i),key=w?[...w].sort().join(''):'';if((c.dataset.rts||'')===key)return;c.dataset.rts=key;
+    if(!key){c.classList.remove('hasroot');c.style.removeProperty('--roots');return}
+    c.style.setProperty('--roots',[...w].map(sd=>ROOTURL[sd]).join(','));c.classList.add('hasroot')});
+}
 function bushPips(x,y){ // [cima,direita,baixo,esquerda]: true = bloco em volta já aberto (ou marcado com bandeira)
   const ok=(a,b)=>a<0||b<0||a>=C||b>=R||grid[b][a].o||grid[b][a].f!==0;
   return [ok(x,y-1),ok(x+1,y),ok(x,y+1),ok(x-1,y)];
@@ -2553,12 +2571,11 @@ function placeBushes(sx,sy){
   for(const i of c){if(ch.length>=k)break;const x=i%C,y=i/C|0;
     if(ch.some(j=>Math.abs((j%C)-x)+Math.abs((j/C|0)-y)<=1))continue;ch.push(i)}
   ch.forEach(i=>{grid[i/C|0][i%C].b=1;
-    const b=document.createElement('i');b.className='bush';b.innerHTML=bushSVG()+'<em class="rt t"></em><em class="rt r"></em><em class="rt b"></em><em class="rt l"></em>';cells[i].appendChild(b);bushRefresh(i)});
+    const b=document.createElement('i');b.className='bush';b.innerHTML=bushSVG();cells[i].appendChild(b);bushList.push(i);bushRefresh(i)});
 }
 function bushRefresh(i){
   const x=i%C,y=i/C|0,g=grid[y][x],b=cells[i]&&cells[i].querySelector('.bush');if(!b||!g.b)return;
-  const pp=bushPips(x,y);['t','r','b','l'].forEach((k,n)=>b.querySelector('.rt.'+k).classList.toggle('lit',pp[n]));
-  const rd=pp.every(Boolean);if(rd&&!b.classList.contains('ready')&&started)SFX.build(i);
+  const rd=bushPips(x,y).every(Boolean);if(rd&&!b.classList.contains('ready')&&started)SFX.build(i);
   b.classList.toggle('ready',rd);
 }
 function bushDeny(x,y){
@@ -2572,7 +2589,7 @@ function bushBreak(x,y){
   for(let k=0;k<20;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#123f1c','#1b5a27','#2c8a3a','#0f3a18'][k%4],sq:true})}loop();SFX.click();
   setTimeout(()=>{if(b&&b.parentNode)b.remove();if(!g.o)move(x,y)},180);
 }
-setInterval(()=>{if(campaign&&camp&&camp.world==='forest'&&cells&&cells.length)cells.forEach((c,i)=>{if(c.querySelector('.bush'))bushRefresh(i)})},150);
+setInterval(()=>{if(campaign&&camp&&camp.world==='forest'&&cells&&cells.length){cells.forEach((c,i)=>{if(c.querySelector('.bush'))bushRefresh(i)});bushRoots()}},150);
 function weedUpdate(i){const g=grid[i/C|0][i%C],w=cells[i]&&cells[i].querySelector('.weed');if(!w)return;
   const p=(g.wmax-g.w)/Math.max(1,g.wmax);
   w.style.setProperty('--p',p.toFixed(2));w.querySelector('b').textContent=g.w;
@@ -2726,7 +2743,7 @@ function callBoss(){
 function setBoss(on,vis){bossOn=on;if(vis===false)return;const g=$('#game');if(g)g.classList.toggle('boss',on);const t=$('#bossTag');if(t){t.hidden=!on;t.textContent=on?ct('bossTag'):''}}
 function applyWorld(){document.documentElement.dataset.world=camp.world}
 function campNewBoard(build,secs){
-  applyWorld();
+  applyWorld();bushList=[];
   const n=SIZES[camp.size];
   const boss=isBossNo(camp.boards+1);
   custom={c:n,r:n,m:boss?bossMines():MINES[camp.size]};
