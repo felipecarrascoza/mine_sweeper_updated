@@ -502,10 +502,10 @@
   .rbot.draw .svb,.rbot.dig .svb{display:none}
   .rbot .ll,.rbot .lr,.rbot .ar{transform-box:view-box}
   .rbot .ll{transform-origin:10px 16px}.rbot .lr{transform-origin:7px 16px}.rbot .ar{transform-origin:9px 9px}
-  .rbot.walk svg{animation:walkBob .30s steps(2) infinite}
-  .rbot.walk .ll{animation:legA .30s ease-in-out infinite alternate}
-  .rbot.walk .lr{animation:legA .30s ease-in-out infinite alternate-reverse}
-  .rbot.walk .ar{animation:legA .30s ease-in-out infinite alternate-reverse}
+  .rbot.walk svg{animation:walkBob .42s steps(2) infinite}
+  .rbot.walk .ll{animation:legA .42s ease-in-out infinite alternate}
+  .rbot.walk .lr{animation:legA .42s ease-in-out infinite alternate-reverse}
+  .rbot.walk .ar{animation:legA .42s ease-in-out infinite alternate-reverse}
   .rbot.fly .ll{transform:rotate(20deg)}.rbot.fly .lr{transform:rotate(-8deg)}
   .rbot.fly svg{animation:flyHover .35s ease-in-out infinite alternate}
   .rbot.draw .ar{animation:armDraw .38s ease-out both}
@@ -2947,7 +2947,7 @@ function botPath(b,dir){
   return pts;
 }
 function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é a mesma de andar
-  const v0=4.2+.4*b.m.spd;let moving=false,kind='walk',left=dt/1000;
+  const v0=2.4+.25*b.m.spd;let moving=false,kind='walk',left=dt/1000;
   while(left>1e-6&&b.seg<b.path.length){
     const n=b.path[b.seg];
     if(!b.segL){b.sx=b.gx;b.sy=b.gy;b.segL=Math.abs(n.gx-b.sx)+Math.abs(n.gy-b.sy);b.segP=0;if(b.segL<1e-6){b.seg++;b.segL=0;continue}}
