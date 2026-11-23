@@ -2014,7 +2014,8 @@ function loadCamp(){
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(j&&typeof j==='object')camp={...camp,...j}}catch(e){}
   if(!camp.newTab)camp.newTab={};
 }
-function saveCamp(){if(!camp)return;camp.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(camp))}catch(e){}}
+let noSave=false;
+function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(camp))}catch(e){}}
 
 /* ---------- textos da campanha (inglês principal, português secundário) ---------- */
 const CSTR={
@@ -2634,7 +2635,7 @@ async function bootCampaign(){
 }
 function resetCamp(){
   ask({emoji:':warn:',title:ct('resetT'),text:ct('resetP'),buttons:[{label:ct('yes'),v:'y'},{label:ct('no'),v:'n',alt:true}]}).then(v=>{
-    if(v!=='y')return;try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload()});
+    if(v!=='y')return;noSave=true;try{localStorage.removeItem(SAVE_KEY)}catch(e){}location.reload()});
 }
 
 applyDevice();applyLang();
