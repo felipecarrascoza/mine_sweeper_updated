@@ -497,9 +497,12 @@
   @keyframes rbBeam{50%{opacity:.55}}
   @keyframes blinkN{50%{opacity:0}}
   #rcrack{position:fixed;z-index:19;pointer-events:none;display:none;mix-blend-mode:normal}
-  #rcrack.c1{background:linear-gradient(135deg,transparent 46%,#000b 47% 53%,transparent 54%)}
-  #rcrack.c2{background:linear-gradient(135deg,transparent 46%,#000b 47% 53%,transparent 54%),linear-gradient(45deg,transparent 56%,#000b 57% 62%,transparent 63%)}
-  #rcrack.c3{background:linear-gradient(135deg,transparent 40%,#000d 41% 55%,transparent 56%),linear-gradient(45deg,transparent 52%,#000d 53% 64%,transparent 65%),linear-gradient(90deg,transparent 48%,#000c 49% 53%,transparent 54%);box-shadow:inset 0 0 14px #ffb34788}
+  #rcrack.c1{background:radial-gradient(circle at 50% 30%,#ffb34733,transparent 70%);box-shadow:inset 0 0 8px #ffb34755}
+  #rcrack.c2{background:radial-gradient(circle at 50% 30%,#ffc65f66,transparent 75%);box-shadow:inset 0 0 14px #ffb347aa,0 0 8px #ffb34755}
+  #rcrack.c3{background:radial-gradient(circle at 50% 30%,#fff2a0aa,#ffb34755 60%,transparent 85%);box-shadow:inset 0 0 20px #ffe27add,0 0 16px #ffb347aa;animation:rcPulse .12s steps(2) infinite}
+  @keyframes rcPulse{50%{filter:brightness(1.4)}}
+  .cell.botshake{animation:blockShake .08s linear infinite!important;filter:brightness(1.25)}
+  @keyframes blockShake{0%{transform:translate(-1px,0) scale(.98)}33%{transform:translate(1px,-1px) scale(.97)}66%{transform:translate(0,1px) scale(.98)}100%{transform:translate(-1px,1px) scale(.97)}}
   html.hascur,html.hascur *{cursor:none!important}
   #cur{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:26px;height:26px;margin:0;opacity:0;transition:opacity .15s;will-change:transform}
   #cur.on{opacity:1}
@@ -2030,7 +2033,7 @@ const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
 const BOT_NEED=3,BOT_MAX={spd:8,rch:8,eff:5};
 const BOT_COST={buy:()=>2500,spd:()=>Math.round(600*Math.pow(1.4,camp.bot.spd)),rch:()=>Math.round(500*Math.pow(1.4,camp.bot.rch)),eff:()=>Math.round(1200*Math.pow(1.6,camp.bot.eff))};
-const botMineMs=()=>Math.round(3000*Math.pow(.85,camp.bot.spd)),botRestMs=()=>Math.round(2500*Math.pow(.85,camp.bot.rch)),botEff=()=>.5+.06*camp.bot.eff;
+const botMineMs=()=>Math.round(5000*Math.pow(.88,camp.bot.spd)),botRestMs=()=>Math.round(4500*Math.pow(.88,camp.bot.rch)),botEff=()=>.5+.06*camp.bot.eff;
 const fmtS=ms=>(ms/1000).toFixed(ms<1000?2:1)+'s';
 const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,need:2},{n:'Mk III',every:120,yield:300,need:4}];
 const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
@@ -2417,7 +2420,7 @@ function botPlace(){ // posição do robô (acima do alvo)
   const hov=Math.max(34,c.height*.9);bot.style.left=(c.left+c.width/2)+'px';bot.style.top=(c.top+c.height/2-hov)+'px';bot.style.setProperty('--bh',(hov-4)+'px');
   Object.assign(cr.style,{left:c.left+'px',top:c.top+'px',width:c.width+'px',height:c.height+'px'});
 }
-function botDock(){const bot=$('#rbot');bot.className='';$('#rcrack').style.display='none';BOT.ph='off';BOT.tx=BOT.ty=-1}
+function botDock(){const bot=$('#rbot');document.querySelectorAll('.cell.botshake').forEach(c=>c.classList.remove('botshake'));bot.className='';$('#rcrack').style.display='none';BOT.ph='off';BOT.tx=BOT.ty=-1}
 function botStep(){
   const bot=$('#rbot'),cr=$('#rcrack'),now=performance.now();
   if(!botCan()){if(BOT.ph!=='off')botDock();return}
@@ -2438,13 +2441,23 @@ function botStep(){
     return;
   }
   if(BOT.ph==='mine'){
-    if(g.o||g.f!==0){bot.classList.remove('mine');cr.style.display='none';BOT.ph='idle';return}
+    if(g.o||g.f!==0){bot.classList.remove('mine');cr.style.display='none';el(BOT.tx,BOT.ty).classList.remove('botshake');BOT.ph='idle';return}
     botPlace();
     const p=Math.min(1,(now-BOT.t0)/BOT.dur);cr.className=p<.34?'c1':p<.67?'c2':'c3';
-    if(now-BOT.spark>110){BOT.spark=now;const r=el(BOT.tx,BOT.ty).getBoundingClientRect();
-      for(let k=0;k<3;k++)parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:(Math.random()-.5)*3,vy:-(.6+Math.random()*2),g:.18,life:1,d:.06,sz:2,c:['#ffd166','#ffffff','#c9bd96'][k],sq:true});loop();if(p<.95)SFX.build(BOT.tx+BOT.ty)}
+    const cellEl=el(BOT.tx,BOT.ty);cellEl.classList.add('botshake');
+    if(now-BOT.spark>(p<.34?90:p<.67?60:38)){BOT.spark=now;const r=cellEl.getBoundingClientRect(),st=p<.34?1:p<.67?2:3;
+      const hx=r.left+r.width/2,hy=r.top+r.height*.28;
+      for(let k=0;k<2+st*2;k++){const a=-Math.PI/2+(Math.random()-.5)*2.6,sp=2.5+Math.random()*(3+st*1.5);
+        parts.push({x:hx+(Math.random()-.5)*r.width*.4,y:hy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:.28,life:1,d:.055+Math.random()*.03,sz:2+(Math.random()<.3?1:0),c:['#fff6c2','#ffd166','#ff9a3c','#ffffff'][k%4],sq:true})}
+      if(Math.random()<.35+st*.15){const side=Math.random()<.5?-1:1;
+        parts.push({x:r.left+(side<0?2:r.width-2),y:r.top+Math.random()*r.height,vx:side*(.6+Math.random()*1.4),vy:-(.3+Math.random()),g:.3,life:1,d:.025,sz:3+(Math.random()*2|0),c:['#2f6fb0','#1d4f86','#4a8fd0'][Math.random()*3|0],sq:true})}
+      loop();if(p<.95)SFX.build(BOT.tx+BOT.ty)}
     if(p>=1){
       bot.classList.remove('mine');cr.style.display='none';
+      const ce=el(BOT.tx,BOT.ty);ce.classList.remove('botshake');
+      {const r=ce.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;
+        for(let k=0;k<22;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#2f6fb0','#1d4f86','#4a8fd0','#ffd166'][k%4],sq:true})}
+        for(let k=0;k<14;k++){const a=Math.random()*6.283,sp=3+Math.random()*6;parts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.2,life:1,d:.05,sz:2,c:['#fff6c2','#ffd166','#ff9a3c'][k%3],sq:true})}loop()}
       if(g.m===0){botActing=true;try{move(BOT.tx,BOT.ty)}finally{botActing=false}}
       BOT.ph='rest';BOT.t0=now;BOT.dur=botRestMs();bot.classList.add('rest');
     }
