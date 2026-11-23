@@ -470,6 +470,12 @@
   #phase[hidden]{display:none!important}
   #phase{display:none;margin:0 0 6px;font-size:12px;color:var(--muted);text-align:center}
   #game.camp #phase{display:block}
+  #phase{display:none;align-items:center;gap:8px}
+  #game.camp #phase{display:flex}
+  #phase .pmid{flex:1;min-width:0}
+  #phase .pic{flex:none;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:22px;font-family:var(--pix);color:var(--cyan)}
+  #phase .pic .px{width:32px;height:32px}
+  #phase .pic.dim{opacity:.7;filter:saturate(.6)}
   #phase .prow{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
   #phase .prow span:first-child,#phase .prow span:last-child{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);white-space:nowrap}
   #phase .pbar{display:block;position:relative;height:10px;margin-top:4px;background:repeating-linear-gradient(90deg,#030812 0 calc(12.5% - 1px),#4a7aa8 calc(12.5% - 1px) 12.5%);border:1px solid var(--line)}
@@ -796,7 +802,7 @@
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><div class="prow"><span id="phaseL"></span><span id="phaseTxt"></span><span id="phaseR"></span></div><i class="pbar"><i id="phaseFill"></i><b class="pend">:bomb:</b></i></div><div class="boardwrap"><div id="board"></div></div></div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><span class="pic" id="phaseIcL"></span><div class="pmid"><div class="prow"><span id="phaseL"></span><span id="phaseTxt"></span><span id="phaseR"></span></div><i class="pbar"><i id="phaseFill"></i></i></div><span class="pic" id="phaseIcR"></span></div><div class="boardwrap"><div id="board"></div></div></div>
   <div class="foot" id="footAct">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
@@ -2510,6 +2516,9 @@ function updatePhase(){ // linha em cima do tabuleiro: vai sendo completada a ca
   const bossNow=bossOn&&$('#game').classList.contains('boss');
   $('#phaseL').textContent=ct(WN[w]);$('#phaseR').textContent=done?'∞':(nx?ct(WN[nx]):ct('wEndTag'));
   ph.classList.toggle('inf',done);
+  $('#phaseIcL').innerHTML=worldOf(w).ic; // começo da linha: o mundo atual
+  const ir=$('#phaseIcR');ir.classList.toggle('dim',!done&&!!nx&&!camp.worlds[nx]);
+  ir.innerHTML=done?'∞':(nx?worldOf(nx).ic:':lock:'); // fim da linha: o próximo mundo a descobrir
   if(bossNow)t.textContent=ct('phaseBoss');
   else if(done)t.textContent=ct('phaseInf',n);
   else t.textContent=ct('phase',Math.min(n,thr),thr,SIZES[sizeIdx(w,n)])+' · '+ct('phaseLeft',Math.max(0,thr-n));
