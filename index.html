@@ -580,7 +580,14 @@
   html[data-world="desert"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
   html[data-world="desert"] .cell.cac:not(.open){background-image:var(--cacimg),radial-gradient(#0000001a 1px,transparent 1.5px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.62),10px) auto,7px 7px;image-rendering:pixelated}
   html[data-world="desert"] .bub{background:#f6dc9f;opacity:.5;border-radius:0}
-  html[data-world="desert"] .tidewave .fill{background:linear-gradient(#fff3c4 0 7px,#f1d58b 7px 14px,transparent 14px),repeating-linear-gradient(0deg,#d9b46a 0 8px,#c39a52 8px 16px);box-shadow:0 0 30px #e8c982}
+  #sandfx{position:fixed;inset:0;z-index:58;pointer-events:none;opacity:0;transition:opacity .35s;
+    background:radial-gradient(#fff3c4 1px,transparent 1.6px) 0 0/23px 29px,radial-gradient(#e8c982 1.2px,transparent 1.8px) 0 0/37px 19px,radial-gradient(#b88f4a 1px,transparent 1.6px) 0 0/17px 31px,linear-gradient(90deg,#e8c98200,#e8c98233 45%,#d9b46a44 70%,#e8c98200);
+    animation:sandBlow .28s linear infinite}
+  #sandfx.on{opacity:.7}
+  @keyframes sandBlow{from{background-position:0 0,0 0,0 0,0 0}to{background-position:90px 22px,150px -16px,70px 26px,0 0}}
+  #game.storm{animation:stormShake .08s linear infinite}
+  @keyframes stormShake{0%{transform:translate(calc(var(--amp,4px)*-1),calc(var(--amp,4px)*.4))}25%{transform:translate(calc(var(--amp,4px)*.8),calc(var(--amp,4px)*-.6))}50%{transform:translate(calc(var(--amp,4px)*-.5),calc(var(--amp,4px)*-.8))}75%{transform:translate(var(--amp,4px),calc(var(--amp,4px)*.5))}100%{transform:translate(calc(var(--amp,4px)*-.7),calc(var(--amp,4px)*.7))}}
+  html[data-world="desert"] .tidewave .fill{background:linear-gradient(#fff3c4 0 7px,#f1d58b 7px 14px,transparent 14px),radial-gradient(#fff3c4 1px,transparent 1.6px) 0 0/7px 9px,radial-gradient(#a9803f 1px,transparent 1.6px) 0 0/11px 7px,repeating-linear-gradient(0deg,#d9b46a 0 8px,#c39a52 8px 16px);box-shadow:0 0 30px #e8c982}
   html[data-world="desert"] .tidewave .edge{background:repeating-linear-gradient(0deg,#fff3c4 0 6px,#e8c982 6px 12px);box-shadow:0 0 18px #ffe9a8}
   html[data-world="desert"] .tidewarn{border-color:#e8c982;background:#e8c98222}
   html.hascur,html.hascur *{cursor:none!important}
@@ -793,6 +800,7 @@
 <div id="rcrack"></div>
 <div id="rbot"><i id="rbotIc">:drone3:</i><i id="rbeam"></i><i id="rbat"><i></i></i><b id="rneed">!</b></div>
 <div id="cur"><svg class="arr" viewBox="0 0 13 13" shape-rendering="crispEdges"></svg></div>
+<div id="sandfx"></div>
 <div id="bossTag" hidden></div>
 <div id="cine" hidden><div id="cineFace">😏</div><div id="cineBox"><span id="cineText"></span></div><small id="cineHint"></small></div>
 <div id="cool" hidden><div id="coolMsg"></div><div class="coolbar"><i id="coolFill"></i></div><button class="tool" id="coolSkip"></button></div>
@@ -1132,6 +1140,7 @@ const SFX={
   buy(){[520,660,880].forEach((f,i)=>tone(f,.08,'triangle',.08,i*.06))},
   talk(){tone(260+Math.random()*120,.03,'square',.03)},
   tideWarn(){noise(.5,.12,200,700);tone(70,.5,'sawtooth',.05,0,170)},
+  sand(){noise(1.0,.34,1200,6500);noise(1.0,.3,6500,900,.95);tone(70,1.6,'sawtooth',.05,0,40)},
   tideIn(){noise(.85,.3,500,3500);tone(110,.8,'sine',.09,0,520);noise(.9,.2,3200,260,.95)},
   rebuild(){tone(420+Math.random()*380,.05,'square',.04)},
   chain(k){noise(.2,.22,2600,180);tone(110+(k*37)%90,.16,'sawtooth',.08,0,45)},
@@ -1689,7 +1698,11 @@ function startTide(){
   grid.forEach((row,y)=>row.forEach((g,x)=>{if(g.o||(des&&g.f!==0))open.push(y*C+x)}));
   if(open.length<4)return;
   const pick=open[Math.random()*open.length|0],band=[];
-  if(!shapes){const r=pick/C|0;for(let x=0;x<C;x++)band.push(r*C+x)}
+  let nr=1;
+  if(!shapes){const r=pick/C|0;
+    if(des){nr=Math.random()<.62?1:(Math.random()<.65?2:3);nr=Math.min(nr,R)} // às vezes a tempestade pega 2 ou 3 linhas de uma vez
+    const r0=Math.max(0,Math.min(R-nr,r-(nr>1?Math.floor(Math.random()*nr):0)));
+    for(let k=0;k<nr;k++)for(let x=0;x<C;x++)band.push((r0+k)*C+x)}
   else{const py=pts[pick][1];for(let i=0;i<C*R;i++)if(Math.abs(pts[i][1]-py)<.55)band.push(i)}
   if(!band.some(i=>{const g=grid[i/C|0][i%C];return g.o||(des&&g.f!==0)}))return;
   tideBusy=true;
@@ -1701,14 +1714,14 @@ function startTide(){
   SFX.tideWarn();toast(tw('tideWarn'));
   setTimeout(()=>{
     warn.remove();
-    if(id!==genId||over){tideBusy=false;return}
+    if(id!==genId||over){tideBusy=false;$('#game').classList.remove('storm');$('#sandfx').classList.remove('on');return}
     const wave=document.createElement('div');wave.className='tidewave';
     wave.style.cssText=`left:${x0}px;top:${y0-pad}px;width:${W}px;height:${H+pad}px`;
     wave.innerHTML='<i class="fill"></i><i class="edge"></i>';document.body.appendChild(wave);
     const kf=[0,.42,.55,1],xs=[0,W+E,W+E,0];
     wave.children[0].animate(xs.map((x,k)=>({offset:kf[k],clipPath:`inset(0 ${Math.max(0,W-x)}px 0 0)`})),{duration:T,easing:'linear',fill:'forwards'});
     wave.children[1].animate(xs.map((x,k)=>({offset:kf[k],transform:`translateX(${x-E}px)`})),{duration:T,easing:'linear',fill:'forwards'});
-    SFX.tideIn();
+    if(des){SFX.sand();const g=$('#game');g.style.setProperty('--amp',(3+3*nr)+'px');g.classList.add('storm');$('#sandfx').classList.add('on');kick(.9)}else SFX.tideIn();
     // espuma voando na frente da onda (chegando) e pingando atrás dela (voltando)
     const t0=performance.now(),cols=des?['#fff3c4','#e8c982','#c9a05a']:['#ffffff','#bff6ff','#4fd8e8'];
     const foam=setInterval(()=>{
@@ -1716,11 +1729,12 @@ function startTide(){
       const f=(performance.now()-t0)/T;if(f>=1){clearInterval(foam);return}
       if(f>=.42&&f<.55)return;
       const going=f<.42,x=going?(f/.42)*(W+E):(1-(f-.55)/.45)*(W+E);
-      for(let k=0;k<6;k++)parts.push({x:x0+x-Math.random()*E,y:y0-pad*Math.random()*.8,vx:going?1+Math.random()*3:-(1+Math.random()*2),vy:going?-(2+Math.random()*4):(Math.random()*2-1),
+      if(des)for(let k=0;k<18;k++)parts.push({x:x0+Math.random()*W,y:y0-pad*.3+Math.random()*(H+pad*.3),vx:going?4+Math.random()*9:-(3+Math.random()*7),vy:(Math.random()-.6)*2.4,g:.04,life:1,d:.03+Math.random()*.02,sz:2+(Math.random()*3|0),c:cols[k%3],sq:true}); // vento carregando areia
+      for(let k=0;k<(des?10:6);k++)parts.push({x:x0+x-Math.random()*E,y:y0-pad*Math.random()*.8,vx:going?1+Math.random()*3:-(1+Math.random()*2),vy:going?-(2+Math.random()*4):(Math.random()*2-1),
         g:going?.25:.2,life:1,d:.035,sz:2*(1+(Math.random()*2|0)),c:cols[k%3],sq:true});
       loop();
     },45);
-    setTimeout(()=>{if(id===genId&&!over)kick(.7)},T*.42);                  // a onda bate
+    setTimeout(()=>{if(id===genId&&!over)kick(des?1.8:.7)},T*.42);                  // a onda bate
     setTimeout(()=>{if(id===genId&&!over)band.forEach(i=>coverCell(i));
       if(des){band.forEach(i=>{const g=grid[i/C|0][i%C];if(g.f!==0){const pv=g.f;fsum-=pv;g.f=0;renderFlag(i%C,i/C|0,pv)}});setCounter();toast(tw('tideToast'))}},T*.48); // escondida debaixo da água
     band.forEach((i,k)=>{ // a linha volta refeita, casa por casa, conforme a água recua
@@ -1728,7 +1742,7 @@ function startTide(){
       setTimeout(()=>{if(id!==genId)return;const c=cells[i];c.classList.add('rebuild');setTimeout(()=>c.classList.remove('rebuild'),560);
         const r=c.getBoundingClientRect();for(let q=0;q<3;q++)parts.push({x:r.left+Math.random()*r.width,y:r.top,vx:(Math.random()-.5)*2,vy:-(1+Math.random()*2),g:.18,life:1,d:.05,sz:2,c:cols[q],sq:true});
         loop();if(k%2===0)SFX.rebuild()},T*f-90)});
-    setTimeout(()=>{wave.remove();tideBusy=false;clearInterval(foam)},T+60);
+    setTimeout(()=>{wave.remove();tideBusy=false;clearInterval(foam);if(des){$('#game').classList.remove('storm');$('#sandfx').classList.remove('on')}},T+60);
   },450);
 }
 function move(x,y,loud){
@@ -2558,9 +2572,23 @@ const ROOTURL=(()=>{ // raízes em pixels que entram pela borda (ou pelo canto) 
   return o;
 })();
 const BUSH_NEED=4; // basta quebrar (abrir ou marcar) quaisquer 4 dos 8 blocos em volta
+const bushAlive=new Set();
+function rootShrink(i){ // quando o arbusto some, as raízes encolhem até o centro dele e desaparecem
+  const x=i%C,y=i/C|0,bc=cells[i].getBoundingClientRect(),cx=bc.left+bc.width/2,cy=bc.top+bc.height/2;
+  [[0,0],[0,-1],[1,0],[0,1],[-1,0],[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([dx,dy])=>{
+    const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;const c=cells[b*C+a];if(!c.classList.contains('hasroot'))return;
+    const r=c.getBoundingClientRect(),o=document.createElement('i');
+    o.style.cssText=`position:fixed;z-index:15;pointer-events:none;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background:${c.style.getPropertyValue('--roots')?`var(--roots)`:'none'};background-size:100% 100%;background-repeat:no-repeat;image-rendering:pixelated`;
+    o.style.setProperty('--roots',c.style.getPropertyValue('--roots'));
+    document.body.appendChild(o);
+    const mx=cx-(r.left+r.width/2),my=cy-(r.top+r.height/2);
+    o.animate([{transform:'none',opacity:1},{transform:`translate(${mx*.8}px,${my*.8}px) scale(.35)`,opacity:.9,offset:.7},{transform:`translate(${mx}px,${my}px) scale(0)`,opacity:0}],{duration:520,easing:'ease-in',fill:'forwards'}).finished.then(()=>o.remove());
+  });
+}
 function bushRoots(){ // as raízes aparecem embaixo de cada bloco em volta do arbusto que já foi quebrado (ou marcado)
+  bushList.forEach(i=>{if(grid[i/C|0][i%C].b)bushAlive.add(i);else if(bushAlive.has(i)){bushAlive.delete(i);rootShrink(i)}});
   const want=new Map(),OFF=[[0,-1,'b','t'],[1,0,'l','r'],[0,1,'t','b'],[-1,0,'r','l'],[-1,-1,'br','tl'],[1,-1,'bl','tr'],[-1,1,'tr','bl'],[1,1,'tl','br']];
-  bushList.forEach(i=>{const x=i%C,y=i/C|0;
+  bushList.filter(i=>grid[i/C|0][i%C].b).forEach(i=>{const x=i%C,y=i/C|0;
     OFF.forEach(([dx,dy,side,own])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
       const g=grid[b][a];if(g.o||g.f!==0){const k=b*C+a,kb=i;
         if(!want.has(k))want.set(k,new Set());want.get(k).add(side);
@@ -2609,7 +2637,8 @@ function bushDeny(x,y){
   b.classList.remove('deny');void b.offsetWidth;b.classList.add('deny');SFX.deny();
 }
 function bushBreak(x,y){
-  const g=grid[y][x],e=el(x,y),b=e.querySelector('.bush');g.b=0;if(b)b.classList.add('cut');
+  const g=grid[y][x],e=el(x,y),b=e.querySelector('.bush');if(b)b.classList.add('cut');bushRoots(); // (g.b ainda=1: as raízes encolhem agora)
+  g.b=0;bushRoots();
   const r=e.getBoundingClientRect();
   for(let k=0;k<20;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#123f1c','#1b5a27','#2c8a3a','#0f3a18'][k%4],sq:true})}loop();SFX.click();
   setTimeout(()=>{if(b&&b.parentNode)b.remove();if(!g.o)move(x,y)},180);
@@ -2768,7 +2797,7 @@ function callBoss(){
 function setBoss(on,vis){bossOn=on;if(vis===false)return;const g=$('#game');if(g)g.classList.toggle('boss',on);const t=$('#bossTag');if(t){t.hidden=!on;t.textContent=on?ct('bossTag'):''}}
 function applyWorld(){document.documentElement.dataset.world=camp.world}
 function campNewBoard(build,secs){
-  applyWorld();bushList=[];
+  applyWorld();bushList=[];bushAlive.clear();
   const n=SIZES[camp.size];
   const boss=isBossNo(camp.boards+1);
   custom={c:n,r:n,m:boss?bossMines():MINES[camp.size]};
