@@ -2779,7 +2779,7 @@ function minerSVG(m){
 }
 const BOTS={}; // estado em tempo de execução de cada bot minerador
 const botTiers=m=>`${Math.min(3,m.int)}-${Math.min(2,Math.floor(m.spd/3))}-${Math.min(2,Math.floor(m.pow/2))}`;
-function botCan(){return campaign&&camp&&!tutorial&&started&&!over&&!campBlock&&!bossOn&&!has('liar')&&!has('partial')&&!has('duel')&&!tideBusy}
+function botCan(){return campaign&&camp&&!tutorial&&!over&&!campBlock&&!bossOn&&!has('liar')&&!has('partial')&&!has('duel')&&!tideBusy}
 function botRT(m){
   let b=BOTS[m.id];if(b)return b;
   b={m,ph:'off',t0:0,dur:0,tx:-1,ty:-1,cx:0,cy:0,spark:0,act:'open',lastSolve:0,sig:''};
@@ -2800,6 +2800,10 @@ function botDestroy(b){if(b.tx>=0){const c=el(b.tx,b.ty);if(c)c.classList.remove
 let solveCache={t:-1e9,safe:[],mines:[]};
 function botSolveCached(now){if(now-solveCache.t>300){const r=botSolve();solveCache={t:now,safe:r.safe,mines:r.mines}}return solveCache}
 function botPick(b,claimed,now){ // escolhe o alvo conforme as habilidades (inteligência)
+  if(!started){ // tabuleiro novo: o bot dá o primeiro clique, bem no centro (melhor chance de abrir uma região)
+    let bi=-1,bd=1e9;for(let i=0;i<C*R;i++){const d=Math.hypot(i%C-(C-1)/2,(i/C|0)-(R-1)/2);if(d<bd){bd=d;bi=i}}
+    return claimed.has(bi)?null:[bi,'start'];
+  }
   const S=botSolveCached(now),m=b.m,opts=[];
   S.safe.forEach(i=>{if(claimed.has(i))return;const g=grid[i/C|0][i%C];
     if(g.w>0){if(m.int>=2)opts.push([i,'weed'])}
@@ -2843,7 +2847,7 @@ function botOne(b,now,claimed,slot,n){
       bot.classList.remove('mine');cr.style.display='none';cellEl.classList.remove('botshake');
       const was={a:botActing,e:botEffNow};botActing=true;botEffNow=minerEff(m);
       try{
-        if(b.act==='open'){if(g.m===0)move(b.tx,b.ty)}
+        if(b.act==='open'||b.act==='start'){if(g.m===0)move(b.tx,b.ty)}
         else if(b.act==='weed'){weedHit(b.tx,b.ty,true)}
         else if(b.act==='bush'){if(!bushLocked(b.tx,b.ty))bushBreak(b.tx,b.ty,true)}
         else if(b.act==='flag'){if(g.m!==0&&g.f===0)toggleFlag(b.tx,b.ty)}
