@@ -470,7 +470,12 @@
   #phase[hidden]{display:none!important}
   #phase{display:none;margin:0 0 6px;font-size:12px;color:var(--muted);text-align:center}
   #game.camp #phase{display:block}
-  #phase .pbar{display:block;height:6px;margin-top:4px;background:#030812;border:1px solid var(--line)}
+  #phase .prow{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  #phase .prow span:first-child,#phase .prow span:last-child{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);white-space:nowrap}
+  #phase .pbar{display:block;position:relative;height:10px;margin-top:4px;background:repeating-linear-gradient(90deg,#030812 0 calc(10% - 1px),#1f4062 calc(10% - 1px) 10%);border:1px solid var(--line)}
+  #phase .pbar .pend{position:absolute;right:-2px;top:-9px;width:18px;height:18px;font-style:normal}
+  #phase .pbar .pend .px{width:18px;height:18px}
+  #phase.inf .pbar i#phaseFill{background:repeating-linear-gradient(90deg,var(--cyan) 0 8px,#7fe8ff 8px 16px)}
   #phase .pbar i{display:block;height:100%;width:0;background:var(--cyan);transition:width .4s}
   #game.boss #phase{color:#ff9aa8}#game.boss #phase .pbar i{background:#ff2d55}
   #cine{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:#030812b0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);padding:16px}
@@ -791,7 +796,7 @@
     <div class="pl" id="p0"><span>🔵 Player 1</span><b id="sc0">0</b></div>
     <div class="pl" id="p1"><span>🟠 Player 2</span><b id="sc1">0</b></div>
   </div>
-  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><span id="phaseTxt"></span><i class="pbar"><i id="phaseFill"></i></i></div><div class="boardwrap"><div id="board"></div></div></div>
+  <div class="boardbox"><i class="hsign l">:warn:</i><i class="hsign r">:warn:</i><div class="tidebar" id="tide" hidden></div><div id="phase"><div class="prow"><span id="phaseL"></span><span id="phaseTxt"></span><span id="phaseR"></span></div><i class="pbar"><i id="phaseFill"></i><b class="pend">:bomb:</b></i></div><div class="boardwrap"><div id="board"></div></div></div>
   <div class="foot" id="footAct">
     <div id="actions">
       <button class="tool" id="flagMode" data-i18n="flagMode">:flag: Flag mode</button>
@@ -2150,6 +2155,8 @@ const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
 const WORLDS=[{id:'mine',mult:1,up:1,cost:0,need:0,ic:':wclassic:'},{id:'grass',mult:1.6,up:1.3,cost:6000,need:3,ic:':wgrass:'},{id:'forest',mult:2.3,up:1.7,cost:20000,need:4,ic:':wforest:'},{id:'desert',mult:3.2,up:2.3,cost:60000,need:5,ic:':wdesert:',mode:'tide'}]
+const BOSS_AT={mine:50,grass:100,forest:150,desert:200}; // trajeto: o chefe de cada mundo fica 50 tabuleiros mais longe que o anterior
+const NEXT={mine:'grass',grass:'forest',forest:'desert',desert:null},PREV={grass:'mine',forest:'grass',desert:'forest'};
 const WN={mine:'wMine',grass:'wGrass',forest:'wForest',desert:'wDesert'};
 const worldModes=()=>{const m=worldOf(camp.world).mode;return m?[m]:[]};;
 const bestSize=()=>Math.max(...Object.values(camp.ws).map(w=>w.size));
@@ -2159,8 +2166,8 @@ const WEED_BASE=20,weedHits=()=>Math.max(1,WEED_BASE-camp.weed),WEED_MAX=19,weed
 const BOT_NEED=3,MINER_MAX_N=6,MINER_MAX={spd:8,pow:5,int:3};
 const MINER_COST={buy:()=>Math.round(2500*Math.pow(4,camp.miners.length)), // cada bot novo custa 4× o anterior
   spd:m=>Math.round(600*Math.pow(1.4,m.spd)),pow:m=>Math.round(1200*Math.pow(1.6,m.pow)),int:m=>Math.round(4000*Math.pow(2.2,m.int))};
-const mineMs=m=>Math.round(5000*Math.pow(.88,m.spd)*worldOf(m.world).mult), // quanto mais avançado o mundo, mais demora quebrar o bloco
-  restMs=m=>Math.round(4500*Math.pow(.88,m.spd)),minerEff=m=>.5+.07*m.pow;
+const mineMs=m=>Math.round(1250*Math.pow(.88,m.spd)*worldOf(m.world).mult), // quanto mais avançado o mundo, mais demora quebrar o bloco
+  restMs=m=>Math.round(1125*Math.pow(.88,m.spd)),minerEff=m=>.5+.07*m.pow;
 // bots designados a OUTROS mundos continuam minerando em segundo plano (estimativa: resolvem ~60% do tabuleiro sozinhos)
 const bgRate=m=>{
   const ws=camp.ws[m.world]||wsNew(),n=SIZES[ws.size],cells=n*n,safe=Math.max(1,cells-MINES[ws.size]),solv=.6*safe;
@@ -2175,15 +2182,16 @@ const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10
   liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
 const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
 /* cada mundo tem os seus próprios upgrades (tabuleiro, moedas/casa, bônus, recarga, drones, robô, podador) */
-const WKEYS=['size','cpc','clear','cool','weed'];
-const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,weed:0});
-const newCamp=()=>({drones:[0,0,0],droneT:[0,0,0],miners:[],minerSeq:0,coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew(),forest:wsNew(),desert:wsNew()}});
+const WKEYS=['size','cpc','clear','cool','weed','boards'];
+const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,weed:0,boards:0});
+const newCamp=()=>({cleared:{},drones:[0,0,0],droneT:[0,0,0],miners:[],minerSeq:0,coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew(),forest:wsNew(),desert:wsNew()}});
 function bindWorld(){WKEYS.forEach(k=>Object.defineProperty(camp,k,{get(){return camp.ws[camp.world][k]},set(v){camp.ws[camp.world][k]=v},enumerable:false,configurable:true}))}
 function loadCamp(){
   camp=newCamp();
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
     if(j&&typeof j==='object'){
       if(!j.ws){const m=wsNew();WKEYS.forEach(k=>{if(j[k]!==undefined)m[k]=j[k]});m.drones=j.drones;m.bot=j.bot;j.ws={mine:m}} // save antigo: o progresso vira o do Classic
+      if(j.ws&&j.boards!==undefined&&j.ws.mine&&j.ws.mine.boards===undefined)j.ws.mine.boards=j.boards; // contador de tabuleiros passou a ser por mundo
       if(!j.miners){ // migração: drones por mundo viram globais; robôs por mundo viram mineradores individuais
         const dr=[0,0,0],mn=[];let seq=0;
         Object.entries(j.ws).forEach(([id,w])=>{(w.drones||[]).forEach((n,i)=>{dr[i]+=n||0});if(w.bot&&w.bot.own)mn.push({id:++seq,world:id,spd:w.bot.spd||0,pow:w.bot.eff||0,int:Math.min(3,w.bot.rch||0)})});
@@ -2192,12 +2200,14 @@ function loadCamp(){
       camp={...camp,...j};
     }}catch(e){}
   WKEYS.forEach(k=>delete camp[k]);
+  if(!camp.cleared)camp.cleared={};
   Object.values(camp.ws).forEach(w=>{delete w.drones;delete w.droneT;delete w.bot});
   if(camp.tabs)camp.tabs=camp.tabs.map(t=>t==='drones'?'bots':t);if(camp.newTab&&camp.newTab.drones){camp.newTab.bots=true;delete camp.newTab.drones}
   if(!camp.newTab)camp.newTab={};
   if(camp.tabs)camp.tabs=camp.tabs.filter(t=>t!=='loadout'&&t!=='floors');
   if(!camp.worlds)camp.worlds={mine:true};if(!camp.world||!camp.ws[camp.world]&&!WORLDS.some(w=>w.id===camp.world))camp.world='mine';if(!camp.wvis)camp.wvis={};
   WORLDS.forEach(w=>{camp.ws[w.id]={...wsNew(),...(camp.ws[w.id]||{})}});
+  WORLDS.forEach(w=>{const nx=NEXT[w.id];if(nx&&camp.worlds[nx])camp.cleared[w.id]=true}); // mundo seguinte já liberado ⇒ este virou infinito
   bindWorld();
 }
 let noSave=false;
@@ -2207,7 +2217,7 @@ function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorag
 const CSTR={
   en:{shop:'Upgrades',items:'Items',bots:'Bots',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
-    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Build time: ${s}s per block.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',minerBuy:'Mining Bot',minerBuyD:n=>`Mines safe blocks for you. Each new bot costs 4× more (#${n}).`,minerName:n=>`Bot #${n}`,mSpd:'Speed',mPow:'Power',mInt:'Intelligence',mSpdD:(a,b)=>`Block ${a} · rest ${b}`,mPowD:v=>`Pays ${v}% of coins`,mIntD:['Opens safe blocks','+ flags mines','+ cuts weeds','+ breaks bushes'],mAway:r=>`Mining in the background · ~${r} coins/min`,mHere:'Working here',mWorldD:(m,t)=>`×${m} slower · ${t}/block`,mNeed:n=>`Mining bots need a ${n}×${n} board`,mMaxN:'Bot limit reached',wMine:'Classic',wGrass:'Grasslands',wForest:'Forest',wDesert:'Desert',wd_grass:m=>`Weeds need ${WEED_BASE} hits to break. Pays ×${m}.`,wd_forest:m=>`Rooted bushes: open or flag any 4 of the 8 blocks around first. Pays ×${m}.`,wd_desert:m=>`Sandstorms bury a row and its flags. Pays ×${m}.`,wFirstForest:'A forest. Bushes with roots. Open or flag any four of the eight blocks around one and it lets go. Nature is rude.',wFirstDesert:'A desert. Sand gets everywhere. Especially over your flags. Enjoy.',bushTip:'That bush is rooted. Open or flag any 4 of the 8 blocks around it. See the roots growing under them?',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Build time: ${s}s per block.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',phaseInf:n=>`Infinite · board ${n}`,wEndTag:'?',wBossTag:n=>`Boss ${n}`,wLockedBoss:(nm,n)=>`Locked. Beat the Boss of ${nm} (board ${n}) to open this world.`,wUnlocked:nm=>`Boss down. ${nm} unlocked. The old world is infinite now: no more bosses. Perfect for bots to farm.`,wEnd:'That was the last world for now. More coming. I would pretend to be sad.',minerBuy:'Mining Bot',minerBuyD:n=>`Mines safe blocks for you. Each new bot costs 4× more (#${n}).`,minerName:n=>`Bot #${n}`,mSpd:'Speed',mPow:'Power',mInt:'Intelligence',mSpdD:(a,b)=>`Block ${a} · rest ${b}`,mPowD:v=>`Pays ${v}% of coins`,mIntD:['Opens safe blocks','+ flags mines','+ cuts weeds','+ breaks bushes'],mAway:r=>`Mining in the background · ~${r} coins/min`,mHere:'Working here',mWorldD:(m,t)=>`×${m} slower · ${t}/block`,mNeed:n=>`Mining bots need a ${n}×${n} board`,mMaxN:'Bot limit reached',wMine:'Classic',wGrass:'Grasslands',wForest:'Forest',wDesert:'Desert',wd_grass:m=>`Weeds need ${WEED_BASE} hits to break. Pays ×${m}.`,wd_forest:m=>`Rooted bushes: open or flag any 4 of the 8 blocks around first. Pays ×${m}.`,wd_desert:m=>`Sandstorms bury a row and its flags. Pays ×${m}.`,wFirstForest:'A forest. Bushes with roots. Open or flag any four of the eight blocks around one and it lets go. Nature is rude.',wFirstDesert:'A desert. Sand gets everywhere. Especially over your flags. Enjoy.',bushTip:'That bush is rooted. Open or flag any 4 of the 8 blocks around it. See the roots growing under them?',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
@@ -2218,7 +2228,7 @@ const CSTR={
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Melhorias',items:'Itens',bots:'Bots',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
-    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Tempo de construção: ${s}s por bloco.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',minerBuy:'Bot Minerador',minerBuyD:n=>`Minera blocos seguros por você. Cada bot novo custa 4× mais (#${n}).`,minerName:n=>`Bot #${n}`,mSpd:'Velocidade',mPow:'Poder',mInt:'Inteligência',mSpdD:(a,b)=>`Bloco ${a} · descanso ${b}`,mPowD:v=>`Paga ${v}% das moedas`,mIntD:['Abre blocos seguros','+ marca minas','+ corta ervas','+ quebra arbustos'],mAway:r=>`Minerando em segundo plano · ~${r} moedas/min`,mHere:'Trabalhando aqui',mWorldD:(m,t)=>`×${m} mais lento · ${t}/bloco`,mNeed:n=>`Bots mineradores pedem tabuleiro ${n}×${n}`,mMaxN:'Limite de bots atingido',wMine:'Clássico',wGrass:'Campos',wForest:'Floresta',wDesert:'Deserto',wd_grass:m=>`Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wd_forest:m=>`Arbustos com raiz: abra ou marque 4 dos 8 blocos em volta antes. Paga ×${m}.`,wd_desert:m=>`Tempestades de areia cobrem uma linha e as bandeiras. Paga ×${m}.`,wFirstForest:'Uma floresta. Arbustos com raiz. Abra ou marque quatro dos oito blocos em volta e ele solta. A natureza é grossa.',wFirstDesert:'Um deserto. Areia entra em tudo. Principalmente nas suas bandeiras. Aproveite.',bushTip:'Esse arbusto tem raiz. Abra ou marque 4 dos 8 blocos em volta. Viu as raízes crescendo embaixo deles?',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Tempo de construção: ${s}s por bloco.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',phaseInf:n=>`Infinito · tabuleiro ${n}`,wEndTag:'?',wBossTag:n=>`Chefe ${n}`,wLockedBoss:(nm,n)=>`Bloqueado. Derrote o Chefe de ${nm} (tabuleiro ${n}) para abrir este mundo.`,wUnlocked:nm=>`Chefe derrotado. ${nm} liberado. O mundo antigo agora é infinito: sem chefes. Perfeito para os bots farmarem.`,wEnd:'Esse foi o último mundo por enquanto. Vem mais. Eu fingiria tristeza.',minerBuy:'Bot Minerador',minerBuyD:n=>`Minera blocos seguros por você. Cada bot novo custa 4× mais (#${n}).`,minerName:n=>`Bot #${n}`,mSpd:'Velocidade',mPow:'Poder',mInt:'Inteligência',mSpdD:(a,b)=>`Bloco ${a} · descanso ${b}`,mPowD:v=>`Paga ${v}% das moedas`,mIntD:['Abre blocos seguros','+ marca minas','+ corta ervas','+ quebra arbustos'],mAway:r=>`Minerando em segundo plano · ~${r} moedas/min`,mHere:'Trabalhando aqui',mWorldD:(m,t)=>`×${m} mais lento · ${t}/bloco`,mNeed:n=>`Bots mineradores pedem tabuleiro ${n}×${n}`,mMaxN:'Limite de bots atingido',wMine:'Clássico',wGrass:'Campos',wForest:'Floresta',wDesert:'Deserto',wd_grass:m=>`Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wd_forest:m=>`Arbustos com raiz: abra ou marque 4 dos 8 blocos em volta antes. Paga ×${m}.`,wd_desert:m=>`Tempestades de areia cobrem uma linha e as bandeiras. Paga ×${m}.`,wFirstForest:'Uma floresta. Arbustos com raiz. Abra ou marque quatro dos oito blocos em volta e ele solta. A natureza é grossa.',wFirstDesert:'Um deserto. Areia entra em tudo. Principalmente nas suas bandeiras. Aproveite.',bushTip:'Esse arbusto tem raiz. Abra ou marque 4 dos 8 blocos em volta. Viu as raízes crescendo embaixo deles?',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
@@ -2265,7 +2275,7 @@ const LINES={
 };
 const CINE_FIRST=[
  [X("Oh. You don't know, do you.","Ah. Você não sabe, né."),'🤨'],
- [X("Every 50 boards, I stop being nice. Okay, I stop being THIS nice.","A cada 50 tabuleiros, eu paro de ser legal. Tá, paro de ser ESSE nível de legal."),'😏'],
+ [X("Every world ends in a Boss. Classic at board 50, Grasslands at 100, the Forest at 150. I stop being nice.","Todo mundo termina num Chefe. O Clássico no tabuleiro 50, os Campos no 100, a Floresta no 150. Eu paro de ser legal."),'😏'],
  [X("See that counter above the board? I was hiding it. Now it counts down to the Boss. Yes, it's ominous.","Viu o contador em cima do tabuleiro? Eu estava escondendo. Agora ele conta até o Chefe. Sim, é ameaçador."),'😒'],
  [X("The Boss board has way more mines. Shields don't work. And if you lose... you lose ALL your coins. Every single one.","O tabuleiro Chefe tem bem mais minas. Escudo não funciona. E se você perder... perde TODAS as moedas. Todinhas."),'😈'],
  [X("But if you win, you get a lot. Like, a LOT. I hate that part. Rude.","Mas se ganhar, leva muito. Tipo, MUITO. Eu odeio essa parte. Que grosseria."),'😠'],
@@ -2428,9 +2438,6 @@ function renderCards(){
       cs.push(camp.cool<8?card({ic:':clock:',name:ct('cCool'),sub:ct('lvl',camp.cool+1),pr:money(COST.cool()),act:'buy:cool',dis:camp.coins<COST.cool(),cls:ok(COST.cool()),tip:ct('cCoolD',coolPer(camp.cool+1).toFixed(2)),desc:ct('cCoolD',coolPer(camp.cool+1).toFixed(2))})
         :card({ic:':clock:',name:ct('cCool'),sub:ct('max'),dis:true}));
     }
-    WORLDS.forEach(w=>{if(w.id==='mine'||camp.worlds[w.id])return;
-      const nm=ct(WN[w.id]);
-      cs.push(bestSize()>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wd_'+w.id,w.mult),desc:ct('wd_'+w.id,w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
     if(camp.world==='grass')cs.push(camp.weed<WEED_MAX?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
   }else if(curTab==='items'){
     cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD'),desc:ct('cShieldD')})
@@ -2489,18 +2496,22 @@ function buyItem(key){
 }
 
 /* ---------- tabuleiro: novo, vitória, derrota, mina ---------- */
-const BOSS_EVERY=50;
-let bossOn=false;
-const isBossNo=k=>k>0&&k%BOSS_EVERY===0;
+let bossOn=false,forceBoss=false;
+const worldCleared=id=>!!(camp.cleared&&camp.cleared[id]);
+const bossDue=()=>!worldCleared(camp.world)&&!!BOSS_AT[camp.world]&&camp.boards+1>=BOSS_AT[camp.world];
 function bossMines(){const n=SIZES[camp.size];return Math.min(n*n-2,Math.ceil(MINES[camp.size]*1.6)+1)}
 function bossPrize(){const safe=C*R-countMineCells(),base=Math.round(safe*cpcVal()*clearMult()*modReward());return Math.max(base*40,Math.round(camp.coins*.6),200)}
-function updatePhaseText(){const t=$('#phaseTxt'),f=$('#phaseFill');const n=((camp.boards-1)%BOSS_EVERY)+1;t.textContent=(bossOn&&$('#game').classList.contains('boss'))?ct('phaseBoss'):ct('phase',n,BOSS_EVERY)+' · '+ct('phaseLeft',BOSS_EVERY-n);f.style.width=(bossOn?100:n/BOSS_EVERY*100)+'%'}
-function updatePhase(){
+function updatePhase(){ // linha em cima do tabuleiro: vai sendo completada a cada tabuleiro até o chefe do mundo
   const t=$('#phaseTxt'),f=$('#phaseFill'),ph=$('#phase');if(!t||!camp)return;
-  ph.hidden=!camp.bossSeen; // só aparece depois do primeiro chefe, para não entregar a surpresa
-  const n=((camp.boards-1)%BOSS_EVERY)+1;
-  t.textContent=(bossOn&&$('#game').classList.contains('boss'))?ct('phaseBoss'):ct('phase',n,BOSS_EVERY)+' · '+ct('phaseLeft',BOSS_EVERY-n);
-  f.style.width=(bossOn?100:n/BOSS_EVERY*100)+'%';
+  ph.hidden=false;
+  const w=camp.world,thr=BOSS_AT[w],n=camp.boards,done=worldCleared(w)||!thr,nx=NEXT[w];
+  const bossNow=bossOn&&$('#game').classList.contains('boss');
+  $('#phaseL').textContent=ct(WN[w]);$('#phaseR').textContent=done?'∞':(nx?ct(WN[nx]):ct('wEndTag'));
+  ph.classList.toggle('inf',done);
+  if(bossNow)t.textContent=ct('phaseBoss');
+  else if(done)t.textContent=ct('phaseInf',n);
+  else t.textContent=ct('phase',Math.min(n,thr),thr)+' · '+ct('phaseLeft',Math.max(0,thr-n));
+  f.style.width=(bossNow||done?100:Math.min(100,n/thr*100))+'%';
 }
 const cineWait=ms=>new Promise(r=>setTimeout(r,ms));
 function cineSay(t){return new Promise(res=>{
@@ -2528,7 +2539,7 @@ async function bossCine(){
   c.hidden=false;c.animate([{opacity:0},{opacity:1}],{duration:350});
   faceEl.style.visibility='hidden';
   await cineFly(true);SFX.talk();
-  for(const [t,m] of lines){cf.textContent=m;if(first&&t===CINE_FIRST[2][0]){$('#phase').hidden=false;updatePhaseText()}await cineSay(RES(t))}
+  for(const [t,m] of lines){cf.textContent=m;if(first&&t===CINE_FIRST[2][0]){updatePhase()}await cineSay(RES(t))}
   cf.textContent='😈';
   const sh=cf.animate([{transform:'translateY(0) rotate(-4deg)'},{transform:'translateY(-14px) rotate(4deg)'}],{duration:130,iterations:16,direction:'alternate'});
   $('#cineText').textContent='HA HA HA HA HA';for(let i=0;i<8;i++){SFX.talk();await cineWait(180)}
@@ -2717,16 +2728,16 @@ function weedHit(x,y,byBot){
 function renderWorlds(){
   const box=$('#worlds');if(!box||!camp)return;
   box.innerHTML=`<div class="wt">${ct('wTitle')}</div>`+WORLDS.map(w=>{const own=!!camp.worlds[w.id],nm=ct(WN[w.id]);
-    return `<button class="wl${camp.world===w.id?' sel':''}${own?'':' lock'}" data-world="${w.id}">${own?w.ic:':lock:'}<b>${nm}</b><small>×${w.mult}</small></button>`}).join('');
+    return `<button class="wl${camp.world===w.id?' sel':''}${own?'':' lock'}" data-world="${w.id}">${own?w.ic:':lock:'}<b>${nm}</b><small>${own?'×'+w.mult+(worldCleared(w.id)?' · ∞':''):ct('wBossTag',BOSS_AT[PREV[w.id]])}</small></button>`}).join('');
   document.querySelectorAll('#demoWorlds button').forEach(b=>{b.textContent=ct(WN[b.dataset.w])});
 }
 function pickWorld(id,force){
   if(!camp)return;
-  if(!force&&!camp.worlds[id]){SFX.deny();curTab='shop';renderTabs();renderCards();sayText(ct('wLocked'),'😏',false);return}
+  if(!force&&!camp.worlds[id]){SFX.deny();const pv=PREV[id];sayText(ct('wLockedBoss',ct(WN[pv]),BOSS_AT[pv]),'😏',false);return}
   if(camp.world===id)return;
   if(!force&&(bossOn||tutorial||$('#askbox').classList.contains('show'))){SFX.deny();return}
   if(force)camp.worlds[id]=true;
-  camp.world=id;camp.wvis[id]=true;saveCamp();SFX.menu();checkUnlocks(true);renderYard();setCoins();
+  camp.world=id;camp.wvis[id]=true;saveCamp();SFX.menu();checkUnlocks(true);renderYard();setCoins();updatePhase();
   startCooldown(coolSecs(),400);
   camp.wf=camp.wf||{};const fk={grass:'wFirstGrass',forest:'wFirstForest',desert:'wFirstDesert'}[id];
   if(fk&&!camp.wf[id]&&!(id==='grass'&&camp.wFirst)){camp.wf[id]=true;saveCamp();setTimeout(()=>sayText(ct(fk),'😏',false),900)}
@@ -2894,7 +2905,7 @@ function callBoss(){
   campBlock=true;setFace('🤨');
   ask({emoji:':bomb:',title:ct('demoT'),text:ct('demoQ'),buttons:[{label:ct('demoYes'),v:'y'},{label:ct('demoNo'),v:'n',alt:true}]}).then(v=>{
     if(v!=='y'){campBlock=false;setFace('🙂');return}
-    camp.boards=BOSS_EVERY-1;saveCamp();SFX.build(0);startCooldown(coolSecs(),600);
+    forceBoss=true;SFX.build(0);startCooldown(coolSecs(),600);
   });
 }
 function setBoss(on,vis){bossOn=on;if(vis===false)return;const g=$('#game');if(g)g.classList.toggle('boss',on);const t=$('#bossTag');if(t){t.hidden=!on;t.textContent=on?ct('bossTag'):''}}
@@ -2902,7 +2913,7 @@ function applyWorld(){document.documentElement.dataset.world=camp.world}
 function campNewBoard(build,secs){
   applyWorld();bushList=[];bushAlive.clear();
   const n=SIZES[camp.size];
-  const boss=isBossNo(camp.boards+1);
+  const boss=forceBoss||bossDue();forceBoss=false;
   custom={c:n,r:n,m:boss?bossMines():MINES[camp.size]};
   level=n<=4?'easy':n<=6?'medium':n<=9?'hard':'insane';
   const mods=worldModes();cur=new Set(mods.length?mods:['classic']);
@@ -2929,7 +2940,8 @@ function campMine(x,y){ // pisou numa mina: escudo > reviver com anúncio > perd
 }
 function campAfterLose(){
   const pct=bossOn?100:lossPct(),loss=Math.floor(camp.coins*pct/100);
-  camp.coins-=loss;camp.losses++;camp.streak=0;camp.lstreak=(camp.lstreak||0)+1;if(bossOn)camp.bossLost=(camp.bossLost||0)+1;saveCamp();setCoins();
+  camp.coins-=loss;camp.losses++;camp.streak=0;camp.lstreak=(camp.lstreak||0)+1;if(bossOn){camp.bossLost=(camp.bossLost||0)+1;if(!worldCleared(camp.world)&&BOSS_AT[camp.world])camp.boards=Math.max(0,BOSS_AT[camp.world]-11)} // perdeu o chefe: 10 tabuleiros para se refazer
+  saveCamp();setCoins();
   if(loss>0)floatText('-'+fmtC(loss),$('#coinStat'),'loss');
   if(bossOn){sayText(ct('bossLost'),'😈')}else quipOr('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
 }
@@ -2937,10 +2949,14 @@ function campWin(){
   if(tutorial){over=true;tutFinish();return}
   over=true;
   const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()*worldMult()*Math.max(.25,1-botOpened/Math.max(1,safe)*.75)));
-  const boss=bossOn,prize=boss?bossPrize():0;
+  const boss=bossOn,prize=boss?bossPrize():0,wid=camp.world,firstClear=boss&&!worldCleared(wid),nxt=NEXT[wid];
+  if(firstClear){camp.cleared[wid]=true;if(nxt)camp.worlds[nxt]=true}
   addCoins(bonus+prize);camp.wins++;camp.streak++;camp.lstreak=0;if(boss)camp.bossWon=(camp.bossWon||0)+1;saveCamp();setFace('😎');
   floatText('+'+fmtC(bonus),$('#coinStat'),'bonus');SFX.win();pixelSparks(cells[cells.length>>1],30,['#4fd8e8','#ff5c93','#ffd166','#ffffff']);
-  boardEl.classList.add('win');if(boss){floatText('+'+fmtC(prize),$('#coinStat'),'bonus');sayText(ct('bossWon',fmtC(prize)),'😎')}else quipOr('win');checkUnlocks();startCooldown(coolSecs(),1400);
+  boardEl.classList.add('win');if(boss){floatText('+'+fmtC(prize),$('#coinStat'),'bonus');sayText(ct('bossWon',fmtC(prize)),'😎')}else quipOr('win');checkUnlocks();
+  if(firstClear&&nxt){ // chefe derrotado: o próximo mundo abre e o anterior vira infinito (sem chefes)
+    setTimeout(()=>sayText(ct('wUnlocked',ct(WN[nxt])),'😏',false),3200);setTimeout(()=>pickWorld(nxt,true),7500);
+  }else{if(firstClear)setTimeout(()=>sayText(ct('wEnd'),'😏',false),3200);startCooldown(coolSecs(),1400)}
 }
 
 /* ---------- intervalo: o Smily apaga o mapa e constrói o próximo ---------- */
