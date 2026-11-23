@@ -1316,6 +1316,12 @@ function gameLabels(){
   if(floor==='torus')helps.push(tr('torusHelp'));
   $('#help').textContent=helps.join(' · ');
 }
+function cellSize(){
+  const mob=isMobile(),big=C>=9,mid=C>=7;
+  const avail=custom&&!mob&&innerWidth>900?Math.min(innerWidth-660,620,big?330:mid?420:620):Math.min(innerWidth-(mob?28:90),mob&&big?300:1100);
+  const w=Math.floor(avail/C)-3,mx=custom?(mob?56:72):(mob?44:36);
+  return mob?Math.max(big?22:28,Math.min(mx,w)):Math.max(big?22:24,Math.min(mx,w));
+}
 function init(){
   setSP(level);const LV=custom||LEVELS[level];C=LV.c;R=LV.r;M=bombsFor(level,cur);plan=makePlan();NET=plan.reduce((a,b)=>a+b,0);
   genId++;generating=false;hideLoading();resetZoom();$('#reviewbar').hidden=true;endSnap=null;fatal=null;tideBusy=false;
@@ -1328,8 +1334,7 @@ function init(){
   $('#duel').hidden=!has('duel');$('#tide').hidden=!has('tide');updateTide();$('#radarBtn').hidden=!has('detector');
   updateDuel();updateRadar();
   boardEl.className=(shapes?'shapes ':'')+floor;boardEl.innerHTML='';boardEl.style.cssText='';
-  const mob=isMobile(),w=Math.floor((custom&&!mob&&innerWidth>900?Math.min(innerWidth-660,620):Math.min(innerWidth-(mob?28:90),1100))/C)-3;
-  userCell=0;const mx=custom?(mob?56:72):(mob?44:36),s=mob?Math.max(28,Math.min(mx,w)):Math.max(24,Math.min(mx,w));
+  userCell=0;const s=cellSize(); // tabuleiros grandes (9×9, 10×10) ficam menores para não tampar a interface
   $('#zoomIn').hidden=$('#zoomOut').hidden=shapes;
   document.documentElement.style.setProperty('--cell',s+'px');
   grid=[];cells=[];
@@ -2098,7 +2103,7 @@ function zoomBoard(d){ // celular: ➖/➕ mudam o tamanho das casas (pisos quad
 $('#zoomIn').onclick=()=>zoomBoard(4);$('#zoomOut').onclick=()=>zoomBoard(-4);
 let rzT=0;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(()=>{const was=document.documentElement.classList.contains('mobile');applyDevice();
   if(document.documentElement.classList.contains('mobile')!==was&&$('#game').classList.contains('active'))gameLabels();
-  if(!shapes&&!userCell&&$('#game').classList.contains('active')&&C){const m=isMobile(),w=Math.floor((Math.min(innerWidth-(m?28:90),1100))/C)-3;{const mx=custom?(m?56:72):(m?44:36);document.documentElement.style.setProperty('--cell',(m?Math.max(28,Math.min(mx,w)):Math.max(24,Math.min(mx,w)))+'px')}}},150)});
+  if(!shapes&&!userCell&&$('#game').classList.contains('active')&&C)document.documentElement.style.setProperty('--cell',cellSize()+'px')},150)});
 $('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)setTab(b.dataset.tab)});
 $('#cards').addEventListener('click',e=>{const b=e.target.closest('.card');if(!b||b.disabled)return;const a=b.dataset.act;if(!a)return;
   if(a.startsWith('buy:'))buyItem(a.slice(4));
@@ -2163,8 +2168,9 @@ const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
 const WORLDS=[{id:'mine',mult:1,up:1,cost:0,need:0,ic:':wclassic:'},{id:'grass',mult:1.6,up:1.3,cost:6000,need:3,ic:':wgrass:'},{id:'forest',mult:2.3,up:1.7,cost:20000,need:4,ic:':wforest:'},{id:'desert',mult:3.2,up:2.3,cost:60000,need:5,ic:':wdesert:',mode:'tide'}]
 const BOSS_AT={mine:50,grass:100,forest:150,desert:200}; // trajeto: o chefe de cada mundo fica 50 tabuleiros mais longe que o anterior
 const SIZE_STEPS=8; // 3×3 até 10×10: o mundo cresce em 8 etapas iguais ao longo dos tabuleiros até o chefe
-const boardAtSize=idx=>{const thr=BOSS_AT[camp.world]||50;return Math.ceil(idx*thr/SIZE_STEPS)+1}; // 1º tabuleiro do mundo atual em que o tabuleiro chega a esse tamanho
-const sizeIdx=(id,k)=>{const thr=BOSS_AT[id];if(!thr||(camp.cleared&&camp.cleared[id]))return SIZE_STEPS-1;return Math.max(0,Math.min(SIZE_STEPS-1,Math.floor((Math.max(1,k)-1)*SIZE_STEPS/thr)))};
+const segStart=id=>BOSS_AT[PREV[id]]||0,segLen=id=>BOSS_AT[id]-segStart(id); // trajeto único: cada mundo ocupa 50 tabuleiros (Clássico 1–50, Campos 51–100, Floresta 101–150, Deserto 151–200)
+const boardAtSize=idx=>{const id=camp.world;return segStart(id)+Math.ceil(idx*segLen(id)/SIZE_STEPS)+1}; // 1º tabuleiro (número do trajeto) em que o tabuleiro chega a esse tamanho
+const sizeIdx=(id,k)=>{if(!BOSS_AT[id]||(camp.cleared&&camp.cleared[id]))return SIZE_STEPS-1;return Math.max(0,Math.min(SIZE_STEPS-1,Math.floor((k-segStart(id)-1)*SIZE_STEPS/segLen(id))))};
 const NEXT={mine:'grass',grass:'forest',forest:'desert',desert:null},PREV={grass:'mine',forest:'grass',desert:'forest'};
 const WN={mine:'wMine',grass:'wGrass',forest:'wForest',desert:'wDesert'};
 const worldModes=()=>{const m=worldOf(camp.world).mode;return m?[m]:[]};;
@@ -2191,16 +2197,15 @@ const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10
   liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
 const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
 /* cada mundo tem os seus próprios upgrades (tabuleiro, moedas/casa, bônus, recarga, drones, robô, podador) */
-const WKEYS=['size','cpc','clear','cool','weed','boards'];
-const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,weed:0,boards:0});
-const newCamp=()=>({cleared:{},drones:[0,0,0],droneT:[0,0,0],miners:[],minerSeq:0,coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew(),forest:wsNew(),desert:wsNew()}});
+const WKEYS=['size','cpc','clear','cool','weed'];
+const wsNew=()=>({size:0,cpc:0,clear:0,cool:0,weed:0,ib:0});
+const newCamp=()=>({boards:0,cleared:{},drones:[0,0,0],droneT:[0,0,0],miners:[],minerSeq:0,coins:0,total:0,shields:0,shieldBought:0,un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,worlds:{mine:true},world:'mine',wvis:{},weedTip:false,ws:{mine:wsNew(),grass:wsNew(),forest:wsNew(),desert:wsNew()}});
 function bindWorld(){WKEYS.forEach(k=>Object.defineProperty(camp,k,{get(){return camp.ws[camp.world][k]},set(v){camp.ws[camp.world][k]=v},enumerable:false,configurable:true}))}
 function loadCamp(){
   camp=newCamp();
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');
     if(j&&typeof j==='object'){
       if(!j.ws){const m=wsNew();WKEYS.forEach(k=>{if(j[k]!==undefined)m[k]=j[k]});m.drones=j.drones;m.bot=j.bot;j.ws={mine:m}} // save antigo: o progresso vira o do Classic
-      if(j.ws&&j.boards!==undefined&&j.ws.mine&&j.ws.mine.boards===undefined)j.ws.mine.boards=j.boards; // contador de tabuleiros passou a ser por mundo
       if(!j.miners){ // migração: drones por mundo viram globais; robôs por mundo viram mineradores individuais
         const dr=[0,0,0],mn=[];let seq=0;
         Object.entries(j.ws).forEach(([id,w])=>{(w.drones||[]).forEach((n,i)=>{dr[i]+=n||0});if(w.bot&&w.bot.own)mn.push({id:++seq,world:id,spd:w.bot.spd||0,pow:w.bot.eff||0,int:Math.min(3,w.bot.rch||0)})});
@@ -2217,7 +2222,13 @@ function loadCamp(){
   if(!camp.worlds)camp.worlds={mine:true};if(!camp.world||!camp.ws[camp.world]&&!WORLDS.some(w=>w.id===camp.world))camp.world='mine';if(!camp.wvis)camp.wvis={};
   WORLDS.forEach(w=>{camp.ws[w.id]={...wsNew(),...(camp.ws[w.id]||{})}});
   WORLDS.forEach(w=>{const nx=NEXT[w.id];if(nx&&camp.worlds[nx])camp.cleared[w.id]=true});
-  WORLDS.forEach(w=>{camp.ws[w.id].size=sizeIdx(w.id,(camp.ws[w.id].boards||0)+1)}); // mundo seguinte já liberado ⇒ este virou infinito
+  if(camp.jv!==2){ // migração: contador por mundo → contador único do trajeto
+    const fr=WORLDS.find(w=>camp.worlds[w.id]&&!camp.cleared[w.id]),f=fr?fr.id:'desert',st=BOSS_AT[PREV[f]]||0;
+    camp.boards=fr?st+Math.min(camp.ws[f].boards||0,BOSS_AT[f]-st):BOSS_AT.desert;camp.jv=2;
+    WORLDS.forEach(w=>{if(camp.cleared[w.id])camp.ws[w.id].ib=camp.ws[w.id].boards||0});
+  }
+  Object.values(camp.ws).forEach(w=>{delete w.boards});
+  WORLDS.forEach(w=>{camp.ws[w.id].size=sizeIdx(w.id,camp.boards+1)});
   bindWorld();
 }
 let noSave=false;
@@ -2513,17 +2524,17 @@ function bossPrize(){const safe=C*R-countMineCells(),base=Math.round(safe*cpcVal
 function updatePhase(){ // linha em cima do tabuleiro: vai sendo completada a cada tabuleiro até o chefe do mundo
   const t=$('#phaseTxt'),f=$('#phaseFill'),ph=$('#phase');if(!t||!camp)return;
   ph.hidden=false;
-  const w=camp.world,thr=BOSS_AT[w],n=camp.boards,done=worldCleared(w)||!thr,nx=NEXT[w];
+  const w=camp.world,thr=BOSS_AT[w],done=worldCleared(w)||!thr,nx=NEXT[w],n=done?(camp.ws[w].ib||0):camp.boards;
   const bossNow=bossOn&&$('#game').classList.contains('boss');
   $('#phaseL').textContent=ct(WN[w]);$('#phaseR').textContent=done?'∞':(nx?ct(WN[nx]):ct('wEndTag'));
   ph.classList.toggle('inf',done);
-  $('#phaseIcL').innerHTML=worldOf(w).ic; // começo da linha: o mundo atual
+  $('#phaseIcL').innerHTML=worldOf(w).ic;
   const ir=$('#phaseIcR');ir.classList.toggle('dim',!done&&!!nx&&!camp.worlds[nx]);
-  ir.innerHTML=done?'∞':(nx?worldOf(nx).ic:':lock:'); // fim da linha: o próximo mundo a descobrir
+  ir.innerHTML=done?'∞':(nx?worldOf(nx).ic:':lock:');
   if(bossNow)t.textContent=ct('phaseBoss');
   else if(done)t.textContent=ct('phaseInf',n);
   else t.textContent=ct('phase',Math.min(n,thr),thr,SIZES[sizeIdx(w,n)])+' · '+ct('phaseLeft',Math.max(0,thr-n));
-  f.style.width=(bossNow||done?100:Math.min(100,n/thr*100))+'%';
+  f.style.width=(bossNow||done?100:Math.max(0,Math.min(100,(n-segStart(w))/segLen(w)*100)))+'%';
 }
 const cineWait=ms=>new Promise(r=>setTimeout(r,ms));
 function cineSay(t){return new Promise(res=>{
@@ -2931,7 +2942,8 @@ function campNewBoard(build,secs){
   level=n<=4?'easy':n<=6?'medium':n<=9?'hard':'insane';
   const mods=worldModes();cur=new Set(mods.length?mods:['classic']);
   floor=activeFloor()||'square';shapes=isPoly(floor);
-  campCells=0;botOpened=0;camp.boards++;
+  campCells=0;botOpened=0;
+  if(worldCleared(camp.world))camp.ws[camp.world].ib=(camp.ws[camp.world].ib||0)+1;else camp.boards++; // contador único só anda no mundo da fronteira; mundos infinitos têm contagem própria
   if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
   setBoss(boss,!(boss&&build)); // na construção, a borda vermelha só aparece depois das falas
   init();decorateGrass();setCoins();
@@ -2953,7 +2965,7 @@ function campMine(x,y){ // pisou numa mina: escudo > reviver com anúncio > perd
 }
 function campAfterLose(){
   const pct=bossOn?100:lossPct(),loss=Math.floor(camp.coins*pct/100);
-  camp.coins-=loss;camp.losses++;camp.streak=0;camp.lstreak=(camp.lstreak||0)+1;if(bossOn){camp.bossLost=(camp.bossLost||0)+1;if(!worldCleared(camp.world)&&BOSS_AT[camp.world])camp.boards=Math.max(0,BOSS_AT[camp.world]-11)} // perdeu o chefe: 10 tabuleiros para se refazer
+  camp.coins-=loss;camp.losses++;camp.streak=0;camp.lstreak=(camp.lstreak||0)+1;if(bossOn){camp.bossLost=(camp.bossLost||0)+1;if(!worldCleared(camp.world)&&BOSS_AT[camp.world])camp.boards=Math.max(segStart(camp.world),BOSS_AT[camp.world]-11)} // perdeu o chefe: 10 tabuleiros para se refazer
   saveCamp();setCoins();
   if(loss>0)floatText('-'+fmtC(loss),$('#coinStat'),'loss');
   if(bossOn){sayText(ct('bossLost'),'😈')}else quipOr('lose',{loss:fmtC(loss)});checkUnlocks();startCooldown(coolSecs(),600);
