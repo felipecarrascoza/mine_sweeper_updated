@@ -500,23 +500,22 @@
   .rbot.fly .fl{display:block;animation:flameF .09s steps(2) infinite}
   .rbot.draw .svh,.rbot.dig .svh{display:block}
   .rbot.draw .svb,.rbot.dig .svb{display:none}
-  .rbot .ll,.rbot .lr,.rbot .ar,.rbot .svh{transform-box:fill-box;transform-origin:50% 0}
+  .rbot .ll,.rbot .lr,.rbot .ar{transform-box:view-box}
+  .rbot .ll{transform-origin:10px 16px}.rbot .lr{transform-origin:7px 16px}.rbot .ar{transform-origin:9px 9px}
   .rbot.walk svg{animation:walkBob .30s steps(2) infinite}
   .rbot.walk .ll{animation:legA .30s ease-in-out infinite alternate}
   .rbot.walk .lr{animation:legA .30s ease-in-out infinite alternate-reverse}
   .rbot.walk .ar{animation:legA .30s ease-in-out infinite alternate-reverse}
-  .rbot.fly .ll{transform:rotate(16deg)}.rbot.fly .lr{transform:rotate(-8deg)}
+  .rbot.fly .ll{transform:rotate(20deg)}.rbot.fly .lr{transform:rotate(-8deg)}
   .rbot.fly svg{animation:flyHover .35s ease-in-out infinite alternate}
-  .rbot.draw .svh{animation:shovelDraw .38s ease-out both}
-  .rbot.dig .svh{animation:shovelStroke .26s ease-in-out infinite alternate}
-  .rbot.dig .ar,.rbot.draw .ar{animation:armDig .26s ease-in-out infinite alternate}
+  .rbot.draw .ar{animation:armDraw .38s ease-out both}
+  .rbot.dig .ar{animation:armDig .26s ease-in-out infinite alternate}
   @keyframes walkBob{50%{transform:translateY(-2px)}}
   @keyframes legA{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
   @keyframes flameF{50%{opacity:.55;transform:scaleY(1.25)}}
   @keyframes flyHover{to{transform:translateY(-1.5px) rotate(-3deg)}}
-  @keyframes shovelDraw{from{transform:rotate(-160deg)}to{transform:none}}
-  @keyframes shovelStroke{from{transform:translateY(-3px) rotate(-10deg)}to{transform:translateY(2px) rotate(8deg)}}
-  @keyframes armDig{from{transform:rotate(-18deg)}to{transform:rotate(16deg)}}
+  @keyframes armDraw{from{transform:rotate(-170deg)}to{transform:rotate(0)}}
+  @keyframes armDig{from{transform:rotate(-22deg)}to{transform:rotate(20deg)}}
   #botyard{display:none;position:relative}
   #bhouse{position:absolute;left:0;top:0;z-index:18;pointer-events:none;transform:translate(-50%,-100%)}
   #bhouse svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
@@ -2844,29 +2843,35 @@ function botSolve(){
 
 /* visual do bot por upgrades: speed → corpo, intelligence → cabeça, power → laser */
 /* bots mineradores humanoides: saem da casinha, andam por cima dos blocos (jetpack nos buracos), cavam com a pá e voltam para descansar */
-function minerSVG(m){
-  const t={head:Math.min(3,m.int||0),body:Math.min(2,Math.floor((m.spd||0)/3)),tool:Math.min(2,Math.floor((m.pow||0)/2))};
+function minerSVG(m){ // bot de perfil (sempre de lado, virado para a direita; o jogo espelha para a esquerda), com o jetpack nas costas à mostra
+  const t={head:Math.min(3,m.int||0),body:Math.min(2,Math.floor((m.spd||0)/3))};
+  const sp=m.spd||0,pw=m.pow||0;
   const R=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
   const BODY=[['#6b7a99','#4a5878','#8fa0c0'],['#3f78c8','#2b5aa0','#7fb4ff'],['#d9364f','#9a2238','#ffd166']][t.body];
-  const sp=m.spd||0,pw=m.pow||0;
-  // pá: um material por nível de Power (madeira, pedra, ferro, ouro, diamante, laser violeta)
   const TOOL=[['#7a5a3a','#b07a4a'],['#7a5a3a','#9aa0a8'],['#6b4a2a','#e8eef7'],['#6b4a2a','#ffd166'],['#4a3a6a','#7fe8ff'],['#3a2a5a','#c58bff']][Math.min(5,pw)];
   const SK='#2b3550';
   let head='';
-  if(t.head===0)head=R(4,1,8,7,SK)+R(5,2,6,5,'#9aa7bd')+R(6,4,1,1,SK)+R(9,4,1,1,SK);
-  else if(t.head===1)head=R(7,0,2,1,'#ff5c93')+R(4,2,8,6,SK)+R(5,3,6,4,'#9aa7bd')+R(5,4,6,2,'#1b6f80')+R(6,4,4,1,'#4fd8e8');
-  else if(t.head===2)head=R(7,0,2,1,'#ffd166')+R(7,1,1,1,SK)+R(3,2,10,6,SK)+R(4,3,8,4,'#b8c4d8')+R(5,4,2,2,'#ffd166')+R(9,4,2,2,'#ffd166')+R(2,4,1,2,'#4fd8e8')+R(13,4,1,2,'#4fd8e8');
-  else head=R(5,0,6,2,'#ff8fc2')+R(6,0,2,1,'#ffd1e8')+R(3,2,10,6,SK)+R(4,3,8,4,'#d9e4f5')+R(4,4,8,2,'#1b6f80')+R(5,4,6,2,'#7fe8ff')+R(6,4,1,2,'#ffffff')+R(9,4,1,2,'#ffffff')+R(2,4,1,2,'#ff8fc2')+R(13,4,1,2,'#ff8fc2');
-  const glow=pw>=4?R(1,0,1,1,'#ffffff')+R(2,1,1,1,TOOL[1])+(pw>=5?R(-1,2,1,1,TOOL[1])+R(1,13,1,1,TOOL[1]):''):'';
-  const shovelBack=R(0,2,1,13,TOOL[0])+R(0,0,2,3,TOOL[1])+glow;
-  let jp=R(1,8,3,7,SK)+R(2,9,1,5,BODY[2])+(sp>=1?R(1,15,3,1,SK):'')+(sp>=5?R(0,10,1,4,SK)+R(0,14,1,1,BODY[2]):'')+(sp>=7?R(-1,8,1,3,BODY[0])+R(-1,12,1,2,BODY[0]):'');
-  const flame=R(1,16,3,2,'#ff9a3c')+R(2,18,1,2,'#ffd166')+(t.body>=2?R(1,18,3,2,'#ff9a3c')+R(2,20,1,2,'#ffffff'):'');
-  const boot=sp>=8?'#ffd166':sp>=1?BODY[2]:SK; // botas ganham faixa colorida e depois douradas
-  const legL=R(5,15,2,5,BODY[1])+R(4,20,4,2,SK)+(sp>=1?R(4,20,4,1,boot):''),legR=R(9,15,2,5,BODY[1])+R(8,20,4,2,SK)+(sp>=1?R(8,20,4,1,boot):'');
-  const torso=R(4,8,8,7,BODY[0])+R(5,9,6,2,BODY[2])+R(4,13,8,1,BODY[1])+(sp>=2?R(7,11,2,2,BODY[2]):'')+(sp>=4?R(3,8,2,2,BODY[2])+R(11,8,2,2,BODY[2]):'')+(sp>=6?R(4,14,8,1,BODY[2]):'');
-  const arm=R(12,8,2,6,BODY[0])+R(12,13,2,2,'#c0c7d4');
-  const shovelHand=R(13,10,1,9,TOOL[0])+R(12,19,3,3,TOOL[1])+(pw>=1?R(12,22,3,1,TOOL[1]):'')+(pw>=3?R(11,20,1,2,TOOL[1])+R(15,20,1,2,TOOL[1]):'')+(pw>=4?R(11,19,1,1,'#ffffff')+R(15,19,1,1,'#ffffff')+R(13,23,1,1,TOOL[1]):'')+(pw>=5?R(10,21,1,1,'#ffffff')+R(16,21,1,1,'#ffffff'):'');
-  return `<svg viewBox="0 0 16 24" shape-rendering="crispEdges"><g class="svb">${shovelBack}</g><g class="jp">${jp}</g><g class="fl">${flame}</g><g class="ll">${legL}</g><g class="lr">${legR}</g><g class="tr">${torso}</g><g class="hd">${head}</g><g class="ar">${arm}</g><g class="svh">${shovelHand}</g></svg>`;
+  if(t.head===0)head=R(6,2,7,7,SK)+R(7,3,5,5,'#9aa7bd')+R(10,4,1,1,SK);
+  else if(t.head===1)head=R(8,0,1,2,'#ff5c93')+R(6,2,7,7,SK)+R(7,3,5,5,'#9aa7bd')+R(9,4,4,2,'#1b6f80')+R(10,4,3,1,'#4fd8e8');
+  else if(t.head===2)head=R(8,0,1,2,'#ffd166')+R(5,2,9,7,SK)+R(6,3,7,5,'#b8c4d8')+R(10,4,2,2,'#ffd166')+R(5,5,1,2,'#4fd8e8');
+  else head=R(6,0,6,3,'#ff8fc2')+R(7,0,2,1,'#ffd1e8')+R(5,2,9,7,SK)+R(6,3,7,5,'#d9e4f5')+R(9,4,4,3,'#1b6f80')+R(10,4,3,2,'#7fe8ff')+R(11,4,1,2,'#ffffff')+R(5,5,1,2,'#ff8fc2');
+  // pá carregada nas costas (por trás do jetpack)
+  const glow=pw>=4?R(0,0,1,1,'#ffffff')+R(3,1,1,1,TOOL[1])+(pw>=5?R(-1,3,1,1,TOOL[1])+R(0,17,1,1,TOOL[1]):''):'';
+  const shovelBack=R(1,3,1,15,TOOL[0])+R(0,0,3,3,TOOL[1])+glow;
+  // jetpack: cresce com o nível de Speed
+  let jp=R(3,9,3,8,SK)+R(4,10,1,6,BODY[2]);
+  if(sp>=2)jp+=R(2,10,1,6,SK);
+  if(sp>=5)jp+=R(0,11,2,3,BODY[0])+R(0,11,2,1,BODY[2]);
+  if(sp>=7)jp+=R(0,15,2,2,BODY[0]);
+  jp+=R(3,17,3,1,SK)+(sp>=3?R(2,17,5,1,SK):'');
+  const flame=R(3,18,3,2,'#ff9a3c')+R(4,20,1,2,'#ffd166')+(sp>=6?R(2,18,5,3,'#ff9a3c')+R(3,21,3,2,'#ffffff'):'');
+  const boot=sp>=8?'#ffd166':sp>=1?BODY[2]:SK;
+  const legBack=R(6,16,3,5,BODY[1])+R(6,21,4,2,SK)+(sp>=1?R(6,21,4,1,boot):'');
+  const legFront=R(9,16,3,5,BODY[1])+R(9,21,5,2,SK)+(sp>=1?R(9,21,5,1,boot):'');
+  const torso=R(8,8,2,1,SK)+R(6,9,6,7,BODY[0])+R(10,10,2,3,BODY[2])+R(6,14,6,1,BODY[1])+(sp>=2?R(7,11,2,2,BODY[2]):'')+(sp>=4?R(7,8,4,2,BODY[2]):'')+(sp>=6?R(6,15,6,1,BODY[2]):'');
+  const arm=R(8,9,3,5,BODY[0])+R(9,13,3,2,'#c0c7d4');
+  const shovelHand=R(12,13,1,9,TOOL[0])+R(11,22,3,2,TOOL[1])+(pw>=1?R(10,22,1,2,TOOL[1])+R(14,22,1,2,TOOL[1]):'')+(pw>=3?R(9,23,1,1,TOOL[1])+R(15,23,1,1,TOOL[1]):'')+(pw>=4?R(10,21,1,1,'#ffffff')+R(14,21,1,1,'#ffffff'):'')+(pw>=5?R(9,22,1,1,'#ffffff')+R(15,22,1,1,'#ffffff'):'');
+  return `<svg viewBox="0 0 16 24" shape-rendering="crispEdges"><g class="svb">${shovelBack}</g><g class="jp">${jp}</g><g class="fl">${flame}</g><g class="lr">${legBack}</g><g class="tr">${torso}</g><g class="hd">${head}</g><g class="ll">${legFront}</g><g class="ar">${arm}<g class="svh">${shovelHand}</g></g></svg>`;
 }
 function houseSVG(){ // oficina mecânica dos bots: garagem de metal com portão, placa de engrenagem, ferramentas e barril de óleo
   const R=(x,y,w,h,c,cl)=>`<rect${cl?` class="${cl}"`:''} x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
@@ -2942,14 +2947,15 @@ function botPath(b,dir){
   return pts;
 }
 function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é a mesma de andar
-  const v=6+.5*b.m.spd;let d=v*dt/1000,moving=false,kind='walk';
-  while(d>1e-6&&b.seg<b.path.length){
+  const v0=4.2+.4*b.m.spd;let moving=false,kind='walk',left=dt/1000;
+  while(left>1e-6&&b.seg<b.path.length){
     const n=b.path[b.seg];
     if(!b.segL){b.sx=b.gx;b.sy=b.gy;b.segL=Math.abs(n.gx-b.sx)+Math.abs(n.gy-b.sy);b.segP=0;if(b.segL<1e-6){b.seg++;b.segL=0;continue}}
-    const st=Math.min(d,b.segL*(1-b.segP));b.segP+=st/b.segL;d-=st;moving=true;kind=n.kind;
+    const edge=Math.min(b.segP,1-b.segP)*b.segL,v=v0*Math.max(.45,Math.min(1,.45+edge/.5)); // acelera ao sair e desacelera ao chegar: movimento suave
+    const st=Math.min(v*left,b.segL*(1-b.segP));left-=st/v;b.segP+=st/b.segL;moving=true;kind=n.kind;
     b.gx=b.sx+(n.gx-b.sx)*b.segP;b.gy=b.sy+(n.gy-b.sy)*b.segP;
     if(Math.abs(n.gx-b.sx)>1e-6)b.face=n.gx>b.sx?1:-1;
-    b.lift=n.kind==='jet'?Math.sin(Math.PI*b.segP)*Math.min(.9,.3+b.segL*.1):0;
+    b.lift=n.kind==='jet'?Math.sin(Math.PI*b.segP)*Math.min(.7,.2+b.segL*.08):0;
     if(b.segP>=.9999){b.gx=n.gx;b.gy=n.gy;b.seg++;b.segL=0}
   }
   b.el.classList.toggle('walk',moving&&kind==='walk');b.el.classList.toggle('fly',moving&&kind==='jet');
@@ -2961,7 +2967,7 @@ function botDoor(){const h=$('#bhouse');h.classList.add('open');clearTimeout(bot
 function botTick(b,now,dt,k,n,P){
   const m=b.m,el0=b.el,hx=(C-1)/2;
   const sg=botTiers(m);if(sg!==b.sig){b.sig=sg;el0.querySelector('.rsp').innerHTML=minerSVG(m)}
-  const H=Math.max(40,Math.min(78,P.py*1.4));el0.style.width=(H*16/24)+'px';el0.style.height=H+'px';
+  const H=Math.max(30,Math.min(58,P.py*1.05));el0.style.width=(H*16/24)+'px';el0.style.height=H+'px';
   if(b.ph==='idle'){
     el0.classList.add('in');
     if(now-b.last>350){b.last=now;
