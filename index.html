@@ -2088,6 +2088,7 @@ function loadCamp(){
   camp=newCamp();
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(j&&typeof j==='object')camp={...camp,...j}}catch(e){}
   if(!camp.newTab)camp.newTab={};
+  if(camp.tabs)camp.tabs=camp.tabs.filter(t=>t!=='loadout'&&t!=='floors');
   if(!camp.bot)camp.bot={own:false,spd:0,rch:0,eff:0};
   if(!camp.worlds)camp.worlds={mine:true};if(!camp.world)camp.world='mine';if(!camp.wvis)camp.wvis={};if(!camp.weed)camp.weed=0;
 }
@@ -2230,8 +2231,8 @@ function quip(ctx,vars){
 const cpcVal=()=>1+camp.cpc;
 const clearMult=()=>1+camp.clear*.25;
 const coolSecs=()=>Math.max(3,Math.round(6+SIZES[camp.size]*1.2-camp.cool)); // tabuleiros maiores esperam mais
-const activeMods=()=>Object.keys(MODS).filter(k=>camp.eq[k]&&camp.un[k]&&SIZES[camp.size]>=MODS[k].min);
-const activeFloor=()=>{const f=camp.eqFloor;return f&&camp.un[f]&&SIZES[camp.size]>=FMODS[f].min?f:''};
+const activeMods=()=>[]; // modos serão ligados por mundo, não por loadout
+const activeFloor=()=>'';
 const modReward=()=>1+(activeMods().reduce((s,k)=>s+MODS[k].r,0)+(activeFloor()?FMODS[activeFloor()].r:0))/100;
 const lossPct=()=>Math.min(60,12+activeMods().reduce((s,k)=>s+MODS[k].k,0)+(activeFloor()?FMODS[activeFloor()].k:0));
 const COST={
@@ -2271,10 +2272,9 @@ function tabsAvail(){
   if(w>=1||camp.total>=40)t.push('shop');
   if(camp.losses>=1||w>=5||camp.shields>0)t.push('items');
   if(w>=12||s>=3||camp.drones.some(n=>n>0))t.push('drones');
-  if((s>=3&&w>=25)||Object.keys(camp.un).length)t.push('loadout');
   return t;
 }
-const floorsAvail=()=>(camp.size>=4&&camp.wins>=40)||!!camp.eqFloor||Object.keys(FMODS).some(k=>camp.un[k]);
+const floorsAvail=()=>false; // loadouts/pisos removidos: cada modo agora pertence a um mundo
 function checkUnlocks(silent){
   const now=tabsAvail(),have=camp.tabs||[],added=now.filter(t=>!have.includes(t)),fl=floorsAvail();
   const firstRun=camp.tabs===null;camp.tabs=now;
