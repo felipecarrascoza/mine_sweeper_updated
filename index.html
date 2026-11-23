@@ -553,7 +553,7 @@
   html[data-world="forest"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
   html[data-world="forest"] .bub{background:#4f8a2a;opacity:.45;border-radius:0}
   .bush{position:absolute;inset:0;z-index:1;pointer-events:none;transform-origin:50% 80%}
-  .bush svg{position:absolute;left:50%;top:50%;width:round(down,var(--cell),12px);height:round(down,var(--cell),12px);transform:translate(-50%,-50%);shape-rendering:crispEdges;overflow:visible}
+  .bush svg{position:absolute;left:50%;top:50%;width:round(down,var(--cell),16px);height:round(down,var(--cell),16px);transform:translate(-50%,-50%);shape-rendering:crispEdges;overflow:visible}
   .bush .rt{position:absolute;width:22%;height:22%;max-width:9px;max-height:9px;min-width:5px;min-height:5px;background:#6b4423;border:1px solid #2a1a0c;z-index:2;font-style:normal;transition:background .15s}
   .bush .rt.t{left:50%;top:1px;transform:translateX(-50%)}.bush .rt.b{left:50%;bottom:1px;transform:translateX(-50%)}
   .bush .rt.l{top:50%;left:1px;transform:translateY(-50%)}.bush .rt.r{top:50%;right:1px;transform:translateY(-50%)}
@@ -2166,7 +2166,7 @@ function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorag
 const CSTR={
   en:{shop:'Upgrades',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
-    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',wMine:'Classic',wGrass:'Grasslands',wForest:'Forest',wDesert:'Desert',wd_grass:m=>`Weeds need ${WEED_BASE} hits to break. Pays ×${m}.`,wd_forest:m=>`Rooted bushes: open or flag the 4 blocks around first. Pays ×${m}.`,wd_desert:m=>`Sandstorms bury a row and its flags. Pays ×${m}.`,wFirstForest:'A forest. Bushes with roots. Open or flag the four blocks around one and it lets go. Nature is rude.',wFirstDesert:'A desert. Sand gets everywhere. Especially over your flags. Enjoy.',bushTip:'That bush is rooted. Open or flag the 4 blocks around it first. See the little roots? They light up.',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',wMine:'Classic',wGrass:'Grasslands',wForest:'Forest',wDesert:'Desert',wd_grass:m=>`Weeds need ${WEED_BASE} hits to break. Pays ×${m}.`,wd_forest:m=>`Rooted bushes: open or flag any 4 of the 8 blocks around first. Pays ×${m}.`,wd_desert:m=>`Sandstorms bury a row and its flags. Pays ×${m}.`,wFirstForest:'A forest. Bushes with roots. Open or flag any four of the eight blocks around one and it lets go. Nature is rude.',wFirstDesert:'A desert. Sand gets everywhere. Especially over your flags. Enjoy.',bushTip:'That bush is rooted. Open or flag any 4 of the 8 blocks around it. See the roots growing under them?',wTitle:'Worlds',wLocked:'Locked. Buy this world in Upgrades.',wBuyD:m=>`New biome. Weeds need ${WEED_BASE} hits. Pays ×${m}.`,wNeed:n=>`Needs ${n}×${n}`,weedCut:'Weed cutter',weedCutD:h=>`Weeds break in ${h} hits.`,weedTip:h=>`That's a weed. It takes ${h} hits. Yes, hits. Violence is the answer.`,wFirstGrass:'Grasslands. Pretty, isn\'t it? Flowers, sunshine, and weeds that hate you. Try not to cry.',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
@@ -2177,7 +2177,7 @@ const CSTR={
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Melhorias',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
-    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',wMine:'Clássico',wGrass:'Campos',wForest:'Floresta',wDesert:'Deserto',wd_grass:m=>`Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wd_forest:m=>`Arbustos com raiz: abra ou marque os 4 blocos em volta antes. Paga ×${m}.`,wd_desert:m=>`Tempestades de areia cobrem uma linha e as bandeiras. Paga ×${m}.`,wFirstForest:'Uma floresta. Arbustos com raiz. Abra ou marque os quatro blocos em volta e ele solta. A natureza é grossa.',wFirstDesert:'Um deserto. Areia entra em tudo. Principalmente nas suas bandeiras. Aproveite.',bushTip:'Esse arbusto tem raiz. Abra ou marque os 4 blocos em volta primeiro. Viu as raizinhas? Elas acendem.',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',wMine:'Clássico',wGrass:'Campos',wForest:'Floresta',wDesert:'Deserto',wd_grass:m=>`Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wd_forest:m=>`Arbustos com raiz: abra ou marque 4 dos 8 blocos em volta antes. Paga ×${m}.`,wd_desert:m=>`Tempestades de areia cobrem uma linha e as bandeiras. Paga ×${m}.`,wFirstForest:'Uma floresta. Arbustos com raiz. Abra ou marque quatro dos oito blocos em volta e ele solta. A natureza é grossa.',wFirstDesert:'Um deserto. Areia entra em tudo. Principalmente nas suas bandeiras. Aproveite.',bushTip:'Esse arbusto tem raiz. Abra ou marque 4 dos 8 blocos em volta. Viu as raízes crescendo embaixo deles?',wTitle:'Mundos',wLocked:'Bloqueado. Compre este mundo em Melhorias.',wBuyD:m=>`Novo bioma. Ervas pedem ${WEED_BASE} golpes. Paga ×${m}.`,wNeed:n=>`Pede ${n}×${n}`,weedCut:'Podador',weedCutD:h=>`Ervas caem em ${h} golpes.`,weedTip:h=>`Isso é uma erva daninha. Precisa de ${h} golpes. Sim, golpes. Violência é a resposta.`,wFirstGrass:'Campos. Bonito, né? Flores, sol e ervas que te odeiam. Tente não chorar.',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
@@ -2388,7 +2388,7 @@ function renderCards(){
     WORLDS.forEach(w=>{if(w.id==='mine'||camp.worlds[w.id])return;
       const nm=ct(WN[w.id]);
       cs.push(bestSize()>=w.need?card({ic:w.ic,name:nm,sub:ct('wTitle'),pr:money(w.cost),act:'buy:world:'+w.id,dis:camp.coins<w.cost,cls:ok(w.cost),tip:ct('wd_'+w.id,w.mult),desc:ct('wd_'+w.id,w.mult)}):card({ic:':lock:',name:nm,sub:ct('wNeed',SIZES[w.need]),dis:true}))});
-    if(camp.wvis.grass)cs.push(camp.weed<WEED_MAX?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
+    if(camp.world==='grass')cs.push(camp.weed<WEED_MAX?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
   }else if(curTab==='items'){
     cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD'),desc:ct('cShieldD')})
       :card({ic:':shield:',name:ct('cShield'),sub:'5/5 '+ct('max'),dis:true}));
@@ -2532,36 +2532,44 @@ function decorateGrass(){ // decoração aleatória e sem efeito no jogo: flores
   if(camp.world==='desert')cells.forEach(c=>{if(Math.random()<.1){c.classList.add('cac');c.style.setProperty('--fx',(8+Math.random()*84).toFixed(0)+'%');c.style.setProperty('--fy',(8+Math.random()*84).toFixed(0)+'%')}});
 }
 let bushList=[];
-const ROOTURL=(()=>{ // raiz em pixels que entra pela borda do bloco quebrado voltada para o arbusto
-  const dk='#5c3b1c',lt='#8b5a2b',P=[[5,8,dk],[6,8,dk],[5,9,dk],[6,9,dk],[5,10,dk],[6,10,dk],[5,11,dk],[6,11,dk],[4,9,lt],[3,10,lt],[7,10,lt],[8,9,lt],[9,10,lt],[2,11,lt],[10,11,lt],[5,7,lt],[6,7,lt]];
-  const base=P.map(([x,y,c])=>`<rect x='${x}' y='${y}' width='1' height='1' fill='${c}'/>`).join(''),rot={b:0,l:90,t:180,r:270},o={};
-  for(const k in rot)o[k]='url("data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' shape-rendering='crispEdges'><g transform='rotate(${rot[k]} 6 6)'>${base}</g></svg>`)+'")';
+const ROOTURL=(()=>{ // raízes em pixels que entram pela borda (ou pelo canto) do bloco quebrado voltado para o arbusto
+  const dk='#5c3b1c',lt='#8b5a2b',mk=P=>P.map(([x,y,c])=>`<rect x='${x}' y='${y}' width='1' height='1' fill='${c}'/>`).join('');
+  const D=(l)=>l.map(([x,y])=>[x,y,dk]),L=(l)=>l.map(([x,y])=>[x,y,lt]); // "raizona": tronco grosso que sobe quase até o centro, com várias ramificações
+  const side=mk([...D([[4,11],[5,11],[6,11],[7,11],[4,10],[5,10],[6,10],[7,10],[5,9],[6,9],[5,8],[6,8],[5,7],[6,7],[5,6],[6,6],[5,5],[6,5],[6,4],[6,3]]),
+    ...L([[3,9],[2,9],[1,10],[0,10],[0,11],[7,9],[8,9],[9,10],[10,10],[11,11],[4,7],[3,6],[2,6],[1,5],[7,6],[8,5],[9,5],[10,4],[4,5],[3,4],[7,4],[8,3],[5,4],[5,3],[6,2]])]);
+  const diag=mk([...D([[11,11],[10,11],[11,10],[10,10],[9,10],[10,9],[9,9],[8,9],[9,8],[8,8],[7,8],[8,7],[7,7],[6,7],[7,6],[6,6],[5,6],[6,5],[5,5],[4,5],[5,4],[4,4],[3,3]]),
+    ...L([[11,8],[10,7],[9,6],[8,5],[11,7],[8,11],[7,10],[6,9],[5,8],[7,11],[4,7],[3,6],[7,4],[6,3],[5,2],[2,5],[3,4],[4,3],[10,6],[6,10]])]);
+  const defs={b:[side,0],l:[side,90],t:[side,180],r:[side,270],br:[diag,0],bl:[diag,90],tl:[diag,180],tr:[diag,270]},o={};
+  for(const k in defs){const [g,rot]=defs[k];o[k]='url("data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' shape-rendering='crispEdges'><g transform='rotate(${rot} 6 6)'>${g}</g></svg>`)+'")'}
   return o;
 })();
+const BUSH_NEED=4; // basta quebrar (abrir ou marcar) quaisquer 4 dos 8 blocos em volta
 function bushRoots(){ // as raízes aparecem embaixo de cada bloco em volta do arbusto que já foi quebrado (ou marcado)
-  const want=new Map();
+  const want=new Map(),OFF=[[0,-1,'b'],[1,0,'l'],[0,1,'t'],[-1,0,'r'],[-1,-1,'br'],[1,-1,'bl'],[-1,1,'tr'],[1,1,'tl']];
   bushList.forEach(i=>{const x=i%C,y=i/C|0;
-    [[0,-1,'b'],[1,0,'l'],[0,1,'t'],[-1,0,'r']].forEach(([dx,dy,side])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
+    OFF.forEach(([dx,dy,side])=>{const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)return;
       const g=grid[b][a];if(g.o||g.f!==0){const k=b*C+a;if(!want.has(k))want.set(k,new Set());want.get(k).add(side)}})});
-  cells.forEach((c,i)=>{const w=want.get(i),key=w?[...w].sort().join(''):'';if((c.dataset.rts||'')===key)return;c.dataset.rts=key;
+  cells.forEach((c,i)=>{const w=want.get(i),key=w?[...w].sort().join(','):'';if((c.dataset.rts||'')===key)return;c.dataset.rts=key;
     if(!key){c.classList.remove('hasroot');c.style.removeProperty('--roots');return}
     c.style.setProperty('--roots',[...w].map(sd=>ROOTURL[sd]).join(','));c.classList.add('hasroot')});
 }
-function bushPips(x,y){ // [cima,direita,baixo,esquerda]: true = bloco em volta já aberto (ou marcado com bandeira)
-  const ok=(a,b)=>a<0||b<0||a>=C||b>=R||grid[b][a].o||grid[b][a].f!==0;
-  return [ok(x,y-1),ok(x+1,y),ok(x,y+1),ok(x-1,y)];
-}
-const bushLocked=(x,y)=>bushPips(x,y).some(v=>!v);
-function bushSVG(){ // arbusto: nuvenzinha circular verde-escura, em pixels
-  const N=12,ri=(a,b)=>a+Math.random()*(b-a),d=[[6,6,4.6]];
-  for(let i=0;i<4;i++){const a=Math.random()*6.283;d.push([6+Math.cos(a)*2.6,6+Math.sin(a)*2.4,ri(2.3,3.3)])}
-  let h=`<svg viewBox="0 0 ${N} ${N}">`;
+const bushCleared=(x,y)=>neighbors(x,y).filter(([a,b])=>grid[b][a].o||grid[b][a].f!==0).length;
+const bushLocked=(x,y)=>bushCleared(x,y)<BUSH_NEED;
+function bushSVG(){ // arbusto folhoso em pixel art (16×16): monte de folhas com borda irregular, luz no alto, frutinhas e caule
+  const N=16,ri=(a,b)=>a+Math.random()*(b-a),j=()=>ri(-.7,.7);
+  const D=[[8,9.4,4.5],[4,9.8,3.4],[12,9.8,3.4],[5.4,7.4,3.5],[10.6,7.4,3.5],[8,6.6,3.6]].map(([x,y,r])=>[x+j(),y+j(),r+ri(-.3,.3)]);
+  const inn=(x,y)=>y<=13&&D.some(([cx,cy,r])=>Math.hypot(x+.5-cx,y+.5-cy)<=r);
+  let h=`<svg viewBox="0 0 ${N} ${N}">`;const R=(x,y,c)=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`;
+  for(let x=3;x<=12;x++)h+=R(x,14,'#0a2410'); // sombra no chão
+  h+=R(7,14,'#5c3b1c')+R(8,14,'#5c3b1c')+R(7,13,'#5c3b1c');
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-    const inn=d.some(([cx,cy,r])=>Math.hypot(x+.5-cx,y+.5-cy)<=r);if(!inn)continue;
-    const edge=!d.some(([cx,cy,r])=>Math.hypot(x+.5-cx,y+.5-cy)<=r-1.1);
-    const c=edge?(y<5?'#1f6a2c':'#0f3a18'):(y<5?(x<6?'#1b5a27':'#174d22'):'#123f1c');
-    h+=`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`}
-  for(let k=0;k<3;k++){const x=Math.floor(ri(2,9)),y=Math.floor(ri(2,6));h+=`<rect x="${x}" y="${y}" width="1" height="1" fill="#2c8a3a"/>`}
+    if(!inn(x,y))continue;
+    const edge=!inn(x-1,y)||!inn(x+1,y)||!inn(x,y-1)||!inn(x,y+1);
+    let c=edge?'#0e3416':(y<6?(x<8?'#2c8a3a':'#1f6a2c'):y<10?(x<8?'#1f6a2c':'#1a5a26'):'#134520');
+    h+=R(x,y,c)}
+  for(let k=0;k<9;k++){const x=Math.floor(ri(3,12)),y=Math.floor(ri(3,11));if(inn(x,y)&&inn(x+1,y+1)&&inn(x-1,y))h+=R(x,y,'#4fc25a')+R(x+1,y+1,'#3fae4c')} // folhinhas claras
+  for(let k=0;k<7;k++){const x=Math.floor(ri(3,12)),y=Math.floor(ri(6,12));if(inn(x,y)&&inn(x,y+1))h+=R(x,y,'#0e3416')+R(x-1,y+1,'#0e3416')} // folhas escuras (profundidade)
+  for(let k=0,n=2+Math.floor(Math.random()*2);k<n;k++){const x=Math.floor(ri(4,11)),y=Math.floor(ri(6,11));if(inn(x,y))h+=R(x,y,'#e0525f')} // frutinhas
   return h+'</svg>';
 }
 function placeBushes(sx,sy){
@@ -2569,13 +2577,13 @@ function placeBushes(sx,sy){
   for(let y=1;y<R-1;y++)for(let x=1;x<C-1;x++)if(!ban.has(y*C+x))c.push(y*C+x);
   shuffle(c);const k=Math.max(1,Math.round(C*R*.07)),ch=[];
   for(const i of c){if(ch.length>=k)break;const x=i%C,y=i/C|0;
-    if(ch.some(j=>Math.abs((j%C)-x)+Math.abs((j/C|0)-y)<=1))continue;ch.push(i)}
+    if(ch.some(j=>Math.max(Math.abs((j%C)-x),Math.abs((j/C|0)-y))<=1))continue;ch.push(i)}
   ch.forEach(i=>{grid[i/C|0][i%C].b=1;
     const b=document.createElement('i');b.className='bush';b.innerHTML=bushSVG();cells[i].appendChild(b);bushList.push(i);bushRefresh(i)});
 }
 function bushRefresh(i){
   const x=i%C,y=i/C|0,g=grid[y][x],b=cells[i]&&cells[i].querySelector('.bush');if(!b||!g.b)return;
-  const rd=bushPips(x,y).every(Boolean);if(rd&&!b.classList.contains('ready')&&started)SFX.build(i);
+  const rd=!bushLocked(x,y);if(rd&&!b.classList.contains('ready')&&started)SFX.build(i);
   b.classList.toggle('ready',rd);
 }
 function bushDeny(x,y){
