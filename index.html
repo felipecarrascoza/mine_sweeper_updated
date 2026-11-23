@@ -578,7 +578,7 @@
   html[data-world="desert"] .cell:not(.open){background-color:#e3bd74;background-image:radial-gradient(#0000001a 1px,transparent 1.5px);background-size:7px 7px;box-shadow:inset 3px 3px 0 #f6dc9f,inset -3px -3px 0 #b88f4a}
   html[data-world="desert"] .cell.open{background:#6a4d2b;box-shadow:inset 0 0 0 1px #8a6a3d}
   html[data-world="desert"] .cell.open.neg{background:#1f3d6b;box-shadow:inset 0 0 0 2px #2d6fd0}
-  html[data-world="desert"] .cell.cac:not(.open){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 10' shape-rendering='crispEdges'%3E%3Crect x='3' y='1' width='2' height='9' fill='%233f9a46'/%3E%3Crect x='4' y='1' width='1' height='9' fill='%2326702e'/%3E%3Crect x='1' y='4' width='1' height='3' fill='%233f9a46'/%3E%3Crect x='2' y='6' width='1' height='1' fill='%233f9a46'/%3E%3Crect x='6' y='3' width='1' height='3' fill='%233f9a46'/%3E%3Crect x='5' y='5' width='1' height='1' fill='%233f9a46'/%3E%3Crect x='4' y='0' width='1' height='1' fill='%23ff8fc2'/%3E%3C/svg%3E"),radial-gradient(#0000001a 1px,transparent 1.5px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.5),8px) auto,7px 7px;image-rendering:pixelated}
+  html[data-world="desert"] .cell.cac:not(.open){background-image:var(--cacimg),radial-gradient(#0000001a 1px,transparent 1.5px);background-repeat:no-repeat,repeat;background-position:var(--fx,50%) var(--fy,50%),0 0;background-size:round(down,calc(var(--cell)*.62),10px) auto,7px 7px;image-rendering:pixelated}
   html[data-world="desert"] .bub{background:#f6dc9f;opacity:.5;border-radius:0}
   html[data-world="desert"] .tidewave .fill{background:linear-gradient(#fff3c4 0 7px,#f1d58b 7px 14px,transparent 14px),repeating-linear-gradient(0deg,#d9b46a 0 8px,#c39a52 8px 16px);box-shadow:0 0 30px #e8c982}
   html[data-world="desert"] .tidewave .edge{background:repeating-linear-gradient(0deg,#fff3c4 0 6px,#e8c982 6px 12px);box-shadow:0 0 18px #ffe9a8}
@@ -2526,10 +2526,24 @@ function weedSVG(){ // pixel art: talos entrelaçados e florzinhas desenhados em
     h+=`<g data-t="${f(.1+Math.random()*.85)}">${px(cx,cy-1,'#ffd166')+px(cx-1,cy,'#ffd166')+px(cx+1,cy,'#ffd166')+px(cx,cy+1,'#ffd166')+px(cx,cy,'#f5b72e')}</g>`}
   return h+'</svg>';
 }
+const CACTI=(()=>{ // vários modelos de cacto em pixel art (10×10)
+  const PAL={l:'#6cc04a',g:'#3f9a46',G:'#26702e',s:'#fff3c4',p:'#ff8fc2',y:'#ffd166',r:'#d94452'};
+  const M=[
+   ["....lg....","....lG....","..l.lG....","..g.lG.l..","..gglG.g..","....lGgg..","....lG....","....lG....","....lG....","....lG...."], // saguaro com dois braços
+   ["....yp....","....lg....","..l.lG....","..g.lG.l..","..gglG.g..","....lGgg..","....lG....","....lG....","....lG....","....lG...."], // saguaro com florzinha no topo
+   ["....pp....","...pyp....","...gggg...","..gllgGg..",".gllsgggG.",".glgggsgG.",".ggggggGG.","..gggGGG..","...GGGG...",".........."], // redondo com flor em cima
+   ["..........","..........","..........","...gggg...","..gllgGg..",".gllsgggG.",".glgggsgG.",".ggggggGG.","..gggGGG..","...GGGG..."], // redondo sem flor
+   ["..r....r..",".gggg.ggg.",".glggggGg.",".gggGgggG.","..gGGggG..","...gggg...","..gglgGg..","..glgggG..","...gGGg...","....GG...."], // palma (figo-da-índia) com frutinhas
+   ["..lg...lg.","..lG...lG.","..lG...lG.","..lGg.glG.","...lGggG..","....lGG...","....lG....","....lG....","....lG....","....lG...."], // duas pontas
+   ["....pp....","....yp....","....lg....","...lggG...","...lggG...","...lggG...","...lggG...","...lggG...","...lggG...","...lggG..."]  // coluna alta com flor
+  ];
+  return M.map(g=>{let r='';g.forEach((row,y)=>[...row].forEach((c,x)=>{if(PAL[c])r+=`<rect x='${x}' y='${y}' width='1' height='1' fill='${PAL[c]}'/>`}));
+    return 'url("data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' shape-rendering='crispEdges'>${r}</svg>`)+'")'});
+})();
 function decorateGrass(){ // decoração aleatória e sem efeito no jogo: flores (campo) e cactos (deserto), dentro da própria casa
   if(!camp)return;
   if(camp.world==='grass')cells.forEach(c=>{if(Math.random()<.09){c.classList.add(Math.random()<.5?'fl':'fl2');c.style.setProperty('--fx',(12+Math.random()*60).toFixed(0)+'%');c.style.setProperty('--fy',(12+Math.random()*60).toFixed(0)+'%')}});
-  if(camp.world==='desert')cells.forEach(c=>{if(Math.random()<.1){c.classList.add('cac');c.style.setProperty('--fx',(8+Math.random()*84).toFixed(0)+'%');c.style.setProperty('--fy',(8+Math.random()*84).toFixed(0)+'%')}});
+  if(camp.world==='desert')cells.forEach(c=>{if(Math.random()<.1){c.classList.add('cac');c.style.setProperty('--cacimg',CACTI[Math.random()*CACTI.length|0]);c.style.setProperty('--fx',(8+Math.random()*84).toFixed(0)+'%');c.style.setProperty('--fy',(8+Math.random()*84).toFixed(0)+'%')}});
 }
 let bushList=[];
 const ROOTURL=(()=>{ // raízes em pixels que entram pela borda (ou pelo canto) do bloco quebrado voltado para o arbusto
