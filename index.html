@@ -478,6 +478,28 @@
   #cineFace{width:150px;height:150px;font-size:96px;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:var(--panel2);border-radius:3px;box-shadow:0 0 40px #ff2d5555}
   #cineBox{max-width:min(520px,92vw);min-height:92px;display:flex;align-items:center;justify-content:center;background:var(--panel);border:2px solid var(--cyan);padding:14px 18px;font-size:16px;line-height:1.5;text-align:center}
   #cineHint{color:var(--muted);font-size:11px}
+  #rbot{position:fixed;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;z-index:20;pointer-events:none;opacity:0;transition:left .42s ease-in-out,top .42s ease-in-out,opacity .25s,filter .3s}
+  #rbot.on{opacity:1}
+  #rbotIc{display:block;width:46px;height:46px;animation:rbHover 1.1s ease-in-out infinite;filter:drop-shadow(0 0 6px #4fd8e8cc)}
+  #rbotIc .px{width:46px;height:46px}
+  #rbot.mine #rbotIc{animation:rbDrill .08s linear infinite}
+  #rbot.rest{filter:saturate(.25) brightness(.7)}
+  #rbot.rest #rbotIc{animation:none;filter:none}
+  #rbeam{position:absolute;left:50%;top:84%;width:4px;height:0;margin-left:-2px;background:linear-gradient(#fff6c2,#ff9a3c);box-shadow:0 0 10px #ffb347;opacity:0}
+  #rbot.mine #rbeam{opacity:1;height:var(--bh,26px);animation:rbBeam .1s steps(2) infinite}
+  #rbat{position:absolute;left:50%;top:-12px;width:34px;height:7px;margin-left:-17px;border:1px solid #4fd8e8;background:#030812;display:none}
+  #rbat i{display:block;height:100%;width:0;background:#7fff9f}
+  #rbot.rest #rbat{display:block}
+  #rneed{position:absolute;right:-6px;top:-10px;color:#ffd166;font-size:16px;display:none;animation:blinkN .6s steps(2) infinite}
+  #rbot.need #rneed{display:block}
+  @keyframes rbHover{50%{transform:translateY(-4px)}}
+  @keyframes rbDrill{0%{transform:translate(-1px,1px)}50%{transform:translate(1px,-1px)}100%{transform:translate(-1px,0)}}
+  @keyframes rbBeam{50%{opacity:.55}}
+  @keyframes blinkN{50%{opacity:0}}
+  #rcrack{position:fixed;z-index:19;pointer-events:none;display:none;mix-blend-mode:normal}
+  #rcrack.c1{background:linear-gradient(135deg,transparent 46%,#000b 47% 53%,transparent 54%)}
+  #rcrack.c2{background:linear-gradient(135deg,transparent 46%,#000b 47% 53%,transparent 54%),linear-gradient(45deg,transparent 56%,#000b 57% 62%,transparent 63%)}
+  #rcrack.c3{background:linear-gradient(135deg,transparent 40%,#000d 41% 55%,transparent 56%),linear-gradient(45deg,transparent 52%,#000d 53% 64%,transparent 65%),linear-gradient(90deg,transparent 48%,#000c 49% 53%,transparent 54%);box-shadow:inset 0 0 14px #ffb34788}
   html.hascur,html.hascur *{cursor:none!important}
   #cur{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;width:26px;height:26px;margin:0;opacity:0;transition:opacity .15s;will-change:transform}
   #cur.on{opacity:1}
@@ -683,6 +705,8 @@
   <div class="row"><button id="again" data-i18n="again">Play again</button><button id="review" class="alt" data-i18n="review">🔍 Review</button><button id="toMenu" class="alt" data-i18n="toMenu">Menu</button></div></div></div>
 <canvas id="fx"></canvas>
 <div id="toast"></div>
+<div id="rcrack"></div>
+<div id="rbot"><i id="rbotIc">:drone3:</i><i id="rbeam"></i><i id="rbat"><i></i></i><b id="rneed">!</b></div>
 <div id="cur"><svg class="arr" viewBox="0 0 13 13" shape-rendering="crispEdges"></svg></div>
 <div id="bossTag" hidden></div>
 <div id="cine" hidden><div id="cineFace">😏</div><div id="cineBox"><span id="cineText"></span></div><small id="cineHint"></small></div>
@@ -2004,15 +2028,20 @@ const iconImg=name=>`<img class="px" src="${iconURL(name)}" alt=":${name}:" drag
 const SIZES=[3,4,5,6,7,8,9,10,12];
 const MINES=[1,2,4,6,9,12,16,21,32];
 const SIZE_COST=[0,90,420,2000,9000,40000,160000,700000,2500000];
+const BOT_NEED=3,BOT_MAX={spd:8,rch:8,eff:5};
+const BOT_COST={buy:()=>2500,spd:()=>Math.round(600*Math.pow(1.4,camp.bot.spd)),rch:()=>Math.round(500*Math.pow(1.4,camp.bot.rch)),eff:()=>Math.round(1200*Math.pow(1.6,camp.bot.eff))};
+const botMineMs=()=>Math.round(3000*Math.pow(.85,camp.bot.spd)),botRestMs=()=>Math.round(2500*Math.pow(.85,camp.bot.rch)),botEff=()=>.5+.06*camp.bot.eff;
+const fmtS=ms=>(ms/1000).toFixed(ms<1000?2:1)+'s';
 const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,need:2},{n:'Mk III',every:120,yield:300,need:4}];
 const MODS={negative:{r:50,k:8,min:4,cost:250,tier:3,tag:'-1'},multi:{r:100,k:10,min:4,cost:500,tier:3,tag:'x3'},mirror:{r:50,k:10,min:4,cost:1200,tier:4,tag:'| |'},
   liar:{r:35,k:8,min:5,cost:700,tier:4,tag:'+-1'},partial:{r:45,k:12,min:5,cost:1000,tier:5,tag:'<>'},echo:{r:60,k:12,min:6,cost:2500,tier:5,tag:'))'},tide:{r:80,k:15,min:6,cost:5000,tier:6,tag:'~~'}};
 const FMODS={irr:{r:25,k:8,min:4,cost:600,tier:4,tag:'IRR'},torus:{r:40,k:8,min:4,cost:1100,tier:5,tag:'TOR'},tri:{r:50,k:10,min:4,cost:2000,tier:6,tag:'TRI'}};
-const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false});
+const newCamp=()=>({coins:0,total:0,size:0,cpc:0,clear:0,cool:0,shields:0,shieldBought:0,drones:[0,0,0],droneT:[0,0,0],un:{},eq:{},eqFloor:'',introDone:false,last:Date.now(),wins:0,losses:0,streak:0,boards:0,tabs:null,newTab:{},floorsOn:false,bot:{own:false,spd:0,rch:0,eff:0}});
 function loadCamp(){
   camp=newCamp();
   try{const j=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(j&&typeof j==='object')camp={...camp,...j}}catch(e){}
   if(!camp.newTab)camp.newTab={};
+  if(!camp.bot)camp.bot={own:false,spd:0,rch:0,eff:0};
 }
 let noSave=false;
 function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(camp))}catch(e){}}
@@ -2021,7 +2050,7 @@ function saveCamp(){if(!camp||noSave)return;camp.last=Date.now();try{localStorag
 const CSTR={
   en:{shop:'Upgrades',items:'Items',drones:'Drones',loadout:'Loadout',
     cSize:n=>`Board ${n}×${n}`,cSizeD:'More cells, more coins, more mines.',cCpc:'Coins / cell',cCpcD:v=>`Each safe cell pays ${v} :coin:.`,
-    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
+    cClear:'Clear bonus',cClearD:m=>`Clearing a board pays ×${m} extra.`,cCool:'Reload',cCoolD:s=>`Next board in ${s}s.`,cShield:'Shield',cShieldD:'Absorbs one mine. Max 5.',droneDesc:'Mines coins on its own, even while you play.',phase:(n,m)=>`Board ${n} / ${m}`,phaseBoss:'BOSS BOARD',botName:'Mining Robot',botBuyD:'Mines safe blocks on its own. Pays 50%. Off in boss, Liar and Partial.',botNeed:n=>`Needs ${n}×${n}`,botSpd:'Drill',botRch:'Recharge',botEff:'Efficiency',botSpdD:v=>`Breaks a block in ${v}.`,botRchD:v=>`Rests ${v} between blocks.`,botEffD:v=>`Pays ${v}% of coins.`,botBought:'My robot is online. It only touches what is certain. Unlike you.',demoT:'Wait.',demoQ:'You want to call the Boss right now? Demo cheat detected. Are you sure? There is no going back (well, there is, but dramatically).',demoYes:'Yes, bring it',demoNo:'No, sorry',phaseLeft:k=>`Boss in ${k}`,tapHint:'tap to continue',bossHeh:'heh...',bossTag:'BOSS · no shields · lose = lose ALL',bossIntro:p=>`BOSS board. More mines, shields don't work, and a loss takes ALL your coins. Win and you get ${p}. No pressure.`,bossLost:'Everything. Gone. I told you it was a boss.',bossWon:p=>`...You won ${p}. I demand a rematch. And a lawyer.`,
     perMin:'/min',perMinT:'Coins per minute from this row of drones',lvl:n=>`Lv ${n}`,max:'MAX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Needs ${n}×${n}`,
     yardEmpty:'No drones yet. Buy one and watch it work.',modD:(r,k)=>`+${r}% coins, +${k}% loss`,needs:n=>`Needs ${n}×${n}`,unlock:'Unlock',equip:'Equip',equipped:'Equipped',
     modMult:(m,l)=>`Coin bonus ×${m} · loss on a mine ${l}%`,floorWord:'Floor',
@@ -2032,7 +2061,7 @@ const CSTR={
     tutBtn:'Replay tutorial',resetBtn:'Reset progress',resetT:'Reset everything?',resetP:'This deletes your coins, upgrades and drones.',yes:'Yes, reset',no:'Cancel',skipIntro:'Skip >>'},
   pt:{shop:'Melhorias',items:'Itens',drones:'Drones',loadout:'Equipar',
     cSize:n=>`Tabuleiro ${n}×${n}`,cSizeD:'Mais casas, mais moedas, mais minas.',cCpc:'Moedas / casa',cCpcD:v=>`Cada casa segura paga ${v} :coin:.`,
-    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
+    cClear:'Bônus de limpeza',cClearD:m=>`Limpar o tabuleiro paga ×${m} extra.`,cCool:'Recarga',cCoolD:s=>`Próximo tabuleiro em ${s}s.`,cShield:'Escudo',cShieldD:'Absorve uma mina. Máx. 5.',droneDesc:'Minera moedas sozinho, até enquanto você joga.',phase:(n,m)=>`Tabuleiro ${n} / ${m}`,phaseBoss:'TABULEIRO CHEFE',botName:'Robô Minerador',botBuyD:'Quebra blocos seguros sozinho. Paga 50%. Desligado no chefe, Mentiroso e Parcial.',botNeed:n=>`Pede ${n}×${n}`,botSpd:'Broca',botRch:'Recarga',botEff:'Eficiência',botSpdD:v=>`Quebra um bloco em ${v}.`,botRchD:v=>`Descansa ${v} entre blocos.`,botEffD:v=>`Paga ${v}% das moedas.`,botBought:'Meu robô está online. Ele só mexe no que é certo. Diferente de você.',demoT:'Espera.',demoQ:'Quer chamar o Chefe agora? Truque de demo detectado. Tem certeza? Não tem volta (tem, mas de forma dramática).',demoYes:'Sim, pode vir',demoNo:'Não, desculpa',phaseLeft:k=>`Chefe em ${k}`,tapHint:'toque para continuar',bossHeh:'hehe...',bossTag:'CHEFE · sem escudo · perder = perder TUDO',bossIntro:p=>`Tabuleiro CHEFE. Mais minas, escudo não funciona e perder leva TODAS as moedas. Ganhou, leva ${p}. Sem pressão.`,bossLost:'Tudo. Foi-se. Eu avisei que era chefe.',bossWon:p=>`...Você ganhou ${p}. Exijo revanche. E um advogado.`,
     perMin:'/min',perMinT:'Moedas por minuto desta fileira de drones',lvl:n=>`Nv ${n}`,max:'MÁX',droneName:n=>`Drone ${n}`,droneD:(e,y)=>`+${y} :coin: / ${e}s`,droneNeed:n=>`Pede ${n}×${n}`,
     yardEmpty:'Ainda sem drones. Compre um e veja trabalhar.',modD:(r,k)=>`+${r}% moedas, +${k}% perda`,needs:n=>`Pede ${n}×${n}`,unlock:'Liberar',equip:'Equipar',equipped:'Equipado',
     modMult:(m,l)=>`Bônus de moedas ×${m} · perda ao pisar numa mina ${l}%`,floorWord:'Piso',
@@ -2173,9 +2202,11 @@ function floatText(txt,anchor,cls){
   const r=anchor.getBoundingClientRect(),d=document.createElement('div');d.className='floaty '+(cls||'');d.textContent=txt;
   d.style.left=(r.left+r.width/2)+'px';d.style.top=(r.top+r.height/2)+'px';document.body.appendChild(d);setTimeout(()=>d.remove(),1000);
 }
+let botActing=false,botOpened=0;
 function campPay(x,y){ // moedas por casa segura aberta (agrupadas por jogada)
   const n=campCells;campCells=0;if(!n||tutorial)return;
-  const gain=Math.max(1,Math.round(n*cpcVal()*modReward()));
+  let gain=Math.max(1,Math.round(n*cpcVal()*modReward()));
+  if(botActing){gain=Math.max(1,Math.round(gain*botEff()));botOpened+=n}
   const first=camp.total===0;addCoins(gain);floatText('+'+gain,el(x,y),'coin');SFX.coin(n);
   if(first)setTimeout(()=>quip('firstCoin'),700);
 }
@@ -2244,6 +2275,12 @@ function renderCards(){
       if(camp.size>=d.need)cs.push(card({ic:':drone'+(i+1)+':',name:ct('droneName',d.n),sub:ct('droneD',d.every,d.yield)+(camp.drones[i]?` · x${camp.drones[i]}`:''),pr:money(COST.drone(i)),act:'buy:drone'+i,dis:camp.coins<COST.drone(i),cls:ok(COST.drone(i)),desc:ct('droneDesc')}));
       else cs.push(card({ic:':lock:',name:ct('droneName',d.n),sub:ct('droneNeed',SIZES[d.need]),dis:true}));
     });
+    if(camp.size>=BOT_NEED||camp.bot.own){
+      if(!camp.bot.own)cs.push(card({ic:':drone3:',name:ct('botName'),sub:'',pr:money(BOT_COST.buy()),act:'buy:bot',dis:camp.coins<BOT_COST.buy(),cls:ok(BOT_COST.buy()),tip:ct('botBuyD'),desc:ct('botBuyD')}));
+      else[['spd',':hammer:',botMineMs,'botSpdD'],['rch',':clock:',botRestMs,'botRchD']].forEach(([k,ic,f,d])=>{
+        const l=camp.bot[k];cs.push(l>=BOT_MAX[k]?card({ic,name:ct('bot'+k[0].toUpperCase()+k.slice(1)),sub:ct('max'),dis:true,desc:ct(d,fmtS(f()))}):card({ic,name:ct('bot'+k[0].toUpperCase()+k.slice(1)),sub:ct('lvl',l+1),pr:money(BOT_COST[k]()),act:'buy:bot'+k,dis:camp.coins<BOT_COST[k](),cls:ok(BOT_COST[k]()),desc:ct(d,fmtS(f()))}))});
+      if(camp.bot.own)cs.push(camp.bot.eff<BOT_MAX.eff?card({ic:':star:',name:ct('botEff'),sub:ct('lvl',camp.bot.eff+1),pr:money(BOT_COST.eff()),act:'buy:boteff',dis:camp.coins<BOT_COST.eff(),cls:ok(BOT_COST.eff()),desc:ct('botEffD',Math.round(botEff()*100))}):card({ic:':star:',name:ct('botEff'),sub:ct('max'),dis:true,desc:ct('botEffD',Math.round(botEff()*100))}));
+    }
   }else if(curTab==='loadout'){
     info.textContent=ct('modMult',modReward().toFixed(2),lossPct());
     const mk=(k,m,nm,isFloor)=>{const ds=((isFloor?FLOORS[k]:MODES[k])||{}).desc||'';const un=camp.un[k],okSize=SIZES[camp.size]>=m.min,on=isFloor?camp.eqFloor===k:camp.eq[k];
@@ -2261,6 +2298,8 @@ function buyItem(key){
   else if(key==='clear'){c=COST.clear();if(camp.coins>=c){camp.clear++;ok=true}}
   else if(key==='cool'&&camp.cool<8){c=COST.cool();if(camp.coins>=c){camp.cool++;ok=true}}
   else if(key==='shield'&&camp.shields<5){c=COST.shield();if(camp.coins>=c){camp.shields++;camp.shieldBought++;ok=true}}
+  else if(key==='bot'){c=BOT_COST.buy();if(!camp.bot.own&&camp.coins>=c){camp.bot.own=true;ok=true;setTimeout(()=>sayText(ct('botBought'),'😏',false),300)}}
+  else if(key==='botspd'||key==='botrch'||key==='boteff'){const k=key.slice(3);c=BOT_COST[k]();if(camp.bot.own&&camp.bot[k]<BOT_MAX[k]&&camp.coins>=c){camp.bot[k]++;ok=true}}
   else if(key.startsWith('drone')){const i=+key.slice(5);c=COST.drone(i);if(camp.coins>=c&&camp.size>=DRONES[i].need){camp.drones[i]++;ok=true;quip('drone')}}
   else if(key.startsWith('unl:')){const k=key.slice(4),m=MODS[k]||FMODS[k];c=m.cost;if(!camp.un[k]&&camp.coins>=c){camp.un[k]=true;ok=true;quip('unlock')}}
   if(!ok)return;camp.coins-=c;SFX.buy();saveCamp();setCoins();renderYard();checkUnlocks();
@@ -2343,6 +2382,80 @@ async function bossCine(){
   document.addEventListener('mouseleave',()=>cur.classList.remove('on'));
   document.addEventListener('mouseenter',()=>{if(on)cur.classList.add('on')});
 })();
+/* ---------- robô minerador: só abre blocos provadamente seguros ---------- */
+function botSolve(){
+  const N=C*R,dmin=has('negative')?(has('multi')?-3:-1):0,dmax=has('multi')?3:1,mi=has('mirror')?mirrorOf:null;
+  const lo=new Int8Array(N).fill(dmin),hi=new Int8Array(N).fill(dmax),op=new Uint8Array(N),cons=[];
+  for(let i=0;i<N;i++)if(grid[i/C|0][i%C].o){op[i]=1;lo[i]=hi[i]=0}
+  const sync=j=>{if(mi&&mi[j]!==j){const t=mi[j],nl=Math.max(lo[t],lo[j]),nh=Math.min(hi[t],hi[j]);lo[t]=lo[j]=nl;hi[t]=hi[j]=nh}};
+  for(let i=0;i<N;i++)sync(i);
+  for(let i=0;i<N;i++)if(op[i]){const v=NA[i].filter(j=>!op[j]);if(v.length)cons.push({v,T:grid[i/C|0][i%C].dn})}
+  const seen=new Set();
+  for(let round=0;round<10;round++){
+    for(let guard=0,any=true;any&&guard<60;guard++){any=false;
+      for(const c of cons){let sl=0,sh=0;for(const j of c.v){sl+=lo[j];sh+=hi[j]}
+        if(c.T<sl||c.T>sh)return [];
+        for(const j of c.v){const nl=Math.max(lo[j],c.T-(sh-hi[j])),nh=Math.min(hi[j],c.T-(sl-lo[j]));
+          if(nl!==lo[j]||nh!==hi[j]){lo[j]=nl;hi[j]=nh;any=true;sync(j)}}}}
+    const norm=[];
+    for(const c of cons){const u=[];let T=c.T;for(const j of c.v){if(lo[j]===hi[j])T-=lo[j];else u.push(j)}if(u.length)norm.push({u,T,set:new Set(u)})}
+    let added=0;
+    if(cons.length<600)for(const A of norm){if(A.u.length>10)continue;
+      for(const B of norm){if(B===A||B.u.length<=A.u.length||!A.u.every(j=>B.set.has(j)))continue;
+        const d=B.u.filter(j=>!A.set.has(j)),key=d.join(',')+':'+(B.T-A.T);if(seen.has(key))continue;seen.add(key);cons.push({v:d,T:B.T-A.T});added++}}
+    if(!added)break;
+  }
+  const out=[];for(let i=0;i<N;i++)if(!op[i]&&lo[i]===0&&hi[i]===0){const g=grid[i/C|0][i%C];if(g.f===0&&g.m===0)out.push(i)} // g.m===0: trava de segurança, nunca abre mina
+  return out;
+}
+const BOT={ph:'off',t0:0,dur:0,tx:-1,ty:-1,cx:0,cy:0,lastSolve:0,spark:0};
+function botCan(){return campaign&&camp&&camp.bot&&camp.bot.own&&!tutorial&&started&&!over&&!campBlock&&!bossOn&&!has('liar')&&!has('partial')&&!has('duel')&&!tideBusy}
+function botPlace(){ // posição do robô (acima do alvo)
+  const bot=$('#rbot'),cr=$('#rcrack');
+  if(BOT.tx<0){const b=$('.boardwrap').getBoundingClientRect();bot.style.left=(b.left+b.width/2)+'px';bot.style.top=(b.top-8)+'px';return}
+  const c=el(BOT.tx,BOT.ty).getBoundingClientRect();
+  const hov=Math.max(34,c.height*.9);bot.style.left=(c.left+c.width/2)+'px';bot.style.top=(c.top+c.height/2-hov)+'px';bot.style.setProperty('--bh',(hov-4)+'px');
+  Object.assign(cr.style,{left:c.left+'px',top:c.top+'px',width:c.width+'px',height:c.height+'px'});
+}
+function botDock(){const bot=$('#rbot');bot.className='';$('#rcrack').style.display='none';BOT.ph='off';BOT.tx=BOT.ty=-1}
+function botStep(){
+  const bot=$('#rbot'),cr=$('#rcrack'),now=performance.now();
+  if(!botCan()){if(BOT.ph!=='off')botDock();return}
+  if(BOT.ph==='off'){BOT.ph='idle';BOT.tx=-1;bot.className='on';botPlace();BOT.lastSolve=0}
+  if(BOT.ph==='idle'){
+    if(now-BOT.lastSolve<350)return;BOT.lastSolve=now;
+    const list=botSolve();
+    if(!list.length){bot.classList.add('need');return}
+    bot.classList.remove('need');
+    let best=list[0],bd=1e9;list.forEach(i=>{const d=Math.hypot(i%C-BOT.cx,(i/C|0)-BOT.cy);if(d<bd){bd=d;best=i}});
+    BOT.tx=best%C;BOT.ty=best/C|0;BOT.cx=BOT.tx;BOT.cy=BOT.ty;BOT.ph='fly';BOT.t0=now;botPlace();
+    cr.className='';cr.style.display='none';return;
+  }
+  const g=BOT.tx>=0?grid[BOT.ty][BOT.tx]:null;
+  if(BOT.ph==='fly'){
+    if(g.o||g.f!==0){BOT.ph='idle';return}
+    if(now-BOT.t0>450){BOT.ph='mine';BOT.t0=now;BOT.dur=botMineMs();bot.classList.add('mine');cr.style.display='block';cr.className='c1';botPlace()}
+    return;
+  }
+  if(BOT.ph==='mine'){
+    if(g.o||g.f!==0){bot.classList.remove('mine');cr.style.display='none';BOT.ph='idle';return}
+    botPlace();
+    const p=Math.min(1,(now-BOT.t0)/BOT.dur);cr.className=p<.34?'c1':p<.67?'c2':'c3';
+    if(now-BOT.spark>110){BOT.spark=now;const r=el(BOT.tx,BOT.ty).getBoundingClientRect();
+      for(let k=0;k<3;k++)parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:(Math.random()-.5)*3,vy:-(.6+Math.random()*2),g:.18,life:1,d:.06,sz:2,c:['#ffd166','#ffffff','#c9bd96'][k],sq:true});loop();if(p<.95)SFX.build(BOT.tx+BOT.ty)}
+    if(p>=1){
+      bot.classList.remove('mine');cr.style.display='none';
+      if(g.m===0){botActing=true;try{move(BOT.tx,BOT.ty)}finally{botActing=false}}
+      BOT.ph='rest';BOT.t0=now;BOT.dur=botRestMs();bot.classList.add('rest');
+    }
+    return;
+  }
+  if(BOT.ph==='rest'){
+    const p=Math.min(1,(now-BOT.t0)/BOT.dur);bot.querySelector('#rbat i').style.width=(p*100)+'%';
+    if(p>=1){bot.classList.remove('rest');BOT.ph='idle'}
+  }
+}
+setInterval(()=>{try{botStep()}catch(e){console.error(e);botDock()}},60);
 /* atalho de demo: Smily x2, bandeira x1, contador de moedas x5 -> chama o boss */
 const DEMO_SEQ=['f','f','m','c','c','c','c','c'];let demoI=0,demoT=0;
 document.addEventListener('click',e=>{
@@ -2369,7 +2482,7 @@ function campNewBoard(build,secs){
   level=n<=4?'easy':n<=6?'medium':n<=9?'hard':'insane';
   const mods=activeMods();cur=new Set(mods.length?mods:['classic']);
   floor=activeFloor()||'square';shapes=isPoly(floor);
-  campCells=0;camp.boards++;
+  campCells=0;botOpened=0;camp.boards++;
   if(!build){clearCool();$('#cool').hidden=true;campBlock=false;hideBuilder()}
   setBoss(boss,!(boss&&build)); // na construção, a borda vermelha só aparece depois das falas
   init();setCoins();
@@ -2398,7 +2511,7 @@ function campAfterLose(){
 function campWin(){
   if(tutorial){over=true;tutFinish();return}
   over=true;
-  const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()));
+  const safe=C*R-countMineCells(),bonus=Math.max(1,Math.round(safe*cpcVal()*.3*clearMult()*modReward()*Math.max(.25,1-botOpened/Math.max(1,safe)*.75)));
   const boss=bossOn,prize=boss?bossPrize():0;
   addCoins(bonus+prize);camp.wins++;camp.streak++;camp.lstreak=0;if(boss)camp.bossWon=(camp.bossWon||0)+1;saveCamp();setFace('😎');
   floatText('+'+fmtC(bonus),$('#coinStat'),'bonus');SFX.win();pixelSparks(cells[cells.length>>1],30,['#4fd8e8','#ff5c93','#ffd166','#ffffff']);
