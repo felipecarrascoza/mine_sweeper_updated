@@ -464,6 +464,7 @@
   @keyframes bump{50%{transform:scale(1.35)}}
   .dot{position:absolute;top:-5px;right:-5px;width:12px;height:12px;background:var(--pink);border:2px solid #000;animation:upd .8s steps(2) infinite}
   .dot[hidden]{display:none}
+  #phase[hidden]{display:none!important}
   #phase{display:none;margin:0 0 6px;font-size:12px;color:var(--muted);text-align:center}
   #game.camp #phase{display:block}
   #phase .pbar{display:block;height:6px;margin-top:4px;background:#030812;border:1px solid var(--line)}
@@ -2060,7 +2061,7 @@ const LINES={
 const CINE_FIRST=[
  [X("Oh. You don't know, do you.","Ah. Você não sabe, né."),'🤨'],
  [X("Every 50 boards, I stop being nice. Okay, I stop being THIS nice.","A cada 50 tabuleiros, eu paro de ser legal. Tá, paro de ser ESSE nível de legal."),'😏'],
- [X("See that counter above the board? It's counting down to the Boss. Yes, I made it. Yes, it's ominous.","Viu o contador em cima do tabuleiro? Ele conta até o Chefe. Sim, fui eu que fiz. Sim, é ameaçador."),'😒'],
+ [X("See that counter above the board? I was hiding it. Now it counts down to the Boss. Yes, it's ominous.","Viu o contador em cima do tabuleiro? Eu estava escondendo. Agora ele conta até o Chefe. Sim, é ameaçador."),'😒'],
  [X("The Boss board has way more mines. Shields don't work. And if you lose... you lose ALL your coins. Every single one.","O tabuleiro Chefe tem bem mais minas. Escudo não funciona. E se você perder... perde TODAS as moedas. Todinhas."),'😈'],
  [X("But if you win, you get a lot. Like, a LOT. I hate that part. Rude.","Mas se ganhar, leva muito. Tipo, MUITO. Eu odeio essa parte. Que grosseria."),'😠'],
  [X("Anyway. Let me finish building. Good luck. You'll need it.","Enfim. Deixa eu terminar de construir. Boa sorte. Você vai precisar."),'😏']];
@@ -2208,8 +2209,10 @@ let bossOn=false;
 const isBossNo=k=>k>0&&k%BOSS_EVERY===0;
 function bossMines(){const n=SIZES[camp.size];return Math.min(n*n-2,Math.ceil(MINES[camp.size]*1.6)+1)}
 function bossPrize(){const safe=C*R-countMineCells(),base=Math.round(safe*cpcVal()*clearMult()*modReward());return Math.max(base*40,Math.round(camp.coins*.6),200)}
+function updatePhaseText(){const t=$('#phaseTxt'),f=$('#phaseFill');const n=((camp.boards-1)%BOSS_EVERY)+1;t.textContent=bossOn?ct('phaseBoss'):ct('phase',n,BOSS_EVERY)+' · '+ct('phaseLeft',BOSS_EVERY-n);f.style.width=(bossOn?100:n/BOSS_EVERY*100)+'%'}
 function updatePhase(){
-  const t=$('#phaseTxt'),f=$('#phaseFill');if(!t||!camp)return;
+  const t=$('#phaseTxt'),f=$('#phaseFill'),ph=$('#phase');if(!t||!camp)return;
+  ph.hidden=!camp.bossSeen; // só aparece depois do primeiro chefe, para não entregar a surpresa
   const n=((camp.boards-1)%BOSS_EVERY)+1;
   t.textContent=bossOn?ct('phaseBoss'):ct('phase',n,BOSS_EVERY)+' · '+ct('phaseLeft',BOSS_EVERY-n);
   f.style.width=(bossOn?100:n/BOSS_EVERY*100)+'%';
@@ -2240,7 +2243,7 @@ async function bossCine(){
   c.hidden=false;c.animate([{opacity:0},{opacity:1}],{duration:350});
   faceEl.style.visibility='hidden';
   await cineFly(true);SFX.talk();
-  for(const [t,m] of lines){cf.textContent=m;await cineSay(RES(t))}
+  for(const [t,m] of lines){cf.textContent=m;if(first&&t===CINE_FIRST[2][0]){$('#phase').hidden=false;updatePhaseText()}await cineSay(RES(t))}
   cf.textContent='😈';
   const sh=cf.animate([{transform:'translateY(0) rotate(-4deg)'},{transform:'translateY(-14px) rotate(4deg)'}],{duration:130,iterations:16,direction:'alternate'});
   $('#cineText').textContent='HA HA HA HA HA';for(let i=0;i<8;i++){SFX.talk();await cineWait(180)}
@@ -2248,7 +2251,7 @@ async function bossCine(){
   await cineFly(false);
   c.animate([{opacity:1},{opacity:0}],{duration:300}).finished.then(()=>{c.hidden=true});
   faceEl.style.visibility='';setFace('😈');
-  camp.bossSeen=true;saveCamp();
+  camp.bossSeen=true;saveCamp();updatePhase();
   await cineWait(250);
 }
 /* atalho de demo: Smily x2, bandeira x1, contador de moedas x5 -> chama o boss */
