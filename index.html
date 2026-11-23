@@ -154,7 +154,10 @@
   .n0{color:#7d8fc2}
   .n1{color:#5bc0ff}.n2{color:#53e69a}.n3{color:#ff6b7a}.n4{color:#c58bff}
   .n5{color:#ffb454}.n6{color:#4fe3e3}.n7{color:#ff7ac8}.n8{color:#e6f0f7}
-  .cell.open[class*=" n"]{text-shadow:-1px 0 #ff5c93aa,1px 0 #4fd8e8aa}
+  .cell.open[class*=" n"]{text-shadow:none}
+  /* números legíveis: a fonte pixel só fica nítida em múltiplos de 8px; sem o brilho colorido que embaralhava o 5 com o 8 */
+  .cell{font-size:round(nearest,calc(var(--cell)*.46),8px);letter-spacing:0;-webkit-font-smoothing:none;font-smooth:never}
+  .cell.long{font-size:round(nearest,calc(var(--cell)*.3),8px)}
   .cell.open.neg{background:#0a2145;box-shadow:inset 0 0 0 2px #2d6fd0}
   /* a pilha de bandeiras/bombas ocupa SEMPRE o mesmo quadrado, centralizado: 1 grande; 2 ou 3 juntas cabem no mesmo espaço */
   #board{--fb:calc(var(--cell)*.74)}
