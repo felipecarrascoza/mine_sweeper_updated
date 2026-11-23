@@ -2834,7 +2834,8 @@ function botOne(b,now,claimed,slot,n){
     return;
   }
   if(b.ph==='mine'){
-    if(g.o||(g.f!==0&&b.act!=='flag')||(b.act==='flag'&&g.f!==0)){botRelease(b);return}
+    if(g.o||g.f!==0){ // alguém abriu/marcou o bloco com o laser ligado: o bot desliga e entra em cooldown
+      botRelease(b);b.ph='rest';b.t0=now;b.dur=restMs(m);bot.classList.add('rest');return}
     botPlace(b,slot,n);
     const p=Math.min(1,(now-b.t0)/b.dur);cr.className='rcrack '+(p<.34?'c1':p<.67?'c2':'c3');
     const cellEl=el(b.tx,b.ty);cellEl.classList.add('botshake');
