@@ -2072,6 +2072,8 @@ function loop(){if(raf)return;raf=requestAnimationFrame(function f(){
 function restart(){if(campaign){quip('poke');SFX.click();return}SFX.click();$('#overlay').classList.remove('show');init()}
 faceEl.onclick=restart;$('#again').onclick=restart;
 $('#flagMode').onclick=e=>{flagMode=!flagMode;e.currentTarget.classList.toggle('on',flagMode)};
+// atalho: tecla F liga/desliga o modo bandeira
+addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;if((e.key==='f'||e.key==='F')&&$('#game').classList.contains('active')&&!/INPUT|TEXTAREA|SELECT/.test((e.target.tagName||''))){const b=$('#flagMode');if(b&&b.offsetParent!==null){b.click();SFX.click();toast(flagMode?(lang==='pt'?'Modo bandeira: LIGADO':'Flag mode: ON'):(lang==='pt'?'Modo bandeira: DESLIGADO':'Flag mode: OFF'))}}});
 addEventListener('keydown',e=>{if((e.key==='r'||e.key==='R')&&$('#game').classList.contains('active'))restart()});
 /* ---------- configurações / idioma ---------- */
 function syncSettings(){
@@ -3109,7 +3111,7 @@ const INTRO_A=[
     {l:X("Why are you smiling?","Por que você está sorrindo?"),m:'🙄',r:X("Default face. Management won't let me change it. I've asked. Twice.","Rosto padrão. A gerência não deixa eu trocar. Eu já pedi. Duas vezes.")},
     {l:X("I'm going to beat you.","Eu vou te vencer."),m:'😐',r:X("Good. Confidence makes the loss so much more... educational.","Ótimo. Confiança faz a derrota ser muito mais... educativa.")}]},
   {m:'🙂',t:X("Quick lesson. Tap a cell to open it. The number says how many mines touch it.","Aula rápida. Toque numa casa para abrir. O número diz quantas minas encostam nela.")},
-  {m:'😬',t:X("Hold your finger (or right-click) to plant a flag. Don't flag what you can't prove. I will laugh. Loudly.","Segure o dedo (ou clique direito) para pôr bandeira. Não marque o que você não consegue provar. Eu vou rir. Alto.")},
+  {m:'😬',t:X("Hold your finger (or right-click) to plant a flag. On a computer you can also press F to toggle flag mode. Don't flag what you can't prove. I will laugh. Loudly.","Segure o dedo (ou clique direito) para pôr bandeira. No computador, também dá para apertar F para ligar/desligar o modo bandeira. Não marque o que você não consegue provar. Eu vou rir. Alto.")},
   {m:'😏',t:X("Every safe cell pays one coin. Clear the board, get a bonus. Yes, I'm generous. It physically hurts.","Cada casa segura paga uma moeda. Limpou o tabuleiro, ganha bônus. Sim, eu sou generoso. Dói fisicamente.")},
   {m:'😈',t:X("Step on a mine and you lose a slice of your coins. Buy shields and I'll look away. Once.","Pisou numa mina, perde uma fatia das moedas. Compre escudos e eu viro o rosto. Uma vez.")},
   {m:'🤨',t:X("Also, there's a developer behind this screen. Hi, boss. Yes, I know you're reading this. Raise my salary.","Aliás, tem um desenvolvedor atrás desta tela. Oi, chefe. Sim, eu sei que você está lendo isso. Aumenta meu salário.")}
@@ -3160,7 +3162,7 @@ const TUT=[
   {act:'tap',t:[0,0],m:'🙂',s:X("Let's do this properly. Tap the glowing cell.","Vamos fazer direito. Toque na casa que está brilhando.")},
   {act:'tap',t:[2,0],m:'😏',s:X("See that 1? Exactly one mine touches that cell. Now tap the other corner.","Viu esse 1? Exatamente uma mina encosta nessa casa. Agora toque no outro canto.")},
   {act:'tap',t:[0,2],m:'🤨',s:X("Another 1. The same mine touches this one too. One more corner.","Outro 1. A mesma mina encosta nesta também. Mais um canto.")},
-  {act:'flag',t:[1,1],m:'😬',s:X("Three cells, one mine. Only one cell touches all three: the middle one. Right-click (or hold) the glowing cell to plant a flag.","Três casas, uma mina. Só uma casa encosta nas três: a do meio. Clique direito (ou segure) na casa brilhante para plantar uma bandeira.")},
+  {act:'flag',t:[1,1],m:'😬',s:X("Three cells, one mine. Only one cell touches all three: the middle one. Right-click (or hold) the glowing cell to plant a flag. Shortcut: press F to toggle flag mode, then tap it.","Três casas, uma mina. Só uma casa encosta nas três: a do meio. Clique direito (ou segure) na casa brilhante para plantar uma bandeira. Atalho: aperte F para ligar o modo bandeira e toque nela.")},
   {act:'tap',t:[0,0],m:'😐',s:X("Flag planted. Now the shortcut: tap a number that already has its flags and I open everything around it. Tap the 1.","Bandeira plantada. Agora o atalho: toque num número que já tem suas bandeiras e eu abro tudo em volta. Toque no 1.")},
   {act:'free',t:null,m:'😏',s:X("Safe, see? Everything else is safe too. Open the rest. Just not the flagged cell.","Seguro, viu? O resto também é seguro. Abra o resto. Só não a casa com bandeira.")}
 ];
