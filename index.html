@@ -3256,6 +3256,7 @@ function botFrame(now,dt){
   const sm=house.querySelectorAll('.smoke');sm.forEach(s=>{s.style.left=(hw*.84)+'px';s.style.top='0px'});
   {const bs=house.querySelector('.bslots');if(bs&&bs.children.length!==assigned.length)bs.innerHTML='<i class="bslot"><i></i></i>'.repeat(assigned.length)}
   list.forEach((m,k)=>{const b=botRT(m);botTick(b,now,dt,k,list.length,P);
+    if(isCave()&&lightState){const ex=b.el.getBoundingClientRect(),cx=ex.left+ex.width/2,cy=ex.top+ex.height*.5,ls=lightState,lit=ls.on&&Math.hypot(cx+scrollX-ls.x,cy+scrollY-ls.y)<=ls.r+P.py*.35;b.el.style.visibility=lit?'':'hidden'}else if(b.el.style.visibility)b.el.style.visibility=''; // no escuro o bot some, igual aos blocos da caverna
     const sl=house.querySelectorAll('.bslot i')[k];if(sl)sl.style.width=(b.ph==='rest'?b.rest*100:(b.ph==='idle'?100:0))+'%'});
   const blindN=isCave()?list.filter(m=>{const b=BOTS[m.id];return b&&b.ph==='idle'&&b.blind}).length:0;
   {const ey=house.querySelector('.eyes');if(ey&&+ey.dataset.n!==blindN){ey.dataset.n=blindN;ey.innerHTML=EYE_SVG.repeat(blindN)}}
