@@ -494,6 +494,7 @@
   #cineHint{color:var(--muted);font-size:11px}
   .rbot{position:absolute;left:0;top:0;z-index:20;pointer-events:none;transform:translate(-50%,-100%);transition:opacity .15s}
   .rbot.in{opacity:0}
+  .rbot.blind .rsp,.rbot.blind .rsp *{animation:none!important} /* sem enxergar, o bot congela a animação */
   .rbot .bleye{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:2px;width:24px;height:16px}
   .rbot .fpk{transform-box:view-box;transform-origin:3px 9px}
   .rbot.plant .fpk{animation:fpPull .62s ease-in-out both}
@@ -3098,7 +3099,7 @@ function botRT(m){
   b.el=e;b.cr=cr;BOTS[m.id]=b;return b;
 }
 const botLit=b=>{if(!isCave()||!curP||b.tx<0)return true;const q=botGrid(curP,b.tx,b.ty);return lightState.on&&Math.hypot(q.x-lightState.x,q.y-lightState.y)<=lightState.r+curP.py*.35}; // na caverna só se cava onde a luz do mouse alcança
-function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.className='bleye';e.innerHTML=EYE_SVG;b.el.appendChild(e);b.eye=e}else if(!on&&b.eye){b.eye.remove();b.eye=null}}
+function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.className='bleye';e.innerHTML=EYE_SVG;b.el.appendChild(e);b.eye=e;b.el.classList.add('blind')}else if(!on&&b.eye){b.eye.remove();b.eye=null;b.el.classList.remove('blind')}}
 function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
 function botDestroy(b){botUnlock(b);b.el.remove();b.cr.remove();delete BOTS[b.m.id]}
 let solveCache={t:-1e9,safe:[],mines:[]};
