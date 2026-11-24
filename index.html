@@ -2875,7 +2875,7 @@ function oreSVG(){ // minério: pedra cinza cobrindo pepitas brilhantes; os peda
 function placeWeeds(sx,sy){
   const N=C*R,s0=sy*C+sx,ban=new Set([s0,...NA[s0]]),c=[],ore=isCave();
   for(let i=0;i<N;i++)if(!ban.has(i))c.push(i);
-  shuffle(c);const k=Math.max(2,Math.round(N*(ore?.1:.12))),h=weedHits();
+  shuffle(c);const k=Math.max(ore?1:2,Math.round(N*(ore?.065:.12))),h=weedHits();
   c.slice(0,k).forEach(i=>{const g=grid[i/C|0][i%C];g.w=g.wmax=h;if(ore)g.ore=1;
     const w=document.createElement('i');w.className='weed'+(ore?' ore':'');w.innerHTML=(ore?oreSVG():weedSVG())+'<b></b>';cells[i].appendChild(w);weedUpdate(i)});
 }
