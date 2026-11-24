@@ -1243,7 +1243,17 @@ const SFX={
   click(){tone(520,.07,'triangle',.1,0,380)},
   menu(){tone(660,.07,'sine',.1);tone(880,.08,'sine',.07,.05)},
   start(){SP.start.forEach((f,i)=>tone(f,.14,'triangle',.11,i*.07))},
-  open(d){tone(340+Math.min(d,16)*30,.09,'sine',.08)},
+  open(d){ // cada mundo tem o seu som ao quebrar um bloco
+    const w=(typeof campaign!=='undefined'&&campaign&&camp)?camp.world:'mine',k=Math.min(d,16);
+    if(w==='grass'){noise(.09,.16,6000,1800);tone(520+k*22,.1,'triangle',.05)} // grama cortada: farfalhar + nota suave
+    else if(w==='forest'){tone(150+k*8,.12,'sine',.12,0,90);tone(900+k*20,.04,'square',.04);noise(.05,.1,1800,500)} // madeira: batida oca + estalo
+    else if(w==='desert'){noise(.16,.2,5200,900);noise(.07,.12,3000,1200,.05);tone(240+k*14,.06,'sine',.03)} // areia seca: crepitar
+    else if(w==='cave'){tone(1250+k*40,.05,'square',.05);tone(210+k*10,.14,'sine',.1,0,110);noise(.06,.12,2600,700);tone(880+k*30,.09,'triangle',.03,.05)} // pedra: clack metálico + eco grave
+    else tone(340+k*30,.09,'sine',.08) // clássico: blip digital
+  },
+  weedBreak(){noise(.2,.22,7000,900);tone(300,.18,'triangle',.06,0,160);tone(620,.1,'triangle',.04,.05)},
+  oreBreak(){tone(1400,.06,'square',.06);tone(180,.2,'sine',.12,0,70);noise(.12,.18,3200,500);[0,.07,.14].forEach((d,i)=>tone(900+i*260,.14,'triangle',.05,d+.05))}, // pedra estala e as gemas tilintam
+  bushBreak(){noise(.22,.24,4500,700);tone(210,.16,'sine',.09,0,110);noise(.1,.14,2000,500,.08)},
   charge(){tone(70,1.3,'sine',.09,0,420);tone(140,1.3,'triangle',.04,0,840)},
   fuseStart(){tone(120,.9,'sawtooth',.06,0,520)},
   tick(k){tone(k%2?520:880,.05,'square',.07)},
@@ -1255,6 +1265,9 @@ const SFX={
   buy(){[520,660,880].forEach((f,i)=>tone(f,.08,'triangle',.08,i*.06))},
   talk(){tone(260+Math.random()*120,.03,'square',.03)},
   tideWarn(){noise(.5,.12,200,700);tone(70,.5,'sawtooth',.05,0,170)},
+  flick(){noise(.07,.2,3200,1400);tone(120,.07,'sawtooth',.07)},
+  lightOut(){noise(.22,.24,2600,260);tone(190,.34,'sawtooth',.08,0,55)},
+  lightOn(){tone(90,.1,'square',.07);noise(.1,.22,1200,3800,.02);tone(540,.16,'triangle',.06,.07)},
   sand(){noise(1.0,.34,1200,6500);noise(1.0,.3,6500,900,.95);tone(70,1.6,'sawtooth',.05,0,40)},
   tideIn(){noise(.85,.3,500,3500);tone(110,.8,'sine',.09,0,520);noise(.9,.2,3200,260,.95)},
   rebuild(){tone(420+Math.random()*380,.05,'square',.04)},
@@ -2851,7 +2864,7 @@ function bushBreak(x,y,byBot){
   const g=grid[y][x],e=el(x,y),b=e.querySelector('.bush');if(b)b.classList.add('cut');bushRoots(); // (g.b ainda=1: as raízes encolhem agora)
   g.b=0;bushRoots();
   const r=e.getBoundingClientRect();
-  for(let k=0;k<20;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#123f1c','#1b5a27','#2c8a3a','#0f3a18'][k%4],sq:true})}loop();SFX.click();
+  for(let k=0;k<20;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:3+(Math.random()*3|0),c:['#123f1c','#1b5a27','#2c8a3a','#0f3a18'][k%4],sq:true})}loop();SFX.bushBreak();
   setTimeout(()=>{if(b&&b.parentNode)b.remove();if(!g.o){const was=botActing;botActing=!!byBot;try{move(x,y)}finally{botActing=was}}},180);
 }
 setInterval(()=>{if(campaign&&camp&&camp.world==='forest'&&cells&&cells.length){cells.forEach((c,i)=>{if(c.querySelector('.bush'))bushRefresh(i)});bushRoots()}},150);
@@ -2889,7 +2902,7 @@ function weedHit(x,y,byBot){
   for(let k=0;k<6;k++)parts.push({x:r.left+r.width/2,y:r.top+r.height*.4,vx:(Math.random()-.5)*5,vy:-(1+Math.random()*3),g:.25,life:1,d:.05,sz:2+(Math.random()*2|0),c:(g.ore?['#8b94a5','#4a5262','#c9d1e0','#6a7384']:['#7bd04f','#2f7f2f','#a6e05a','#3f8f3f'])[k%4],sq:true});loop();
   SFX.click();
   if(g.w>0){w.classList.remove('hit');void w.offsetWidth;w.classList.add('hit');weedUpdate(i);return}
-  g.w=0;g.wmax=0;w.classList.add('cut');
+  g.w=0;g.wmax=0;w.classList.add('cut');if(SFX.weedBreak)SFX[g.ore?'oreBreak':'weedBreak']();
   for(let k=0;k<22;k++){const a=Math.random()*6.283,sp=2+Math.random()*5;parts.push({x:r.left+r.width/2,y:r.top+r.height/2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:.3,life:1,d:.03,sz:2+(Math.random()*3|0),c:(g.ore?['#ffd166','#7fe8ff','#7fff9f','#ff5c93','#ffffff']:['#5cc04a','#276f2c','#3a9a3a','#ffd166','#fff0a0'])[k%5],sq:true})}loop();
   if(g.m===0)campCells+=(g.ore?ORE_BONUS:2); // bônus: quebrar a erva rende 3× o valor da casa
   setTimeout(()=>{if(!g.o){const was=botActing;botActing=!!byBot;try{move(x,y)}finally{botActing=was}}},180);
@@ -2917,12 +2930,19 @@ document.addEventListener('click',e=>{
   const d=e.target.closest&&e.target.closest('#demoWorlds button');if(d)pickWorld(d.dataset.w,true);
 });
 /* ---------- caverna: tabuleiro escuro, só o mouse ilumina ---------- */
-let darkRAF=0,darkX=null,darkY=null;
+let darkRAF=0,darkX=null,darkY=null,lightMul=1,flickBusy=false,nextFlick=Date.now()+12000;
+function lightFlicker(){ // de vez em quando a luz pisca, apaga por um instante e volta (com efeitos sonoros)
+  flickBusy=true;const dark=700+Math.random()*900;
+  const seq=[[0,.35,'flick'],[70,1],[150,.2,'flick'],[230,.9],[320,.1,'flick'],[400,0,'lightOut'],[400+dark,.45,'flick'],[400+dark+90,0],[400+dark+170,.7,'flick'],[400+dark+250,.15],[400+dark+330,1,'lightOn']];
+  seq.forEach(([t,m,sfx])=>setTimeout(()=>{lightMul=m;if(sfx&&SFX[sfx])SFX[sfx]();schedDark()},t));
+  setTimeout(()=>{lightMul=1;flickBusy=false;nextFlick=Date.now()+14000+Math.random()*22000;schedDark()},400+dark+420);
+}
+setInterval(()=>{if(camp&&camp.world==='cave'&&campaign&&!campBlock&&!flickBusy&&Date.now()>nextFlick)lightFlicker()},1000);
 function updateDark(){
   darkRAF=0;const d=$('#cavedark');if(!d||!camp||camp.world!=='cave'||!cells||!cells.length)return;
   const r=d.getBoundingClientRect(),k0=cells[0],k1=cells[1]||k0,pitch=(k1.offsetLeft-k0.offsetLeft)||k0.offsetWidth||36;
   const x=darkX===null?r.width/2:darkX-r.left,y=darkY===null?r.height/2:darkY-r.top;
-  d.style.setProperty('--mx',x.toFixed(0)+'px');d.style.setProperty('--my',y.toFixed(0)+'px');d.style.setProperty('--lr',(pitch*lightRadius()).toFixed(0)+'px');
+  d.style.setProperty('--mx',x.toFixed(0)+'px');d.style.setProperty('--my',y.toFixed(0)+'px');d.style.setProperty('--lr',Math.max(2,pitch*lightRadius()*lightMul).toFixed(0)+'px');
 }
 function schedDark(){if(!darkRAF)darkRAF=requestAnimationFrame(updateDark)}
 addEventListener('pointermove',e=>{darkX=e.clientX;darkY=e.clientY;schedDark()},{passive:true});
@@ -3208,7 +3228,7 @@ function callBoss(){
   });
 }
 function setBoss(on,vis){bossOn=on;if(vis===false)return;const g=$('#game');if(g)g.classList.toggle('boss',on);const t=$('#bossTag');if(t){t.hidden=!on;t.textContent=on?ct('bossTag'):''}}
-function applyWorld(){document.documentElement.dataset.world=camp.world}
+function applyWorld(){document.documentElement.dataset.world=camp.world;if(camp.world!=='cave'){lightMul=1}}
 function campNewBoard(build,secs){
   applyWorld();bushList=[];bushAlive.clear();
   camp.size=sizeIdx(camp.world,camp.boards+1); // o tabuleiro cresce com o progresso no mundo
