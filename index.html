@@ -494,6 +494,7 @@
   #cineHint{color:var(--muted);font-size:11px}
   .rbot{position:absolute;left:0;top:0;z-index:20;pointer-events:none;transform:translate(-50%,-100%);transition:opacity .15s}
   .rbot.in{opacity:0}
+  .rbot .bleye{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);margin-bottom:2px;width:24px;height:16px}
   .rbot .fpk{transform-box:view-box;transform-origin:3px 9px}
   .rbot.plant .fpk{animation:fpPull .62s ease-in-out both}
   @keyframes fpPull{0%{transform:translateY(0)}25%{transform:translate(1px,-3px) rotate(-14deg)}55%{transform:translate(1px,-3px) rotate(-14deg)}100%{transform:translateY(0)}}
@@ -3096,6 +3097,8 @@ function botRT(m){
   const cr=document.createElement('div');cr.className='rcrack';document.body.appendChild(cr);
   b.el=e;b.cr=cr;BOTS[m.id]=b;return b;
 }
+const botLit=b=>{if(!isCave()||!curP||b.tx<0)return true;const q=botGrid(curP,b.tx,b.ty);return lightState.on&&Math.hypot(q.x-lightState.x,q.y-lightState.y)<=lightState.r+curP.py*.35}; // na caverna só se cava onde a luz do mouse alcança
+function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.className='bleye';e.innerHTML=EYE_SVG;b.el.appendChild(e);b.eye=e}else if(!on&&b.eye){b.eye.remove();b.eye=null}}
 function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
 function botDestroy(b){botUnlock(b);b.el.remove();b.cr.remove();delete BOTS[b.m.id]}
 let solveCache={t:-1e9,safe:[],mines:[]};
@@ -3103,7 +3106,6 @@ function botSolveCached(now){if(now-solveCache.t>300){const r=botSolve();solveCa
 function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as habilidades (inteligência); ignora blocos já travados por outro bot
   const hx=(C-1)/2;
   if(!started){let bi=-1,bd=1e9;for(let i=0;i<C*R;i++){const d=Math.hypot(i%C-(C-1)/2,(i/C|0)-(R-1)/2);if(d<bd){bd=d;bi=i}}const g=grid[bi/C|0][bi%C];b.blind=false;if(g.o)return null;
-    if(isCave()&&curP){const q=botGrid(curP,bi%C,bi/C|0);if(!lightState.on||Math.hypot(q.x-lightState.x,q.y-lightState.y)>lightState.r+curP.py*.35){b.blind=true;return null}}
     return g.lk?null:[bi,'start']}
   const S=botSolveCached(now),m=b.m,opts=[];b.blind=false;
   S.safe.forEach(i=>{const g=grid[i/C|0][i%C];if(g.lk||g.o||g.f!==0)return; // a análise vem de um cache de até 0,3 s: confere o estado atual do bloco
@@ -3111,9 +3113,7 @@ function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as
     else if(g.b){if(m.int>=3&&!bushLocked(i%C,i/C|0))opts.push([i,'bush'])}
     else opts.push([i,'open'])});
   if(m.int>=1)S.mines.forEach(i=>{const g=grid[i/C|0][i%C];if(!g.lk&&!g.o&&g.f===0)opts.push([i,'flag'])});
-  let vis=opts;
-  if(isCave()&&curP){const pitch=curP.py;vis=lightState.on?opts.filter(([i])=>{const q=botGrid(curP,i%C,i/C|0);return Math.hypot(q.x-lightState.x,q.y-lightState.y)<=lightState.r+pitch*.35}):[];if(!vis.length&&opts.length)b.blind=true} // na caverna os bots só enxergam blocos iluminados
-  let best=null,bd=1e9;vis.forEach(([i,act])=>{const d=Math.hypot(i%C-hx,(i/C|0)+1);if(d<bd){bd=d;best=[i,act]}});
+  let best=null,bd=1e9;opts.forEach(([i,act])=>{const d=Math.hypot(i%C-hx,(i/C|0)+1);if(d<bd){bd=d;best=[i,act]}});
   return best;
 }
 /* caminho: da porta até a coluna do alvo pelo chão, depois desce a coluna; sobre buracos (blocos já quebrados) usa o jetpack */
@@ -3160,6 +3160,7 @@ function botTick(b,now,dt,k,n,P){
   const m=b.m,el0=b.el,hx=(C-1)/2;
   const sg=botTiers(m);if(sg!==b.sig){b.sig=sg;el0.querySelector('.rsp').innerHTML=minerSVG(m)}
   const H=Math.max(26,Math.min(48,P.py*.85));el0.style.width=(H*16/24)+'px';el0.style.height=H+'px';
+  if(b.eye&&(!(b.ph==='draw'||b.ph==='dig'||b.ph==='plant')||botLit(b)))botEye(b,false);
   if(b.ph==='daze'){ // sentado e confuso até a poeira baixar; depois volta para a oficina
     if(!botDazed()){el0.classList.remove('sit');botAbort(b)}
     else{const pt=botGrid(P,b.gx,b.gy-b.lift);el0.style.left=pt.x+'px';el0.style.top=pt.y+'px';el0.querySelector('.rsp').style.transform=`scaleX(${b.face})`}
@@ -3177,6 +3178,8 @@ function botTick(b,now,dt,k,n,P){
   }
   else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
   else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');b.ph='draw';b.t0=now;el0.classList.add('draw')}}
+  else if((b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&!botLit(b)){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco
+    botEye(b,true);b.t0+=dt;const c=cells[b.ty*C+b.tx];if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
   else if(b.ph==='draw'&&b.act==='flag'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.remove('tl-pick','tl-jack','jh');el0.classList.add('dig','tl-shovel','plant');b.ph='plant';b.t0=now}} // bandeira: só enfia no chão, sem rachadura, sem tremor, sem descanso
   else if(b.ph==='plant'){
     if(now-b.t0>620){
@@ -3193,7 +3196,7 @@ function botTick(b,now,dt,k,n,P){
   else if(b.ph==='draw'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.add('dig');{const pwl=Math.min(9,m.pwr||0),kd=pwl>=5?'jack':pwl>=2?'pick':'shovel';el0.classList.remove('tl-shovel','tl-pick','tl-jack','jh');el0.classList.add('tl-'+kd);if(kd==='jack')el0.classList.add('jh');b.kind=kd}b.ph='dig';b.t0=now;b.dur=b.act==='weed'?mineMs(m)*.3:b.act==='flag'?mineMs(m)*.25:mineMs(m);b.cr.style.display='block'}}
   else if(b.ph==='dig'){
     const g=grid[b.ty][b.tx],cellEl=cells[b.ty*C+b.tx];
-    const p=Math.min(1,(now-b.t0)/b.dur);b.cr.className='rcrack '+(p<.34?'c1':p<.67?'c2':'c3');
+    b.cr.style.display='block';const p=Math.min(1,(now-b.t0)/b.dur);b.cr.className='rcrack '+(p<.34?'c1':p<.67?'c2':'c3');
     const r=cellEl.getBoundingClientRect();Object.assign(b.cr.style,{left:(r.left+scrollX)+'px',top:(r.top+scrollY)+'px',width:r.width+'px',height:r.height+'px'});
     cellEl.classList.add('botshake');
     { // a cada golpe da pá no chão (42% do ciclo de 560 ms) sai terra do bloco
