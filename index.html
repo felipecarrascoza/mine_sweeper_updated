@@ -494,6 +494,9 @@
   #cineHint{color:var(--muted);font-size:11px}
   .rbot{position:absolute;left:0;top:0;z-index:20;pointer-events:none;transform:translate(-50%,-100%);transition:opacity .15s}
   .rbot.in{opacity:0}
+  .rbot .fpk{transform-box:view-box;transform-origin:3px 9px}
+  .rbot.plant .fpk{animation:fpPull .62s ease-in-out both}
+  @keyframes fpPull{0%{transform:translateY(0)}25%{transform:translate(1px,-3px) rotate(-14deg)}55%{transform:translate(1px,-3px) rotate(-14deg)}100%{transform:translateY(0)}}
   .rbot.sit svg{animation:sitDrop .3s ease-in both}
   .rbot.sit .ll{transform:rotate(82deg)}.rbot.sit .lr{transform:rotate(68deg)}.rbot.sit .ar{transform:rotate(25deg)}
   .rbot.sit::after{content:'? ?';position:absolute;left:50%;top:-14px;transform:translateX(-50%);font:700 11px var(--pix),monospace;color:#ffd166;text-shadow:1px 1px #000;white-space:nowrap;animation:dizzy .9s ease-in-out infinite alternate}
@@ -2359,7 +2362,7 @@ function loadCamp(){
   }
   Object.values(camp.ws).forEach(w=>{delete w.boards});
   WORLDS.forEach(w=>{camp.ws[w.id].size=sizeIdx(w.id,camp.boards+1)});
-  {const own=WORLDS.filter(w=>camp.worlds[w.id]).map(w=>w.id);own.forEach(w=>{camp.miners.filter(m=>m.world===w).slice(2).forEach(m=>{const t=own.find(x=>camp.miners.filter(q=>q.world===x).length<2);if(t)m.world=t})})}
+  {const own=WORLDS.filter(w=>camp.worlds[w.id]).map(w=>w.id);own.forEach(w=>{camp.miners.filter(m=>m.world===w).slice(PER_WORLD).forEach(m=>{const t=own.find(x=>camp.miners.filter(q=>q.world===x).length<PER_WORLD);if(t)m.world=t})})}
   camp.miners.forEach(m=>{if(m.pwr===undefined)m.pwr=m.spd||0});
   if(camp.msc!==5){ // bots antigos (fortes) viram 5 bots novos cada, com os mesmos upgrades: a produção total é a mesma
     const old=camp.miners.slice();old.forEach(m=>{for(let k=0;k<4;k++)camp.miners.push({...m,id:++camp.minerSeq,acc:0,bacc:0})});camp.msc=5} // Power novo: quem já tinha Speed mantém a velocidade de mineração
@@ -3038,6 +3041,8 @@ function minerSVG(m){ // bot de perfil (sempre de lado, virado para a direita; o
   if(sp>=5)jp+=R(0,11,2,3,BODY[0])+R(0,11,2,1,BODY[2]);
   if(sp>=7)jp+=R(0,15,2,2,BODY[0]);
   jp+=R(3,17,3,1,SK)+(sp>=3?R(2,17,5,1,SK):'');
+  // pacotinho de bandeiras amarrado em cima do jetpack (só quem tem Intelligence sabe marcar minas)
+  const fpk=(m.int||0)>=1?R(2,6,1,4,'#c0c7d4')+R(3,4,1,6,'#c0c7d4')+R(4,5,1,5,'#c0c7d4')+R(2,6,3,1,'#d9364f')+R(3,4,3,2,'#ff5c93')+R(4,5,2,1,'#d9364f')+R(2,9,4,1,'#b07a2a'):'';
   const flame=R(3,18,3,2,'#ff9a3c')+R(4,20,1,2,'#ffd166')+(sp>=6?R(2,18,5,3,'#ff9a3c')+R(3,21,3,2,'#ffffff'):'');
   const boot=sp>=8?'#ffd166':sp>=1?BODY[2]:SK;
   const legBack=R(6,16,3,5,BODY[1])+R(6,21,4,2,SK)+(sp>=1?R(6,21,4,1,boot):'');
@@ -3046,7 +3051,7 @@ function minerSVG(m){ // bot de perfil (sempre de lado, virado para a direita; o
   const arm=R(8,9,3,5,BODY[0])+R(9,13,3,2,'#c0c7d4');
   const gold=(inc>=1?R(6,15,3,2,'#b07a2a')+R(7,15,1,1,'#ffd166'):'')+(inc>=2?R(6,14,6,1,'#ffd166'):'')+(inc>=3?R(10,10,2,1,'#ffd166'):'')+(inc>=4?R(6,2,7,1,'#ffd166'):'')+(inc>=5?R(11,9,1,1,'#ffffff')+R(5,9,1,1,'#ffd166'):'');
   const shovelHand=T.hand;
-  return `<svg viewBox="0 0 16 24" shape-rendering="crispEdges"><g class="svb">${shovelBack}</g><g class="jp">${jp}</g><g class="fl">${flame}</g><g class="lr">${legBack}</g><g class="tr">${torso}${gold}</g><g class="hd">${head}</g><g class="ll">${legFront}</g><g class="ar">${arm}<g class="svh${pw>=9?' ult':''}">${shovelHand}</g></g></svg>`;
+  return `<svg viewBox="0 0 16 24" shape-rendering="crispEdges"><g class="svb">${shovelBack}</g><g class="jp">${jp}</g><g class="fpk">${fpk}</g><g class="fl">${flame}</g><g class="lr">${legBack}</g><g class="tr">${torso}${gold}</g><g class="hd">${head}</g><g class="ll">${legFront}</g><g class="ar">${arm}<g class="svh${pw>=9?' ult':''}">${shovelHand}</g></g></svg>`;
 }
 const EYE_SVG='<i class="beye"><svg viewBox="0 0 14 9" shape-rendering="crispEdges"><rect x="3" y="1" width="8" height="1" fill="#e4ecf8"/><rect x="1" y="2" width="12" height="5" fill="#e4ecf8"/><rect x="3" y="7" width="8" height="1" fill="#e4ecf8"/><rect x="5" y="2" width="4" height="5" fill="#2b3550"/><rect x="6" y="3" width="2" height="3" fill="#4fd8e8"/><rect x="1" y="7" width="2" height="1" fill="#ff4d5e"/><rect x="3" y="6" width="2" height="1" fill="#ff4d5e"/><rect x="5" y="4" width="4" height="1" fill="#ff4d5e"/><rect x="9" y="2" width="2" height="1" fill="#ff4d5e"/><rect x="11" y="1" width="2" height="1" fill="#ff4d5e"/></svg></i>'; // olho riscado = bot sem luz
 function houseSVG(){ // oficina mecânica dos bots: garagem de metal com portão, placa de engrenagem, ferramentas e barril de óleo
@@ -3105,7 +3110,7 @@ function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as
     if(g.w>0){if(m.int>=2)opts.push([i,'weed'])}
     else if(g.b){if(m.int>=3&&!bushLocked(i%C,i/C|0))opts.push([i,'bush'])}
     else opts.push([i,'open'])});
-  if(!opts.length&&m.int>=1)S.mines.forEach(i=>{const g=grid[i/C|0][i%C];if(!g.lk&&!g.o&&g.f===0)opts.push([i,'flag'])});
+  if(m.int>=1)S.mines.forEach(i=>{const g=grid[i/C|0][i%C];if(!g.lk&&!g.o&&g.f===0)opts.push([i,'flag'])});
   let vis=opts;
   if(isCave()&&curP){const pitch=curP.py;vis=lightState.on?opts.filter(([i])=>{const q=botGrid(curP,i%C,i/C|0);return Math.hypot(q.x-lightState.x,q.y-lightState.y)<=lightState.r+pitch*.35}):[];if(!vis.length&&opts.length)b.blind=true} // na caverna os bots só enxergam blocos iluminados
   let best=null,bd=1e9;vis.forEach(([i,act])=>{const d=Math.hypot(i%C-hx,(i/C|0)+1);if(d<bd){bd=d;best=[i,act]}});
@@ -3144,7 +3149,7 @@ function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é 
 }
 function botGrid(P,gx,gy){return {x:P.ox+gx*P.px,y:P.oy+gy*P.py}}
 function botAbort(b){ // o alvo já foi aberto/marcado por outro meio: o bot desiste, solta o bloco e volta para a oficina
-  botUnlock(b);b.cr.style.display='none';b.el.classList.remove('draw','dig','jh');
+  botUnlock(b);b.cr.style.display='none';b.el.classList.remove('draw','dig','plant','tl-shovel','jh');
   const hx=(C-1)/2,G=BOT_GROUND,col=Math.round(b.gx),rowF=Math.max(0,Math.min(R-1,Math.round(b.gy-.3)));
   let jet=false;if(b.gy>G+.1&&grid[0]&&grid[0][col]){for(let r=0;r<=rowF;r++)if(grid[r][col].o){jet=true;break}}
   const pts=[];if(b.gy>G+.05)pts.push({gx:b.gx,gy:G,kind:jet?'jet':'walk'});if(Math.abs(b.gx-hx)>.01)pts.push({gx:hx,gy:G,kind:'walk'});
@@ -3159,8 +3164,8 @@ function botTick(b,now,dt,k,n,P){
     if(!botDazed()){el0.classList.remove('sit');botAbort(b)}
     else{const pt=botGrid(P,b.gx,b.gy-b.lift);el0.style.left=pt.x+'px';el0.style.top=pt.y+'px';el0.querySelector('.rsp').style.transform=`scaleX(${b.face})`}
     return}
-  if(botDazed()&&(b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='back')){
-    botUnlock(b);b.cr.style.display='none';b.tx=b.ty=-1;b.lift=0;b.ph='daze';el0.classList.remove('walk','fly','draw','dig','jh');el0.classList.add('sit');return}
+  if(botDazed()&&(b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant'||b.ph==='back')){
+    botUnlock(b);b.cr.style.display='none';b.tx=b.ty=-1;b.lift=0;b.ph='daze';el0.classList.remove('walk','fly','draw','dig','jh','plant');el0.classList.add('sit');return}
   if(b.ph==='idle'){
     el0.classList.add('in');
     if(botDazed()){b.wait=true;return}
@@ -3170,8 +3175,21 @@ function botTick(b,now,dt,k,n,P){
       else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].lk=m.id; // trava o bloco: ninguém quebra ou interrompe
         b.gx=hx;b.gy=BOT_GROUND;b.path=botPath(b,'out');b.seg=0;b.segL=0;b.face=1;b.ph='out';el0.classList.remove('in');botDoor()}}
   }
-  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
+  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
   else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');b.ph='draw';b.t0=now;el0.classList.add('draw')}}
+  else if(b.ph==='draw'&&b.act==='flag'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.remove('tl-pick','tl-jack','jh');el0.classList.add('dig','tl-shovel','plant');b.ph='plant';b.t0=now}} // bandeira: só enfia no chão, sem rachadura, sem tremor, sem descanso
+  else if(b.ph==='plant'){
+    if(now-b.t0>620){
+      const g=grid[b.ty][b.tx];
+      const was=botActing;botActing=true;try{if(g.m!==0&&!g.o&&g.f===0)toggleFlag(b.tx,b.ty)}finally{botActing=was}
+      el0.classList.remove('dig','tl-shovel','plant');botUnlock(b);const ox=b.tx,oy=b.ty,pk=botPick(b,now);
+      if(pk){ // segue direto para o próximo bloco, sem voltar à casinha
+        const back=botPath(b,'back');if(back.length&&back[back.length-1].gy===BOT_GROUND&&back[back.length-1].gx===(C-1)/2&&ox!==(C-1)/2)back.pop();
+        const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].lk=m.id;
+        b.path=back.concat([{gx:b.tx,gy:BOT_GROUND,kind:'walk'}],botPath(b,'out'));b.seg=0;b.segL=0;b.ph='out'}
+      else{b.path=botPath(b,'back');b.seg=0;b.segL=0;b.ph='back'}
+    }
+  }
   else if(b.ph==='draw'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.add('dig');{const pwl=Math.min(9,m.pwr||0),kd=pwl>=5?'jack':pwl>=2?'pick':'shovel';el0.classList.remove('tl-shovel','tl-pick','tl-jack','jh');el0.classList.add('tl-'+kd);if(kd==='jack')el0.classList.add('jh');b.kind=kd}b.ph='dig';b.t0=now;b.dur=b.act==='weed'?mineMs(m)*.3:b.act==='flag'?mineMs(m)*.25:mineMs(m);b.cr.style.display='block'}}
   else if(b.ph==='dig'){
     const g=grid[b.ty][b.tx],cellEl=cells[b.ty*C+b.tx];
