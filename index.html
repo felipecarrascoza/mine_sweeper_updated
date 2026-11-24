@@ -509,13 +509,15 @@
   .rbot.fly .ll{transform:rotate(20deg)}.rbot.fly .lr{transform:rotate(-8deg)}
   .rbot.fly svg{animation:flyHover .35s ease-in-out infinite alternate}
   .rbot.draw .ar{animation:armDraw .38s ease-out both}
-  .rbot.dig .ar{animation:armDig .26s ease-in-out infinite alternate}
+  .rbot.dig .ar{animation:armDig .56s ease-in-out infinite}
+  .rbot.dig .tr,.rbot.dig .hd,.rbot.dig .jp{animation:leanDig .56s ease-in-out infinite}
   @keyframes walkBob{50%{transform:translateY(-2px)}}
   @keyframes legA{from{transform:rotate(-26deg)}to{transform:rotate(26deg)}}
   @keyframes flameF{50%{opacity:.55;transform:scaleY(1.25)}}
   @keyframes flyHover{to{transform:translateY(-1.5px) rotate(-3deg)}}
   @keyframes armDraw{from{transform:rotate(-170deg)}to{transform:rotate(0)}}
-  @keyframes armDig{from{transform:rotate(-22deg)}to{transform:rotate(20deg)}}
+  @keyframes armDig{0%{transform:rotate(-62deg) translateY(-3px)}30%{transform:rotate(4deg) translateY(1px)}42%{transform:rotate(9deg) translateY(5px)}55%{transform:rotate(9deg) translateY(5px)}80%{transform:rotate(-34deg) translateY(-1px)}100%{transform:rotate(-62deg) translateY(-3px)}}
+  @keyframes leanDig{0%,100%{transform:translate(0,0)}42%,55%{transform:translate(.9px,.5px)}80%{transform:translate(-.3px,0)}}
   #botyard{display:none;position:relative}
   #bhouse{position:absolute;left:0;top:0;z-index:18;pointer-events:none;transform:translate(-50%,-100%)}
   #bhouse svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
@@ -2994,10 +2996,14 @@ function botTick(b,now,dt,k,n,P){
     const p=Math.min(1,(now-b.t0)/b.dur);b.cr.className='rcrack '+(p<.34?'c1':p<.67?'c2':'c3');
     const r=cellEl.getBoundingClientRect();Object.assign(b.cr.style,{left:(r.left+scrollX)+'px',top:(r.top+scrollY)+'px',width:r.width+'px',height:r.height+'px'});
     cellEl.classList.add('botshake');
-    if(now-b.spark>(p<.34?90:p<.67?60:38)){b.spark=now;const st=p<.34?1:p<.67?2:3,hx0=r.left+r.width/2,hy0=r.top+r.height*.3;
-      for(let q=0;q<2+st*2;q++){const a=-Math.PI/2+(Math.random()-.5)*2.6,sp=2.5+Math.random()*(3+st*1.5);
-        parts.push({x:hx0+(Math.random()-.5)*r.width*.4,y:hy0,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,g:.28,life:1,d:.055+Math.random()*.03,sz:2+(Math.random()<.3?1:0),c:['#c9bd96','#8b5a2b','#ffd166','#ffffff'][q%4],sq:true})}
-      loop();if(p<.95)SFX.build(b.tx+b.ty)}
+    { // a cada golpe da pá no chão (42% do ciclo de 560 ms) sai terra do bloco
+      const ph=((now-b.t0)%560)/560;
+      if(ph>.4&&!b.hit){b.hit=1;const st=p<.34?1:p<.67?2:3,hx0=r.left+r.width/2,hy0=r.top+r.height*.45;
+        for(let q=0;q<5+st*2;q++){const a=-Math.PI/2+(Math.random()-.5)*2.2,sp=2+Math.random()*(2.5+st);
+          parts.push({x:hx0+(Math.random()-.5)*r.width*.5,y:hy0,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,g:.3,life:1,d:.04+Math.random()*.03,sz:2+(Math.random()*2|0),c:['#8b5a2b','#6b4423','#c9bd96','#3a2410','#2f6fb0','#4a8fd0'][q%6],sq:true})}
+        loop();SFX.build(b.tx+b.ty)}
+      else if(ph<.3)b.hit=0;
+    }
     if(p>=1){
       cellEl.classList.remove('botshake');b.cr.style.display='none';
       const was={a:botActing,e:botEffNow};botActing=true;botEffNow=minerEff(m);
