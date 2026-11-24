@@ -1905,7 +1905,7 @@ function move(x,y,loud){
   const gain=opened-before,fresh=seenCount-seen0;
   if(has('duel')&&fresh>0){scores[turn]+=fresh;updateDuel()}
   if(pendingWin){pendingWin=false;return win()}
-  if(gain>0&&has('tide')){moves++;updateTide();if(moves%TIDE[level]===0)startTide()}
+  if(gain>0&&has('tide')&&!botActing){moves++;updateTide();if(moves%TIDE[level]===0)startTide()} // jogadas de bots não contam: a tempestade (que sacode a tela toda) só vem das jogadas do jogador
   if(has('duel')&&gain>0)passTurn();
 }
 function reveal(x,y,loud){
