@@ -2959,7 +2959,7 @@ function updateDark(){
   const x=darkX===null?r.width/2:darkX-r.left,y=darkY===null?r.height/2:darkY-r.top;
   const lrad=Math.max(2,pitch*lightRadius()*lightMul);
   d.style.setProperty('--mx',x.toFixed(0)+'px');d.style.setProperty('--my',y.toFixed(0)+'px');d.style.setProperty('--lr',lrad.toFixed(0)+'px');
-  lightState={x:r.left+scrollX+x,y:r.top+scrollY+y,r:lrad,on:darkX!==null&&lightMul>.15&&!flickBusy}; // piscando = sem luz para os bots; para os bots: só enxergam o que a luz do mouse ilumina
+  lightState={x:r.left+scrollX+x,y:r.top+scrollY+y,r:lrad,on:darkX!==null&&lightMul>.15&&!flickBusy,v:darkX!==null}; // piscando = sem luz para os bots; para os bots: só enxergam o que a luz do mouse ilumina
 }
 function schedDark(){if(!darkRAF)darkRAF=requestAnimationFrame(updateDark)}
 addEventListener('pointermove',e=>{darkX=e.clientX;darkY=e.clientY;schedDark()},{passive:true});
@@ -3256,7 +3256,11 @@ function botFrame(now,dt){
   const sm=house.querySelectorAll('.smoke');sm.forEach(s=>{s.style.left=(hw*.84)+'px';s.style.top='0px'});
   {const bs=house.querySelector('.bslots');if(bs&&bs.children.length!==assigned.length)bs.innerHTML='<i class="bslot"><i></i></i>'.repeat(assigned.length)}
   list.forEach((m,k)=>{const b=botRT(m);botTick(b,now,dt,k,list.length,P);
-    if(isCave()&&lightState){const ex=b.el.getBoundingClientRect(),cx=ex.left+ex.width/2,cy=ex.top+ex.height*.5,ls=lightState,lit=ls.on&&Math.hypot(cx+scrollX-ls.x,cy+scrollY-ls.y)<=ls.r+P.py*.35;b.el.style.visibility=lit?'':'hidden'}else if(b.el.style.visibility)b.el.style.visibility=''; // no escuro o bot some, igual aos blocos da caverna
+    if(isCave()&&lightState){ // escurece aos poucos, com a mesma curva do gradiente do #cavedark: claro até 55% do raio, quase preto em 82%, preto no raio todo
+      if(b.el.classList.contains('in'))b.el.style.opacity='';
+      else{const ex=b.el.getBoundingClientRect(),ls=lightState,d=Math.hypot(ex.left+ex.width/2+scrollX-ls.x,ex.top+ex.height*.5+scrollY-ls.y),f=ls.v&&ls.r>0?d/ls.r:9;
+        const a=f<=.55?0:f<=.82?.9*(f-.55)/.27:f<=1?.9+.088*(f-.82)/.18:.988;b.el.style.opacity=a>=.95?'0':(1-a).toFixed(2)}
+    }else if(b.el.style.opacity)b.el.style.opacity=''; // no escuro o bot some aos poucos, igual aos blocos da caverna
     const sl=house.querySelectorAll('.bslot i')[k];if(sl)sl.style.width=(b.ph==='rest'?b.rest*100:(b.ph==='idle'?100:0))+'%'});
   const blindN=isCave()?list.filter(m=>{const b=BOTS[m.id];return b&&b.ph==='idle'&&b.blind}).length:0;
   {const ey=house.querySelector('.eyes');if(ey&&+ey.dataset.n!==blindN){ey.dataset.n=blindN;ey.innerHTML=EYE_SVG.repeat(blindN)}}
