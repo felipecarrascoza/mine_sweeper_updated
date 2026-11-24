@@ -160,6 +160,8 @@
   .cell.long{font-size:round(nearest,calc(var(--cell)*.3),8px)}
   .dgs{display:inline-flex;align-items:center;gap:calc(var(--cell)/36);pointer-events:none}
   .dg{height:max(14px,round(down,calc(var(--cell)*.4),7px));aspect-ratio:5/7;width:auto;display:block;shape-rendering:crispEdges}
+  .dgs.sm{display:inline-flex;gap:1px;vertical-align:0;margin:0 1px}
+  .dgs.sm .dg{height:7px;width:5px}
   .cell.long .dg{height:max(7px,round(down,calc(var(--cell)*.26),7px))}
   .cell.open.neg{background:#0a2145;box-shadow:inset 0 0 0 2px #2d6fd0}
   /* a pilha de bandeiras/bombas ocupa SEMPRE o mesmo quadrado, centralizado: 1 grande; 2 ou 3 juntas cabem no mesmo espaço */
@@ -1954,6 +1956,7 @@ const DG={'0':'01110 10001 10001 10001 10001 10001 01110','1':'00100 01100 00100
 const DGC={};
 function dgSVG(ch){if(DGC[ch])return DGC[ch];const rows=DG[ch].split(' ');let r='';rows.forEach((row,y)=>{let x=0;while(x<5){if(row[x]==='1'){let w=1;while(x+w<5&&row[x+w]==='1')w++;r+=`<rect x="${x}" y="${y}" width="${w}" height="1"/>`;x+=w}else x++}});return DGC[ch]=`<svg class="dg" viewBox="0 0 5 7" shape-rendering="crispEdges" fill="currentColor">${r}</svg>`}
 const numHTML=t=>/^-?\d+$/.test(t)?`<span class="dgs">${[...t].map(dgSVG).join('')}</span>`:null;
+const pxn=t=>String(t).replace(/\d+/g,m=>`<span class="dgs sm">${[...m].map(dgSVG).join('')}</span>`); // números pequenos da interface em pixels desenhados à mão (5 ≠ S)
 function openCell(x,y,d){
   const g=grid[y][x],e=el(x,y);g.b=0;opened++;
   if(!g.seen){g.seen=true;seenCount++;if(campaign)campCells++}
@@ -2701,9 +2704,9 @@ function updatePhase(){ // linha em cima do tabuleiro: vai sendo completada a ca
   const ir=$('#phaseIcR');ir.classList.toggle('dim',!done&&!!nx&&!camp.worlds[nx]);
   ir.innerHTML=done?'∞':(nx?worldOf(nx).ic:':lock:');
   if(bossNow)t.textContent=ct('phaseBoss');
-  else if(done)t.textContent=ct('phaseInf',n);
+  else if(done)t.innerHTML=pxn(ct('phaseInf',n));
   else{const nn=Math.max(segStart(w),Math.min(n,thr)); // texto e barra usam o mesmo número, dentro da faixa deste mundo
-    t.textContent=ct('phase',nn,thr,SIZES[sizeIdx(w,nn)])+' · '+ct('phaseLeft',Math.max(0,thr-nn));
+    t.innerHTML=pxn(ct('phase',nn,thr,SIZES[sizeIdx(w,nn)])+' · '+ct('phaseLeft',Math.max(0,thr-nn)));
     f.style.width=(bossNow?100:Math.max(0,Math.min(100,(nn-segStart(w))/segLen(w)*100)))+'%'}
   if(bossNow||done)f.style.width='100%';
 }
@@ -2936,7 +2939,7 @@ function weedHit(x,y,byBot){
 function renderWorlds(){
   const box=$('#worlds');if(!box||!camp)return;
   box.innerHTML=`<div class="wt">${ct('wTitle')}</div>`+WORLDS.map(w=>{const own=!!camp.worlds[w.id],nm=ct(WN[w.id]);
-    return `<button class="wl${camp.world===w.id?' sel':''}${own?'':' lock'}${(frontier()===w.id&&camp.world!==w.id&&bossPending())?' alert':''}" data-world="${w.id}">${own?w.ic:':lock:'}<b>${nm}</b><small>${own?'×'+w.mult+(worldCleared(w.id)?' · ∞':''):ct('wBossTag',BOSS_AT[PREV[w.id]])}</small></button>`}).join('');
+    return `<button class="wl${camp.world===w.id?' sel':''}${own?'':' lock'}${(frontier()===w.id&&camp.world!==w.id&&bossPending())?' alert':''}" data-world="${w.id}">${own?w.ic:':lock:'}<b>${nm}</b><small>${own?'×'+w.mult+(worldCleared(w.id)?' · ∞':''):pxn(ct('wBossTag',BOSS_AT[PREV[w.id]]))}</small></button>`}).join('');
   document.querySelectorAll('#demoWorlds button').forEach(b=>{b.textContent=ct(WN[b.dataset.w])});
 }
 function pickWorld(id,force){
