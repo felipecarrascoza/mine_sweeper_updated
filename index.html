@@ -3098,7 +3098,11 @@ function botRT(m){
   const cr=document.createElement('div');cr.className='rcrack';document.body.appendChild(cr);
   b.el=e;b.cr=cr;BOTS[m.id]=b;return b;
 }
-const botLit=b=>{if(!isCave()||!curP||b.tx<0)return true;const q=botGrid(curP,b.tx,b.ty);return lightState.on&&Math.hypot(q.x-lightState.x,q.y-lightState.y)<=lightState.r+curP.py*.35}; // na caverna só se cava onde a luz do mouse alcança
+const botLit=b=>{ // o bot só trabalha se a luz cobre mais da metade do quadrado do bloco (amostra 5x5 pontos dentro do raio de luz visível)
+  if(!isCave()||!curP||b.tx<0)return true;if(!lightState.on)return false;
+  const q=botGrid(curP,b.tx,b.ty),L=lightState,R2=(L.r*.82)**2;let n=0;
+  for(let i=0;i<5;i++)for(let j=0;j<5;j++){const x=q.x+((i+.5)/5-.5)*curP.px-L.x,y=q.y+((j+.5)/5-.5)*curP.py-L.y;if(x*x+y*y<=R2)n++}
+  return n>12.5}; // na caverna só se cava onde a luz do mouse alcança
 function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.className='bleye';e.innerHTML=EYE_SVG;b.el.appendChild(e);b.eye=e;b.el.classList.add('blind')}else if(!on&&b.eye){b.eye.remove();b.eye=null;b.el.classList.remove('blind')}}
 function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
 function botDestroy(b){botUnlock(b);b.el.remove();b.cr.remove();delete BOTS[b.m.id]}
