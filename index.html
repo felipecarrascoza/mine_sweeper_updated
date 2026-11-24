@@ -3265,7 +3265,6 @@ function botFrame(now,dt){
       const ex=b.el.getBoundingClientRect(),ls=lightState,w=b.el.offsetWidth||20,rs=b.el.firstChild;
       let lx=ls.x-(ex.left+scrollX);if(b.face===-1)lx=w-lx;
       rs.style.setProperty('--lx',lx.toFixed(1)+'px');rs.style.setProperty('--ly',(ls.y-(ex.top+scrollY)).toFixed(1)+'px');rs.style.setProperty('--lr',((ls.v&&ls.r>0?ls.r:.01)).toFixed(1)+'px');
-      if(b.eye){const d=Math.hypot(ex.left+ex.width/2+scrollX-ls.x,ex.top-8+scrollY-ls.y),f=ls.v&&ls.r>0?d/ls.r:9,a=f<=.55?0:f<=.82?.9*(f-.55)/.27:f<=1?.9+.088*(f-.82)/.18:.988;b.eye.style.opacity=(1-a).toFixed(2)}
     }else{if(b.el.firstChild.style.maskImage)b.el.firstChild.style.removeProperty('--lr')} // fora da caverna não há máscara
     const sl=house.querySelectorAll('.bslot i')[k];if(sl)sl.style.width=(b.ph==='rest'?b.rest*100:(b.ph==='idle'?100:0))+'%'});
   const blindN=isCave()?list.filter(m=>{const b=BOTS[m.id];return b&&b.ph==='idle'&&b.blind}).length:0;
