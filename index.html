@@ -570,9 +570,9 @@
   .mrow .mspr.sm{width:30px;height:44px}
   .mrow .mmid{min-width:0}.mrow .mmid b{display:block;font-size:12px;margin-bottom:3px}
   .mworld.sm{padding:3px 6px;font-size:11px}.mworld.sm .px{width:14px;height:14px}.mworld.sm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mups4{display:grid;grid-template-columns:repeat(4,64px);gap:4px}
-  .mu.sm{padding:3px 2px;gap:1px}.mu.sm b{font-size:10px}.mu.sm .cpr{font-size:10px}
-  @media(max-width:520px){.mups4{grid-template-columns:repeat(2,64px)}}
+  .mups4{display:grid;grid-template-columns:repeat(4,minmax(86px,1fr));gap:4px}
+  .mu.sm{padding:4px 3px;gap:1px}.mu.sm b{font-size:11px;white-space:nowrap}.mu.sm small{font-size:10px}.mu.sm .cpr{font-size:10px}
+  @media(max-width:640px){.mrow{grid-template-columns:34px minmax(0,1fr)}.mups4{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}}
   .mups{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
   .mu{border:2px solid var(--line);background:var(--panel2);padding:6px 4px;text-align:center;font-size:12px;line-height:1.2;cursor:pointer;display:flex;flex-direction:column;gap:3px;align-items:center}
   .mu b{font-size:13px}.mu small{color:var(--muted);font-size:11px}
@@ -2561,7 +2561,7 @@ const minerIcon=()=>`<i class="mic">${minerSVG({spd:0,pwr:0,pow:0,int:0})}</i>`;
 function minerPanel(m){ // linha compacta: com muitos bots a lista precisa caber
   const w=worldOf(m.world),here=m.world===camp.world,tm=fmtS(mineMs(m));
   const up=(k,nm,desc)=>{const l=m[k],mx=MINER_MAX[k],c=l<mx?MINER_COST[k](m):0;
-    return `<button class="mu sm${l<mx&&camp.coins>=c?' ok':''}"${l>=mx||camp.coins<c?' disabled':''} data-mact="mu:${m.id}:${k}" title="${ct(nm)}: ${desc}"><b>${ct(nm+'S')} ${l}</b>${l<mx?`<span class="cpr">${fmtC(c)}</span>`:`<span class="cpr">${ct('max')}</span>`}</button>`};
+    return `<button class="mu sm${l<mx&&camp.coins>=c?' ok':''}"${l>=mx||camp.coins<c?' disabled':''} data-mact="mu:${m.id}:${k}" title="${ct(nm)}: ${desc}"><b>${ct(nm)}</b><small>${l>=mx?ct('max'):ct('lvl',l)}</small>${l<mx?`<span class="cpr">${fmtC(c)}</span>`:''}</button>`};
   return `<div class="mrow"><span class="mspr sm">${minerSVG(m)}</span><div class="mmid"><b>${ct('minerName',m.id)}</b>
     <button class="mworld sm" data-mact="mw:${m.id}" title="${here?ct('mHere'):ct('mAway',fmtC(Math.round(bgRate(m)*60)))}">${w.ic}<span>${ct(WN[w.id])} ${minersIn(w.id)}/${PER_WORLD} · ${tm}</span></button></div>
     <div class="mups4">${up('spd','mSpd',ct('mSpdD',fmtS(restMs(m)),walkV(m).toFixed(1)))}${up('pwr','mPow',ct('mPowD',tm))}${up('pow','mInc',ct('mIncD',Math.round(minerEff(m)*100)))}${up('int','mInt',ct('mIntD')[Math.min(3,m.int)])}</div></div>`;
