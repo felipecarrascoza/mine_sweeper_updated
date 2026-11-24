@@ -760,7 +760,7 @@
   #game.camp .boardwrap{max-height:none;max-width:100%;position:relative}
   #cavedark{display:none;position:absolute;inset:0;pointer-events:none;z-index:8;border-radius:2px;background:radial-gradient(circle var(--lr,70px) at var(--mx,50%) var(--my,50%),rgba(255,214,150,.07) 0,rgba(0,0,0,0) calc(var(--lr,70px)*.55),rgba(2,4,8,.9) calc(var(--lr,70px)*.82),rgba(2,4,8,.988) var(--lr,70px))}
   html[data-world="cave"] #cavedark{display:block}
-  .weed.ore{background:#1b2029;box-shadow:inset 0 0 0 1px #0a0d13}
+  .weed.ore{background:transparent;box-shadow:none}
   .weed.ore b{color:#ffd166}
   #tabs{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;min-height:40px}
   #tabs[hidden]{display:none}
@@ -2864,7 +2864,7 @@ function oreSVG(){ // minério: pedra cinza cobrindo pepitas brilhantes; os peda
   const N=12,ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),f=v=>v.toFixed(2);let ch=Array.from({length:9},()=>'');
   const R=(x,y,c)=>`<rect x="${x}" y="${y}" width="1" height="1" fill="${c}"/>`;
   for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=(x-5.5)/5.6,dy=(y-5.6)/5.2;if(dx*dx+dy*dy>1)continue;
-    const edge=((x-5.5)/4.6)**2+((y-5.6)/4.2)**2>1;const c=edge?'#4a5262':(x+y<9?'#8b94a5':x+y<13?'#7b8494':'#667084');
+    const edge=((x-5.5)/4.6)**2+((y-5.6)/4.2)**2>1;const c=edge?'#2b3140':(x+y<9?'#8b94a5':x+y<13?'#6f788a':'#566072');
     ch[Math.floor(x/4)*3+Math.floor(y/4)]+=R(x,y,c)}
   let h=`<svg viewBox="0 0 ${N} ${N}">`;
   const gems=['#ffd166','#7fe8ff','#7fff9f','#ff5c93'];
