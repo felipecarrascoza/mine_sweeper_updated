@@ -2959,7 +2959,7 @@ function updateDark(){
   const x=darkX===null?r.width/2:darkX-r.left,y=darkY===null?r.height/2:darkY-r.top;
   const lrad=Math.max(2,pitch*lightRadius()*lightMul);
   d.style.setProperty('--mx',x.toFixed(0)+'px');d.style.setProperty('--my',y.toFixed(0)+'px');d.style.setProperty('--lr',lrad.toFixed(0)+'px');
-  lightState={x:r.left+scrollX+x,y:r.top+scrollY+y,r:lrad,on:darkX!==null&&lightMul>.15}; // para os bots: só enxergam o que a luz do mouse ilumina
+  lightState={x:r.left+scrollX+x,y:r.top+scrollY+y,r:lrad,on:darkX!==null&&lightMul>.15&&!flickBusy}; // piscando = sem luz para os bots; para os bots: só enxergam o que a luz do mouse ilumina
 }
 function schedDark(){if(!darkRAF)darkRAF=requestAnimationFrame(updateDark)}
 addEventListener('pointermove',e=>{darkX=e.clientX;darkY=e.clientY;schedDark()},{passive:true});
