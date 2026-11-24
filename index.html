@@ -2278,7 +2278,7 @@ const upMul=()=>worldOf(camp.world).up||1; // upgrades de mundos mais avançados
 const worldOf=id=>WORLDS.find(w=>w.id===id)||WORLDS[0],worldMult=()=>worldOf(camp.world).mult;
 const WEED_BASE=20,ORE_BASE=15,ORE_BONUS=20,isCave=()=>camp.world==='cave';
 const weedBase=()=>isCave()?ORE_BASE:WEED_BASE,weedHits=()=>Math.max(1,weedBase()-camp.weed),weedMax=()=>weedBase()-1,weedCost=()=>Math.round(350*Math.pow(1.42,camp.weed)*upMul());
-const lightRadius=()=>1.7+.3*(camp.light||0),lightCost=()=>Math.round(250*Math.pow(1.5,camp.light||0)*upMul()),LIGHT_MAX=12; // raio da luz do mouse (em blocos)
+const lightRadius=()=>1.2+.3*(camp.light||0),lightCost=()=>Math.round(250*Math.pow(1.5,camp.light||0)*upMul()),LIGHT_MAX=12; // raio da luz do mouse (em blocos)
 const BOT_NEED=3,MINER_MAX={spd:8,pwr:9,pow:5,int:3}; // pow = Income (moedas por bloco); pwr = Power (quebra o bloco mais rápido)
 const PER_WORLD=10,minersIn=(w,except)=>camp.miners.filter(m=>m.world===w&&m!==except).length; // no máximo 2 bots mineradores por mundo
 const roomWorld=(pref,except)=>{const own=WORLDS.filter(w=>camp.worlds[w.id]).map(w=>w.id);return (own.includes(pref)&&minersIn(pref,except)<PER_WORLD)?pref:(own.find(w=>minersIn(w,except)<PER_WORLD)||null)};
