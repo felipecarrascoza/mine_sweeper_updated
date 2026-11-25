@@ -2267,6 +2267,7 @@ const ICONS={
   flag:[".kw.......",".kwrrrr...",".kwrrrrrr.",".kwrrrrrR.",".kwrrrRR..",".kwrRR....",".kw.......",".kw.......",".kw.......","kkkkk....."],
   bomb:[".......oy.","......ko..","....kkkk..","...kGGGGk.","..kGwGGGGk","..kGwGGGGk","..kGGGGGGk","..kGGGGGGk","...kGGGGk.","....kkkk.."],
   star:["....yy....","....yy....","...yyyy...","yyyyyyyyyy",".yyyyyyyy.","..yyyyyy..","..yyyyyy..",".yyyyyyyy.",".yyy..yyy.",".yy....yy."],
+  bulb:["..kkkkkk..",".kyywyyyk.","kyywyyyyYk","kyywyyyyYk","kyyyyyyyYk",".kyyyyyYk.","..kyyyYk..","...kggk...","...kGGk...","....kk...."],
   clock:["..kkkkkk..",".kwwwwwwk.","kwwwwkwwwk","kwwwwkwwwk","kwwwwkkwwk","kwwwwwwwwk","kwwwwwwwwk",".kwwwwwwk.","..kkkkkk..",".........."],
   grid:["cccc.cccc.","cccc.cccc.","cccc.cccc.","cccc.cccc.","..........","cccc.cccc.","cccc.cccc.","cccc.cccc.","cccc.cccc.",".........."],
   lock:["...kkkk...","..kggggk..","..kg..gk..",".kkkkkkkk.",".kyyyyyyk.",".kyyyyyyk.",".kyykkyyk.",".kyykkyyk.",".kyyyyyyk.",".kkkkkkkk."],
@@ -2611,7 +2612,7 @@ function renderCards(){
         :card({ic:':clock:',name:ct('cCool'),sub:ct('max'),dis:true}));
     }
     if(isCave()){cs.push(card({ic:':hammer:',name:ct('orePick'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.weed>=weedMax()||camp.coins<weedCost(),cls:camp.weed<weedMax()?ok(weedCost()):'',desc:ct('orePickD',Math.max(1,weedHits()-1))}));
-      cs.push((camp.light||0)<LIGHT_MAX?card({ic:':star:',name:ct('lamp'),sub:ct('lvl',(camp.light||0)+1),pr:money(lightCost()),act:'buy:light',dis:camp.coins<lightCost(),cls:ok(lightCost()),desc:ct('lampD',(lightRadius()+.3).toFixed(1))}):card({ic:':star:',name:ct('lamp'),sub:ct('max'),dis:true,desc:ct('lampD',lightRadius().toFixed(1))}))}
+      cs.push((camp.light||0)<LIGHT_MAX?card({ic:':bulb:',name:ct('lamp'),sub:ct('lvl',(camp.light||0)+1),pr:money(lightCost()),act:'buy:light',dis:camp.coins<lightCost(),cls:ok(lightCost()),desc:ct('lampD',(lightRadius()+.3).toFixed(1))}):card({ic:':bulb:',name:ct('lamp'),sub:ct('max'),dis:true,desc:ct('lampD',lightRadius().toFixed(1))}))}
     if(camp.world==='grass')cs.push(camp.weed<weedMax()?card({ic:':hammer:',name:ct('weedCut'),sub:ct('lvl',camp.weed+1),pr:money(weedCost()),act:'buy:weed',dis:camp.coins<weedCost(),cls:ok(weedCost()),desc:ct('weedCutD',weedHits()-1)}):card({ic:':hammer:',name:ct('weedCut'),sub:ct('max'),dis:true,desc:ct('weedCutD',weedHits())}));
   }else if(curTab==='items'){
     cs.push(camp.shields<5?card({ic:':shield:',name:ct('cShield'),sub:camp.shields+'/5',pr:money(COST.shield()),act:'buy:shield',dis:camp.coins<COST.shield(),cls:ok(COST.shield()),tip:ct('cShieldD'),desc:ct('cShieldD')})
@@ -3642,7 +3643,7 @@ for(let i=0;i<(isMobile()?10:26);i++){const b=document.createElement('div'),z=2+
 /* ---------- emojis em pixel art: cada emoji vira um sprite 20×20 (sem suavização, poucas cores) ---------- */
 const EMO=/(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|[\u{1F3FB}-\u{1F3FF}])*)/u;
 const EMO_G=new RegExp(EMO.source,'gu');
-const TOKS='wcave|wforest|wdesert|wclassic|wgrass|coin|shield|drone1|drone2|drone3|drone|flag|bomb|star|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot|dirt|pick1|pick2|pick3|pick|stone|crystal|hand';
+const TOKS='wcave|wforest|wdesert|wclassic|wgrass|coin|shield|drone1|drone2|drone3|drone|flag|bomb|star|bulb|clock|grid|lock|gear|spk|spkoff|warn|hammer|vault|depot|dirt|pick1|pick2|pick3|pick|stone|crystal|hand';
 const TOKRE=new RegExp(':('+TOKS+'):'),SPLIT=new RegExp('(:(?:'+TOKS+'):|'+EMO.source.slice(1,-1)+')','u');
 const HAS=v=>EMO.test(v)||TOKRE.test(v);
 const spriteCache=new Map(),spritePix=new Map(),PXN=20;
