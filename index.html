@@ -3180,7 +3180,8 @@ function botTick(b,now,dt,k,n,P){
   const m=b.m,el0=b.el,hx=(C-1)/2;
   const sg=botTiers(m);if(sg!==b.sig){b.sig=sg;el0.querySelector('.rsp').innerHTML=minerSVG(m)}
   const H=Math.max(26,Math.min(48,P.py*.85));el0.style.width=(H*16/24)+'px';el0.style.height=H+'px';
-  if(b.eye&&(!(b.ph==='draw'||b.ph==='dig'||b.ph==='plant')||botLit(b)))botEye(b,false);
+  const frz=isCave()&&(((b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&!botLit(b))||(flickBusy&&(b.ph==='out'||b.ph==='back'))); // sem luz (ou lanterna piscando): o bot congela onde está
+  if(b.eye&&!frz)botEye(b,false);
   if(b.ph==='daze'){ // sentado e confuso até a poeira baixar; depois volta para a oficina
     if(!botDazed()){el0.classList.remove('sit');botAbort(b)}
     else{const pt=botGrid(P,b.gx,b.gy-b.lift);el0.style.left=pt.x+'px';el0.style.top=pt.y+'px';el0.querySelector('.rsp').style.transform=`scaleX(${b.face})`}
@@ -3198,8 +3199,8 @@ function botTick(b,now,dt,k,n,P){
   }
   else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
   else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');b.ph='draw';b.t0=now;el0.classList.add('draw')}}
-  else if((b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&!botLit(b)){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco
-    botEye(b,true);b.t0+=dt;const c=cells[b.ty*C+b.tx];if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
+  else if(frz){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco (e a lanterna parar de piscar)
+    botEye(b,true);b.t0+=dt;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
   else if(b.ph==='draw'&&b.act==='flag'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.remove('tl-pick','tl-jack','jh');el0.classList.add('dig','tl-shovel','plant');b.ph='plant';b.t0=now}} // bandeira: só enfia no chão, sem rachadura, sem tremor, sem descanso
   else if(b.ph==='plant'){
     if(now-b.t0>620){
