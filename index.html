@@ -2327,7 +2327,7 @@ const roomWorld=(pref,except)=>{const own=WORLDS.filter(w=>camp.worlds[w.id]).ma
 // muito mais bots, cada um com 1/5 da força de antes (5 bots juntos = 1 bot antigo): parece mais um jogo idle
 const MINER_COST={buy:()=>Math.round(400*Math.pow(1.3,camp.miners.length)),
   spd:m=>Math.round(200*Math.pow(1.4,m.spd)),pwr:m=>Math.round(230*Math.pow(1.45,m.pwr)),pow:m=>Math.round(400*Math.pow(1.6,m.pow)),int:m=>Math.round(1300*Math.pow(2.2,m.int))};
-const mineMs=m=>Math.round(2500*Math.pow(.88,m.pwr||0)*worldOf(m.world).mult), // quanto mais avançado o mundo, mais demora quebrar o bloco
+const mineMs=m=>Math.round(4000*Math.pow(.88,m.pwr||0)*worldOf(m.world).mult), // quanto mais avançado o mundo, mais demora quebrar o bloco
   restMs=m=>Math.round(2250*Math.pow(.88,m.spd)),minerEff=m=>.2+.028*m.pow,walkV=m=>2.4+.25*m.spd;
 // bots designados a OUTROS mundos continuam minerando em segundo plano (estimativa: resolvem ~60% do tabuleiro sozinhos)
 const bgBoardSecs=m=>{const ws=camp.ws[m.world]||wsNew(),n=SIZES[ws.size],cells=n*n,safe=Math.max(1,cells-MINES[ws.size]),solv=.6*safe;return solv*(mineMs(m)+restMs(m))/1000+cells*coolPer(ws.cool)+8};
