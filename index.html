@@ -3136,21 +3136,32 @@ function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as
   let best=null,bd=1e9;opts.forEach(([i,act])=>{const d=Math.hypot(i%C-hx,(i/C|0)+1);if(d<bd){bd=d;best=[i,act]}});
   return best;
 }
-/* caminho: da porta até a coluna do alvo pelo chão, depois desce a coluna; sobre buracos (blocos já quebrados) usa o jetpack */
-function botPath(b,dir){
-  const hx=(C-1)/2,G=BOT_GROUND,tx=b.tx,ty=b.ty,open=r=>r>=0&&grid[r][tx].o;
-  const kind=(a,c)=>(open(a)||open(c))?'jet':'walk',pts=[];
-  const push=(gx,gy,k)=>{const l=pts[pts.length-1];if(l&&l.kind===k&&((l.gx===gx&&gx===(pts[pts.length-2]?pts[pts.length-2].gx:l.gx))||(l.gy===gy&&pts.length>1&&pts[pts.length-2].gy===gy)))l.gx=gx,l.gy=gy;else pts.push({gx,gy,kind:k})};
-  if(dir==='out'){
-    if(tx!==hx)pts.push({gx:tx,gy:G,kind:'walk'});
-    let prev=-1;for(let r=0;r<=ty;r++){push(tx,r+.3,kind(prev,r));prev=r}
-  }else{
-    for(let r=ty-1;r>=0;r--)push(tx,r+.3,kind(r+1,r));
-    push(tx,G,kind(0,-1));
-    if(tx!==hx)pts.push({gx:hx,gy:G,kind:'walk'});
-  }
-  return pts;
+/* caminho: grade de 4 direções (direita, esquerda, cima, baixo), sem diagonais. A pé quando dá (chão em cima do tabuleiro e casas abertas com apoio embaixo); jetpack só para subir/descer ou atravessar vão sem apoio */
+function botRoute(sx,sy,gx,gy,tgt){
+  const W=C,H=R+1,N=W*H,id=(x,y)=>(y+1)*W+x,dist=new Float64Array(N).fill(1e9),prev=new Int32Array(N).fill(-1),pk=new Array(N),done=new Uint8Array(N);
+  const open=(x,y)=>y<0||grid[y][x].o||(tgt&&x===tgt.x&&y===tgt.y)||(x===sx&&y===sy);
+  const supp=(x,y)=>y<0||y>=R-1||!grid[y+1][x].o;
+  dist[id(sx,sy)]=0;
+  for(;;){let u=-1,bd=1e9;for(let n=0;n<N;n++)if(!done[n]&&dist[n]<bd){bd=dist[n];u=n}
+    if(u<0||u===id(gx,gy))break;done[u]=1;const x=u%W,y=(u/W|0)-1;
+    [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{const nx=x+dx,ny=y+dy;if(nx<0||nx>=W||ny<-1||ny>=R)return;
+      const v=id(nx,ny);if(done[v])return;
+      const kind=dy!==0?'jet':(supp(x,y)&&supp(nx,ny)?'walk':'jet'),c=dist[u]+(kind==='walk'?1:4)+(open(nx,ny)?0:6);
+      if(c<dist[v]){dist[v]=c;prev[v]=u;pk[v]=kind}})}
+  const out=[];let v=id(gx,gy);if(prev[v]<0&&v!==id(sx,sy))return out;
+  while(v!==id(sx,sy)){const x=v%W,y=(v/W|0)-1;out.push({gx:x,gy:y<0?BOT_GROUND:y+.3,kind:pk[v]});v=prev[v]}
+  out.reverse();
+  // junta passos em linha reta com o mesmo tipo de movimento
+  const m=[];out.forEach(p=>{const a=m[m.length-1],b=m[m.length-2];if(a&&b&&a.kind===p.kind&&((a.gx===p.gx&&b.gx===p.gx)||(a.gy===p.gy&&b.gy===p.gy)))m[m.length-1]=p;else m.push(p)});
+  return m;
 }
+const botNode=b=>({x:Math.max(0,Math.min(C-1,Math.round(b.gx))),y:b.gy<=BOT_GROUND+.15?-1:Math.max(0,Math.min(R-1,Math.round(b.gy-.3)))});
+function botPath(b,dir){
+  const hx=(C-1)/2,hc=Math.round(hx),G=BOT_GROUND,pts=[];
+  if(dir==='out'){if(hc!==hx)pts.push({gx:hc,gy:G,kind:'walk'});return pts.concat(botRoute(hc,-1,b.tx,b.ty,{x:b.tx,y:b.ty}))}
+  const n=botNode(b),r=botRoute(n.x,n.y,hc,-1,null);if(hc!==hx)r.push({gx:hx,gy:G,kind:'walk'});return r; // 'back': de onde está até a casinha
+}
+const botChain=(b,nx,ny)=>{const n=botNode(b);return botRoute(n.x,n.y,nx,ny,{x:nx,y:ny})}; // direto para o próximo alvo
 function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é a mesma de andar
   const v0=walkV(b.m);let moving=false,kind='walk',left=dt/1000;
   while(left>1e-6&&b.seg<b.path.length){
@@ -3160,7 +3171,7 @@ function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é 
     const st=Math.min(v*left,b.segL*(1-b.segP));left-=st/v;b.segP+=st/b.segL;moving=true;kind=n.kind;
     b.gx=b.sx+(n.gx-b.sx)*b.segP;b.gy=b.sy+(n.gy-b.sy)*b.segP;
     if(Math.abs(n.gx-b.sx)>1e-6)b.face=n.gx>b.sx?1:-1;
-    b.lift=n.kind==='jet'?Math.sin(Math.PI*b.segP)*Math.min(.7,.2+b.segL*.08):0;
+    b.lift=(n.kind==='jet'&&Math.abs(n.gy-b.sy)<1e-6)?Math.sin(Math.PI*b.segP)*Math.min(.7,.2+b.segL*.08):0; // paira só nos vãos horizontais
     if(b.segP>=.9999){b.gx=n.gx;b.gy=n.gy;b.seg++;b.segL=0}
   }
   b.el.classList.toggle('walk',moving&&kind==='walk');b.el.classList.toggle('fly',moving&&kind==='jet');
@@ -3170,9 +3181,7 @@ function botAdvance(b,dt){ // anda/voa pelo caminho; a velocidade do jetpack é 
 function botGrid(P,gx,gy){return {x:P.ox+gx*P.px,y:P.oy+gy*P.py}}
 function botAbort(b){ // o alvo já foi aberto/marcado por outro meio: o bot desiste, solta o bloco e volta para a oficina
   botUnlock(b);b.cr.style.display='none';b.el.classList.remove('draw','dig','plant','tl-shovel','jh');
-  const hx=(C-1)/2,G=BOT_GROUND,col=Math.round(b.gx),rowF=Math.max(0,Math.min(R-1,Math.round(b.gy-.3)));
-  let jet=false;if(b.gy>G+.1&&grid[0]&&grid[0][col]){for(let r=0;r<=rowF;r++)if(grid[r][col].o){jet=true;break}}
-  const pts=[];if(b.gy>G+.05)pts.push({gx:b.gx,gy:G,kind:jet?'jet':'walk'});if(Math.abs(b.gx-hx)>.01)pts.push({gx:hx,gy:G,kind:'walk'});
+  const pts=botPath(b,'back');
   b.tx=b.ty=-1;b.path=pts;b.seg=0;b.segL=0;b.ph='back';
 }
 function botDoor(){const h=$('#bhouse');h.classList.add('open');clearTimeout(botDoor.t);botDoor.t=setTimeout(()=>h.classList.remove('open'),650)}
@@ -3208,9 +3217,8 @@ function botTick(b,now,dt,k,n,P){
       const was=botActing;botActing=true;try{if(g.m!==0&&!g.o&&g.f===0)toggleFlag(b.tx,b.ty)}finally{botActing=was}
       el0.classList.remove('dig','tl-shovel','plant');botUnlock(b);const ox=b.tx,oy=b.ty,pk=botPick(b,now);
       if(pk){ // segue direto para o próximo bloco, sem voltar à casinha
-        const back=botPath(b,'back');if(back.length&&back[back.length-1].gy===BOT_GROUND&&back[back.length-1].gx===(C-1)/2&&ox!==(C-1)/2)back.pop();
         const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=m.id;
-        b.path=back.concat([{gx:b.tx,gy:BOT_GROUND,kind:'walk'}],botPath(b,'out'));b.seg=0;b.segL=0;b.ph='out'}
+        b.path=botChain(b,b.tx,b.ty);b.seg=0;b.segL=0;b.ph='out'}
       else{b.path=botPath(b,'back');b.seg=0;b.segL=0;b.ph='back';b.noRest=true}
     }
   }
