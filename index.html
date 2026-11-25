@@ -3119,20 +3119,20 @@ const botLit=b=>{ // o bot só trabalha se a luz cobre mais da metade do quadrad
   for(let i=0;i<5;i++)for(let j=0;j<5;j++){const x=q.x+((i+.5)/5-.5)*curP.px-L.x,y=q.y+((j+.5)/5-.5)*curP.py-L.y;if(x*x+y*y<=R2)n++}
   return n>12.5}; // na caverna só se cava onde a luz do mouse alcança
 function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.className='bleye';e.innerHTML=EYE_SVG;b.el.appendChild(e);b.eye=e;b.el.classList.add('blind')}else if(!on&&b.eye){b.eye.remove();b.eye=null;b.el.classList.remove('blind')}}
-function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
+function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].cl===b.m.id)grid[b.ty][b.tx].cl=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
 function botDestroy(b){botUnlock(b);b.el.remove();b.cr.remove();delete BOTS[b.m.id]}
 let solveCache={t:-1e9,safe:[],mines:[]};
 function botSolveCached(now){if(now-solveCache.t>300){const r=botSolve();solveCache={t:now,safe:r.safe,mines:r.mines}}return solveCache}
 function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as habilidades (inteligência); ignora blocos já travados por outro bot
   const hx=(C-1)/2;
   if(!started){let bi=-1,bd=1e9;for(let i=0;i<C*R;i++){const d=Math.hypot(i%C-(C-1)/2,(i/C|0)-(R-1)/2);if(d<bd){bd=d;bi=i}}const g=grid[bi/C|0][bi%C];b.blind=false;if(g.o)return null;
-    return g.lk?null:[bi,'start']}
+    return (g.lk||(g.cl&&g.cl!==b.m.id))?null:[bi,'start']}
   const S=botSolveCached(now),m=b.m,opts=[];b.blind=false;
-  S.safe.forEach(i=>{const g=grid[i/C|0][i%C];if(g.lk||g.o||g.f!==0)return; // a análise vem de um cache de até 0,3 s: confere o estado atual do bloco
+  S.safe.forEach(i=>{const g=grid[i/C|0][i%C];if(g.lk||(g.cl&&g.cl!==m.id)||g.o||g.f!==0)return; // a análise vem de um cache de até 0,3 s: confere o estado atual do bloco
     if(g.w>0){if(m.int>=2)opts.push([i,'weed'])}
     else if(g.b){if(m.int>=3&&!bushLocked(i%C,i/C|0))opts.push([i,'bush'])}
     else opts.push([i,'open'])});
-  if(m.int>=1)S.mines.forEach(i=>{const g=grid[i/C|0][i%C];if(!g.lk&&!g.o&&g.f===0)opts.push([i,'flag'])});
+  if(m.int>=1)S.mines.forEach(i=>{const g=grid[i/C|0][i%C];if(!g.lk&&!(g.cl&&g.cl!==m.id)&&!g.o&&g.f===0)opts.push([i,'flag'])});
   let best=null,bd=1e9;opts.forEach(([i,act])=>{const d=Math.hypot(i%C-hx,(i/C|0)+1);if(d<bd){bd=d;best=[i,act]}});
   return best;
 }
@@ -3194,11 +3194,11 @@ function botTick(b,now,dt,k,n,P){
     const bk=Math.floor(now/350);if(bk!==b.bk){b.bk=bk; // todos tentam na mesma rodada, na ordem da lista: o bot com mais upgrades sai primeiro
       const pk=botPick(b,now);
       if(!pk)b.wait=true;
-      else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].lk=m.id; // trava o bloco: ninguém quebra ou interrompe
+      else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=m.id; // reserva o bloco para outros bots; o jogador só fica proibido de quebrar quando o bot já está em cima dele
         b.gx=hx;b.gy=BOT_GROUND;b.path=botPath(b,'out');b.seg=0;b.segL=0;b.face=1;b.ph='out';el0.classList.remove('in');botDoor()}}
   }
-  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
-  else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');b.ph='draw';b.t0=now;el0.classList.add('draw')}}
+  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act!=='flag'&&grid[b.ty][b.tx].f!==0&&b.ph==='out')||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
+  else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');grid[b.ty][b.tx].lk=m.id;b.ph='draw';b.t0=now;el0.classList.add('draw')}}
   else if(frz){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco (e a lanterna parar de piscar)
     botEye(b,true);b.t0+=dt;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
   else if(b.ph==='draw'&&b.act==='flag'){if(now-b.t0>380){el0.classList.remove('draw');el0.classList.remove('tl-pick','tl-jack','jh');el0.classList.add('dig','tl-shovel','plant');b.ph='plant';b.t0=now}} // bandeira: só enfia no chão, sem rachadura, sem tremor, sem descanso
@@ -3209,7 +3209,7 @@ function botTick(b,now,dt,k,n,P){
       el0.classList.remove('dig','tl-shovel','plant');botUnlock(b);const ox=b.tx,oy=b.ty,pk=botPick(b,now);
       if(pk){ // segue direto para o próximo bloco, sem voltar à casinha
         const back=botPath(b,'back');if(back.length&&back[back.length-1].gy===BOT_GROUND&&back[back.length-1].gx===(C-1)/2&&ox!==(C-1)/2)back.pop();
-        const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].lk=m.id;
+        const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=m.id;
         b.path=back.concat([{gx:b.tx,gy:BOT_GROUND,kind:'walk'}],botPath(b,'out'));b.seg=0;b.segL=0;b.ph='out'}
       else{b.path=botPath(b,'back');b.seg=0;b.segL=0;b.ph='back';b.noRest=true}
     }
@@ -3245,7 +3245,7 @@ function botTick(b,now,dt,k,n,P){
         else if(b.act==='flag'){if(g.m!==0&&g.f===0)toggleFlag(b.tx,b.ty)}
       }finally{botActing=was.a;botEffNow=was.e}
       if(b.act==='weed'&&g.w>0){b.t0=now;b.dur=mineMs(m)*.3;b.cr.style.display='block';return} // continua dando golpes na erva até quebrar
-      grid[b.ty][b.tx].lk=0;el0.classList.remove('dig');b.noRest=false;
+      grid[b.ty][b.tx].lk=0;grid[b.ty][b.tx].cl=0;el0.classList.remove('dig');b.noRest=false;
       b.path=botPath(b,'back');b.seg=0;b.segL=0;b.ph='back';
     }
   }
