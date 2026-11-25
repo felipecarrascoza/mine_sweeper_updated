@@ -2339,6 +2339,7 @@ const bgRate=m=>{
 const frontier=()=>{const w=WORLDS.find(w=>camp.worlds[w.id]&&!camp.cleared[w.id]&&BOSS_AT[w.id]);return w?w.id:null};
 const bossPending=()=>{const f=frontier();return !!f&&camp.boards+1>=BOSS_AT[f]};
 let bgShow=0,bgTick=0;
+const upSum=m=>(m.spd||0)+(m.pwr||0)+(m.pow||0)+(m.int||0);
 const minerById=id=>camp.miners.find(m=>m.id===id);
 const fmtS=ms=>(ms/1000).toFixed(ms<1000?2:1)+'s';
 const DRONES=[{n:'Mk I',every:30,yield:2,need:0},{n:'Mk II',every:60,yield:30,need:2},{n:'Mk III',every:120,yield:300,need:4}];
@@ -3189,7 +3190,7 @@ function botTick(b,now,dt,k,n,P){
   if(b.ph==='idle'){
     el0.classList.add('in');
     if(botDazed()){b.wait=true;return}
-    if(now-b.last>350){b.last=now;
+    const bk=Math.floor(now/350);if(bk!==b.bk){b.bk=bk; // todos tentam na mesma rodada, na ordem da lista: o bot com mais upgrades sai primeiro
       const pk=botPick(b,now);
       if(!pk)b.wait=true;
       else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].lk=m.id; // trava o bloco: ninguém quebra ou interrompe
@@ -3259,7 +3260,7 @@ function botFrame(now,dt){
   if(house.parentNode!==document.body)document.body.appendChild(house); // coordenadas de página, como os bots
   const show=campaign&&camp&&camp.miners.length>0&&cells&&cells.length&&!shapes;
   if(yard)yard.style.display=show?'block':'none';
-  const assigned=show?camp.miners.filter(m=>m.world===camp.world):[],list=(botCan()||(botDazed()&&campaign&&camp&&!tutorial&&!over&&!campBlock&&!bossOn))?assigned:[]; // a oficina fica sempre lá; os bots só saem quando dá para minerar
+  const assigned=show?camp.miners.filter(m=>m.world===camp.world):[],list=(botCan()||(botDazed()&&campaign&&camp&&!tutorial&&!over&&!campBlock&&!bossOn))?assigned.slice().sort((a,b)=>upSum(b)-upSum(a)||a.id-b.id):[]; // a oficina fica sempre lá; os bots só saem quando dá para minerar
   Object.values(BOTS).forEach(b=>{if(!list.includes(b.m))botDestroy(b)});
   if(!show){return}
   const br=boardEl.getBoundingClientRect(),k0=cells[0],k1=cells[1]||k0,kc=cells[C]||k0; // offsets ignoram as animações de escala das casas: a oficina não treme mais
