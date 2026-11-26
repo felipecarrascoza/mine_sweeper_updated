@@ -961,6 +961,19 @@
   <button class="play" id="setOk" data-i18n="close">Close</button></div></div>
 
 <script>
+/* O jogo continua rodando com a aba em segundo plano: o navegador segura timers e animações de abas escondidas,
+   então todos os setTimeout/setInterval passam por um Worker (que não é segurado). Sem Worker, usa os timers normais. */
+(function(){
+  let W=null;
+  try{const src='const T={};onmessage=e=>{const d=e.data;if(d.c){clearTimeout(T[d.i]);clearInterval(T[d.i]);delete T[d.i];return}if(d.r)T[d.i]=setInterval(()=>postMessage(d.i),d.t);else T[d.i]=setTimeout(()=>{delete T[d.i];postMessage(d.i)},d.t)};';
+    W=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));W.onerror=()=>{};}catch(e){W=null}
+  if(!W)return;
+  const cb=new Map(),nT=window.setTimeout.bind(window),nI=window.setInterval.bind(window),nCT=window.clearTimeout.bind(window),nCI=window.clearInterval.bind(window);let seq=1e6;
+  W.onmessage=e=>{const o=cb.get(e.data);if(!o)return;if(!o.r)cb.delete(e.data);try{o.f(...o.a)}catch(err){console.error(err)}};
+  const mk=r=>(f,t,...a)=>{if(typeof f!=='function')return r?nI(f,t):nT(f,t);const i=++seq;cb.set(i,{f,a,r});W.postMessage({i,t:Math.max(0,+t||0),r:r?1:0});return i};
+  const cl=nat=>i=>{if(cb.has(i)){cb.delete(i);W.postMessage({i,c:1})}else nat(i)};
+  window.setTimeout=mk(0);window.setInterval=mk(1);window.clearTimeout=cl(nCT);window.clearInterval=cl(nCI);
+})();
 /* ---------- idiomas (inglês é o padrão) ---------- */
 const X=(en,pt)=>({en,pt});
 let lang='en';
@@ -2976,7 +2989,7 @@ function updateDark(){
   d.style.setProperty('--mx',x.toFixed(0)+'px');d.style.setProperty('--my',y.toFixed(0)+'px');d.style.setProperty('--lr',lrad.toFixed(0)+'px');
   lightState={x:r.left+scrollX+x,y:r.top+scrollY+y,r:lrad,on:darkX!==null&&lightMul>.15&&!flickBusy,v:darkX!==null}; // piscando = sem luz para os bots; para os bots: só enxergam o que a luz do mouse ilumina
 }
-function schedDark(){if(!darkRAF)darkRAF=requestAnimationFrame(updateDark)}
+function schedDark(){if(document.hidden){updateDark();return}if(!darkRAF)darkRAF=requestAnimationFrame(updateDark)}
 addEventListener('pointermove',e=>{darkX=e.clientX;darkY=e.clientY;schedDark()},{passive:true});
 addEventListener('pointerdown',e=>{darkX=e.clientX;darkY=e.clientY;schedDark()},{passive:true});
 setInterval(()=>{if(camp&&camp.world==='cave')schedDark()},400); // acompanha mudanças de tamanho/upgrades
@@ -3122,13 +3135,13 @@ function botEye(b,on){if(on&&!b.eye){const e=document.createElement('div');e.cla
 function botUnlock(b){if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].lk===b.m.id)grid[b.ty][b.tx].lk=0;if(b.tx>=0&&grid&&grid[b.ty]&&grid[b.ty][b.tx]&&grid[b.ty][b.tx].cl===b.m.id)grid[b.ty][b.tx].cl=0;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake')}
 function botDestroy(b){botUnlock(b);b.el.remove();b.cr.remove();delete BOTS[b.m.id]}
 let solveCache={t:-1e9,safe:[],mines:[]};
-function botSolveCached(now){if(now-solveCache.t>300){const r=botSolve();solveCache={t:now,safe:r.safe,mines:r.mines}}return solveCache}
+function botSolveCached(now){if(now-solveCache.t>300||solveCache.g!==genId||solveCache.o!==opened){const r=botSolve();solveCache={t:now,g:genId,o:opened,safe:r.safe,mines:r.mines}}return solveCache} // o cache vale só para o mesmo tabuleiro e o mesmo número de casas abertas (antes um cache velho de outro tabuleiro podia apontar para uma mina)
 function botPick(b,now){ // escolhe o alvo (o mais perto da casinha) conforme as habilidades (inteligência); ignora blocos já travados por outro bot
   const hx=(C-1)/2;
   if(!started){let bi=-1,bd=1e9;for(let i=0;i<C*R;i++){const d=Math.hypot(i%C-(C-1)/2,(i/C|0)-(R-1)/2);if(d<bd){bd=d;bi=i}}const g=grid[bi/C|0][bi%C];b.blind=false;if(g.o)return null;
     return (g.lk||(g.cl&&g.cl!==b.m.id))?null:[bi,'start']}
   const S=botSolveCached(now),m=b.m,opts=[];b.blind=false;
-  S.safe.forEach(i=>{const g=grid[i/C|0][i%C];if(g.lk||(g.cl&&g.cl!==m.id)||g.o||g.f!==0)return; // a análise vem de um cache de até 0,3 s: confere o estado atual do bloco
+  S.safe.forEach(i=>{const g=grid[i/C|0][i%C];if(g.lk||(g.cl&&g.cl!==m.id)||g.o||g.f!==0||g.m!==0)return; // (g.m!==0: confere ao vivo que não é mina) a análise vem de um cache de até 0,3 s: confere o estado atual do bloco
     if(g.w>0){if(m.int>=2)opts.push([i,'weed'])}
     else if(g.b){if(m.int>=3&&!bushLocked(i%C,i/C|0))opts.push([i,'bush'])}
     else opts.push([i,'open'])});
@@ -3212,7 +3225,7 @@ function botTick(b,now,dt,k,n,P){
       else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=m.id; // reserva o bloco para outros bots; o jogador só fica proibido de quebrar quando o bot já está em cima dele
         b.gx=hx;b.gy=BOT_GROUND;b.path=botPath(b,'out');b.seg=0;b.segL=0;b.face=1;b.ph='out';el0.classList.remove('in');botDoor()}}
   }
-  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act!=='flag'&&grid[b.ty][b.tx].f!==0&&b.ph==='out')||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botRetarget(b,now)}
+  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act!=='flag'&&b.act!=='start'&&grid[b.ty][b.tx].m!==0)||(b.act!=='flag'&&grid[b.ty][b.tx].f!==0&&b.ph==='out')||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botRetarget(b,now)}
   else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');grid[b.ty][b.tx].lk=m.id;b.ph='draw';b.t0=now;el0.classList.add('draw')}}
   else if(frz){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco (e a lanterna parar de piscar)
     botEye(b,true);b.t0+=dt;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
@@ -3305,6 +3318,7 @@ function botFrame(now,dt){
 let botLast=0;
 function botLoop(t){requestAnimationFrame(botLoop);const dt=Math.min(80,t-botLast||16);botLast=t;try{botFrame(t,dt)}catch(e){console.error(e);Object.values(BOTS).forEach(botDestroy)}}
 requestAnimationFrame(botLoop);
+setInterval(()=>{if(!document.hidden)return;const t=performance.now(),dt=Math.min(80,t-botLast||16);botLast=t;try{botFrame(t,dt)}catch(e){console.error(e)}},60); // aba escondida: o requestAnimationFrame para, então o relógio do Worker move os bots
 /* atalho de demo: Smily x2, bandeira x1, contador de moedas x5 -> chama o boss */
 const DEMO_SEQ=['f','f','m','c','c','c','c','c'];let demoI=0,demoT=0;
 document.addEventListener('click',e=>{
