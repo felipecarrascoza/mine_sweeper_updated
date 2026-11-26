@@ -3184,6 +3184,12 @@ function botAbort(b){ // o alvo já foi aberto/marcado por outro meio: o bot des
   const pts=botPath(b,'back');
   b.tx=b.ty=-1;b.path=pts;b.seg=0;b.segL=0;b.ph='back';
 }
+function botRetarget(b,now){ // o alvo foi aberto/marcado antes de o bot chegar: procura outro bloco e muda de direção, sem voltar à casinha nem descanso
+  botUnlock(b);b.cr.style.display='none';b.el.classList.remove('draw','dig','plant','tl-shovel','jh');
+  const pk=botPick(b,now);
+  if(pk){const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=b.m.id;b.path=botChain(b,b.tx,b.ty);b.seg=0;b.segL=0;b.ph='out'}
+  else{b.path=botPath(b,'back');b.tx=b.ty=-1;b.seg=0;b.segL=0;b.ph='back';b.noRest=true}
+}
 function botDoor(){const h=$('#bhouse');h.classList.add('open');clearTimeout(botDoor.t);botDoor.t=setTimeout(()=>h.classList.remove('open'),650)}
 function botTick(b,now,dt,k,n,P){
   const m=b.m,el0=b.el,hx=(C-1)/2;
@@ -3206,7 +3212,7 @@ function botTick(b,now,dt,k,n,P){
       else{b.wait=false;const [i,act]=pk;b.tx=i%C;b.ty=i/C|0;b.act=act;grid[b.ty][b.tx].cl=m.id; // reserva o bloco para outros bots; o jogador só fica proibido de quebrar quando o bot já está em cima dele
         b.gx=hx;b.gy=BOT_GROUND;b.path=botPath(b,'out');b.seg=0;b.segL=0;b.face=1;b.ph='out';el0.classList.remove('in');botDoor()}}
   }
-  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act!=='flag'&&grid[b.ty][b.tx].f!==0&&b.ph==='out')||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botAbort(b)}
+  else if((b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&b.tx>=0&&(grid[b.ty][b.tx].o&&b.act!=='flag'||(b.act!=='flag'&&grid[b.ty][b.tx].f!==0&&b.ph==='out')||(b.act==='flag'&&grid[b.ty][b.tx].f!==0))){botRetarget(b,now)}
   else if(b.ph==='out'){if(botAdvance(b,dt)){el0.classList.remove('walk','fly');grid[b.ty][b.tx].lk=m.id;b.ph='draw';b.t0=now;el0.classList.add('draw')}}
   else if(frz){ // escuro: o bot fica parado, de olho cruzado, até a luz do mouse chegar no bloco (e a lanterna parar de piscar)
     botEye(b,true);b.t0+=dt;const c=b.tx>=0?cells[b.ty*C+b.tx]:null;if(c)c.classList.remove('botshake');b.cr.style.display='none';b.hit=0;el0.classList.remove('walk','fly');return}
