@@ -3198,7 +3198,7 @@ function botTick(b,now,dt,k,n,P){
   const frz=isCave()&&(((b.ph==='draw'||b.ph==='dig'||b.ph==='plant')&&!botLit(b))||(flickBusy&&(b.ph==='out'||b.ph==='back'))); // sem luz (ou lanterna piscando): o bot congela onde está
   if(b.eye&&!frz)botEye(b,false);
   if(b.ph==='daze'){ // sentado e confuso até a poeira baixar; depois volta para a oficina
-    if(!botDazed()){el0.classList.remove('sit');botAbort(b)}
+    if(!botDazed()){el0.classList.remove('sit');botRetarget(b,now)} // depois do susto, volta ao trabalho (outro bloco), sem descanso
     else{const pt=botGrid(P,b.gx,b.gy-b.lift);el0.style.left=pt.x+'px';el0.style.top=pt.y+'px';el0.querySelector('.rsp').style.transform=`scaleX(${b.face})`}
     return}
   if(botDazed()&&(b.ph==='out'||b.ph==='draw'||b.ph==='dig'||b.ph==='plant'||b.ph==='back')){
